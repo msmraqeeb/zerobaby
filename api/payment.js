@@ -11,14 +11,24 @@ export default async function handler(req, res) {
     const storeId = process.env.STORE_ID;
     const storePassword = process.env.STORE_PASSWORD;
 
+    // Smarter base URL detection for Vercel vs Local
+    let baseUrl = process.env.VITE_APP_URL;
+    if (!baseUrl || (baseUrl.includes('localhost') && req.headers['host'] && !req.headers['host'].includes('localhost'))) {
+        const protocol = req.headers['x-forwarded-proto'] || 'http';
+        const host = req.headers['host'];
+        baseUrl = `${protocol}://${host}`;
+    }
+
     const data = {
         total_amount: amount,
         currency: 'BDT',
         tran_id: transactionId,
-        success_url: `${process.env.VITE_APP_URL || 'http://localhost:3000'}/order-success/${transactionId}`,
-        fail_url: `${process.env.VITE_APP_URL || 'http://localhost:3000'}/checkout`,
-        cancel_url: `${process.env.VITE_APP_URL || 'http://localhost:3000'}/checkout`,
-        ipn_url: `${process.env.VITE_APP_URL || 'http://localhost:3000'}/api/ipn`,
+        success_url: `${baseUrl}/order-success/${transactionId}`,
+        fail_url: `${baseUrl}/checkout`,
+        cancel_url: `${baseUrl}/checkout`,
+        ipn_url: `${baseUrl}/api/ipn`,
+
+
         shipping_method: 'Courier',
         product_name: 'Grocery Items',
         product_category: 'Grocery',
