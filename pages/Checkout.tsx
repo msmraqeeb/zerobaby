@@ -21,6 +21,8 @@ const Checkout: React.FC = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'online'>('cod');
+
 
   useEffect(() => {
     if (user) {
@@ -64,11 +66,49 @@ const Checkout: React.FC = () => {
     setIsSubmitting(true);
     setCheckoutError(null);
     try {
+      console.log("Placing order with formData:", formData);
       const order = await placeOrder(formData);
+      console.log("Order placed successfully:", order);
+      console.log("Selected Payment Method:", paymentMethod);
+      
+      if (paymentMethod === 'online') {
+        console.log("Initiating online payment for total:", total);
+        try {
+          const response = await fetch('/api/payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              amount: total,
+              transactionId: order.id,
+              customerName: formData.fullName,
+              customerEmail: formData.email,
+              customerPhone: formData.phone
+            })
+          });
+          
+          const data = await response.json();
+          console.log("Payment API Response:", data);
+          if (data.gatewayUrl) {
+            console.log("Redirecting to:", data.gatewayUrl);
+            window.location.href = data.gatewayUrl;
+            return;
+          } else {
+            throw new Error(data.error || 'Failed to initialize payment');
+          }
+
+        } catch (err: any) {
+          console.error("Payment Error:", err);
+          setCheckoutError(`Order placed (ID: ${order.id}), but payment initialization failed: ${err.message}. Please contact support.`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       navigate(`/order-success/${order.id}`, { 
         state: { order },
         replace: true 
       });
+
     } catch (err: any) {
       console.error("Detailed Checkout Error:", err);
       
@@ -179,16 +219,28 @@ const Checkout: React.FC = () => {
             <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 md:p-12">
                <h2 className="text-xl font-black text-gray-800 mb-8 flex items-center gap-4 uppercase tracking-tighter"><span className="w-10 h-10 rounded-2xl bg-[#e6fbf2] text-[#00a651] flex items-center justify-center text-lg font-black border border-emerald-100">02</span>Payment Method</h2>
                <div className="space-y-4">
-                <label className="flex items-center gap-6 p-8 border-2 border-[#00a651] bg-emerald-50/20 rounded-[2rem] cursor-pointer shadow-xl shadow-emerald-50/20 transition-transform active:scale-[0.99]">
-                  <input type="radio" name="payment" defaultChecked className="w-6 h-6 accent-[#00a651]" />
+                <label className={`flex items-center gap-6 p-8 border-2 rounded-[2rem] cursor-pointer transition-all active:scale-[0.99] ${paymentMethod === 'cod' ? 'border-[#00a651] bg-emerald-50/20 shadow-xl shadow-emerald-50/20' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                  <input type="radio" name="payment" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="w-6 h-6 accent-[#00a651]" />
                   <div className="flex-1">
                     <span className="font-black text-gray-800 text-lg block leading-none mb-2">Cash on Delivery</span>
                     <span className="text-xs text-gray-500 font-bold uppercase tracking-[1px]">Standard delivery in 2-3 business days.</span>
                   </div>
-                  <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#00a651] shadow-md">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-colors ${paymentMethod === 'cod' ? 'bg-white text-[#00a651]' : 'bg-gray-50 text-gray-400'}`}>
                     <Truck size={28} />
                   </div>
                 </label>
+
+                <label className={`flex items-center gap-6 p-8 border-2 rounded-[2rem] cursor-pointer transition-all active:scale-[0.99] ${paymentMethod === 'online' ? 'border-[#00a651] bg-emerald-50/20 shadow-xl shadow-emerald-50/20' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                  <input type="radio" name="payment" checked={paymentMethod === 'online'} onChange={() => setPaymentMethod('online')} className="w-6 h-6 accent-[#00a651]" />
+                  <div className="flex-1">
+                    <span className="font-black text-gray-800 text-lg block leading-none mb-2">Online Payment</span>
+                    <span className="text-xs text-gray-500 font-bold uppercase tracking-[1px]">Pay securely with SSLCommerz.</span>
+                  </div>
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-colors ${paymentMethod === 'online' ? 'bg-white text-[#00a651]' : 'bg-gray-50 text-gray-400'}`}>
+                    <CreditCard size={28} />
+                  </div>
+                </label>
+
               </div>
             </div>
           </div>
