@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 
 import { supabase } from '../lib/supabase';
+import { uploadToImageKit } from '../lib/imagekit';
 
 interface RichTextEditorProps {
   value: string;
@@ -59,14 +60,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, label,
 
     try {
       setIsUploading(true);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `content-${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('product-images').upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
-      execCommand('insertImage', data.publicUrl);
+      const url = await uploadToImageKit(file, '/richtext');
+      execCommand('insertImage', url);
     } catch (error: any) {
       alert(`Upload failed: ${error.message}`);
     } finally {

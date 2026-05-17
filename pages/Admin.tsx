@@ -2,6 +2,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { supabase } from '../lib/supabase';
+
 import {
   Package, ShoppingBag, Plus, Trash2, X, ShieldCheck, Pencil,
   Ticket, Eye, Truck, RefreshCw, Layers, Zap, Users as UsersIcon,
@@ -13,6 +14,10 @@ import { Product, Category, Order, Variant, ShippingSettings, Brand, Coupon, Car
 import { PageBuilder } from '../components/PageBuilder';
 import RichTextEditor from '../components/RichTextEditor';
 import { DISTRICT_AREA_DATA } from '../constants';
+import ProductImageUpload from '../components/ProductImageUpload';
+import { uploadToImageKit } from '../lib/imagekit';
+
+
 
 const Admin: React.FC = () => {
   const {
@@ -39,6 +44,7 @@ const Admin: React.FC = () => {
   // Forms Visibility & Data
   const [editingItem, setEditingItem] = useState<{ type: string; data: any } | null>(null);
   const [isAdding, setIsAdding] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
   const [isEditingOrder, setIsEditingOrder] = useState(false);
   const [editingOrderData, setEditingOrderData] = useState<Order | null>(null);
@@ -176,17 +182,21 @@ const Admin: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSupportImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSupportImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
+      setIsUploadingImage(true);
+      try {
+        const url = await uploadToImageKit(file, '/support');
         setStoreForm(prev => ({
           ...prev,
-          floatingWidget: { ...(prev.floatingWidget || {}), supportImage: reader.result as string }
+          floatingWidget: { ...(prev.floatingWidget || {}), supportImage: url }
         }));
-      };
-      reader.readAsDataURL(file);
+      } catch (err: any) {
+        alert('Error uploading image: ' + err.message);
+      } finally {
+        setIsUploadingImage(false);
+      }
     }
   };
 
@@ -721,23 +731,14 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
   const handleSectionBannerImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `${fileName}`;
-
+    setIsUploadingImage(true);
     try {
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
-      setSectionForm({ ...sectionForm, banner: { ...sectionForm.banner!, imageUrl: data.publicUrl } });
+      const url = await uploadToImageKit(file, '/sections');
+      setSectionForm({ ...sectionForm, banner: { ...sectionForm.banner!, imageUrl: url } });
     } catch (error: any) {
       alert('Error uploading image: ' + error.message);
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -763,23 +764,14 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
   const handleBlogImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
-    const fileExt = file.name.split('.').pop();
-    const fileName = `blog-${Math.random()}.${fileExt}`;
-    const filePath = `${fileName}`;
-
+    setIsUploadingImage(true);
     try {
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
-      setBlogForm(prev => ({ ...prev, imageUrl: data.publicUrl }));
+      const url = await uploadToImageKit(file, '/blogs');
+      setBlogForm(prev => ({ ...prev, imageUrl: url }));
     } catch (error: any) {
       alert('Error uploading image: ' + error.message);
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -823,21 +815,14 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
   const handleBrandLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
-    const fileExt = file.name.split('.').pop();
-    const fileName = `brand-${Math.random()}.${fileExt}`;
-    const filePath = `${fileName}`;
-
+    setIsUploadingImage(true);
     try {
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
-      setBrandForm(prev => ({ ...prev, logo_url: data.publicUrl }));
+      const url = await uploadToImageKit(file, '/brands');
+      setBrandForm(prev => ({ ...prev, logo_url: url }));
     } catch (error: any) {
       alert('Error uploading logo: ' + error.message);
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -960,32 +945,29 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
+    setIsUploadingImage(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `store-logo-${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('product-images').upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
-      setStoreForm(prev => ({ ...prev, logo_url: data.publicUrl }));
+      const url = await uploadToImageKit(file, '/store');
+      setStoreForm(prev => ({ ...prev, logo_url: url }));
     } catch (error: any) {
       alert(`Error uploading logo: ${error.message}`);
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
   const handleBannerImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setIsUploadingImage(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `banner-${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('product-images').upload(fileName, file);
-      if (uploadError) throw uploadError;
-      const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
-      setBannerForm(prev => ({ ...prev, image_url: data.publicUrl }));
-    } catch (error: any) { alert(`Error uploading image: ${error.message}`); }
+      const url = await uploadToImageKit(file, '/banners');
+      setBannerForm(prev => ({ ...prev, image_url: url }));
+    } catch (error: any) {
+      alert(`Error uploading image: ${error.message}`);
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const saveOrderEdits = async () => {
@@ -1732,16 +1714,58 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                 <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-10 space-y-8">
                   <div className="space-y-4">
                     <h3 className="text-lg font-bold text-[#1a3a34]">Images</h3>
-                    <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-[#d1e7dd] rounded-2xl bg-[#f9fdfb] py-16 flex flex-col items-center justify-center cursor-pointer hover:bg-[#f0f9f4] transition-all group">
-                      <input type="file" ref={fileInputRef} className="hidden" multiple accept="image/*" onChange={(e) => {
-                        Array.from(e.target.files || []).forEach((file: File) => {
-                          const reader = new FileReader();
-                          reader.onloadend = () => setProdForm(prev => ({ ...prev, images: [...prev.images, reader.result as string] }));
-                          reader.readAsDataURL(file);
-                        });
+                    <div onClick={() => !isUploadingImage && fileInputRef.current?.click()} className={`border-2 border-dashed border-[#d1e7dd] rounded-2xl bg-[#f9fdfb] py-16 flex flex-col items-center justify-center transition-all group ${isUploadingImage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-[#f0f9f4]'}`}>
+                      <input type="file" ref={fileInputRef} className="hidden" multiple accept="image/*" onChange={async (e) => {
+                        const files = Array.from(e.target.files || []);
+                        if (files.length === 0) return;
+                        
+                        setIsUploadingImage(true);
+                        try {
+                          const authRes = await fetch('/api/imagekit-auth');
+                          const authData = await authRes.json();
+                          
+                          const newUrls: string[] = [];
+                          for (const file of files) {
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            formData.append('publicKey', import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY as string);
+                            formData.append('signature', authData.signature);
+                            formData.append('expire', authData.expire.toString());
+                            formData.append('token', authData.token);
+                            formData.append('fileName', file.name);
+                            formData.append('folder', '/products');
+                            
+                            const uploadRes = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+                              method: 'POST',
+                              body: formData,
+                            });
+                            
+                            if (uploadRes.ok) {
+                              const data = await uploadRes.json();
+                              newUrls.push(data.url);
+                            }
+                          }
+                          
+                          setProdForm(prev => ({ ...prev, images: [...prev.images, ...newUrls] }));
+                        } catch (error) {
+                          console.error('Image upload failed', error);
+                          alert('Failed to upload images. Please try again.');
+                        } finally {
+                          setIsUploadingImage(false);
+                          if (fileInputRef.current) fileInputRef.current.value = '';
+                        }
                       }} />
-                      <PlusCircle size={32} className="text-[#00a651] mb-2" />
-                      <p className="text-[#00a651] font-black text-lg">Click to select product images</p>
+                      {isUploadingImage ? (
+                        <>
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00a651] mb-2"></div>
+                          <p className="text-[#00a651] font-black text-lg">Uploading to ImageKit...</p>
+                        </>
+                      ) : (
+                        <>
+                          <PlusCircle size={32} className="text-[#00a651] mb-2" />
+                          <p className="text-[#00a651] font-black text-lg">Click to select product images</p>
+                        </>
+                      )}
                     </div>
                     <div className="flex flex-wrap gap-4">{prodForm.images.map((img, idx) => (<div key={idx} className="relative w-24 h-24 border rounded-xl overflow-hidden p-2"><img src={img} className="w-full h-full object-contain" /><button onClick={() => setProdForm(p => ({ ...p, images: p.images.filter((_, i) => i !== idx) }))} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"><X size={10} /></button></div>))}</div>
                   </div>
@@ -2334,6 +2358,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
           )
         }
       </main >
+      
     </div >
   );
 };

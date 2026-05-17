@@ -28,8 +28,10 @@ const vercelWrapper = (handler) => async (req, res) => {
     }
 };
 
-app.post('/api/payment', vercelWrapper(paymentHandler));
+import imagekitAuthHandler from './api/imagekit-auth.js';
 
+app.post('/api/payment', vercelWrapper(paymentHandler));
+app.get('/api/imagekit-auth', vercelWrapper(imagekitAuthHandler));
 app.listen(PORT, () => {
     console.log(`API Server running on http://localhost:${PORT}`);
 });

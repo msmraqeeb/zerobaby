@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { supabase } from '../lib/supabase';
+import { uploadToImageKit } from '../lib/imagekit';
 
 // --- Types ---
 
@@ -275,12 +276,8 @@ const StoryBlockEditor = ({ data, onChange }: { data: any, onChange: (d: any) =>
         const file = e.target.files?.[0];
         if (!file) return;
         try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `page-asset-${Date.now()}.${fileExt}`;
-            const { error: uploadError } = await supabase.storage.from('product-images').upload(fileName, file);
-            if (uploadError) throw uploadError;
-            const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
-            onChange({ ...data, image_url: urlData.publicUrl });
+            const url = await uploadToImageKit(file, '/pagebuilder');
+            onChange({ ...data, image_url: url });
         } catch (error: any) {
             console.error("Error uploading image:", error);
             alert(`Error uploading image: ${error.message}`);
@@ -340,12 +337,8 @@ const HeroSectionEditor = ({ data, onChange }: { data: any, onChange: (d: any) =
         const file = e.target.files?.[0];
         if (!file) return;
         try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `hero-bg-${Date.now()}.${fileExt}`;
-            const { error: uploadError } = await supabase.storage.from('product-images').upload(fileName, file);
-            if (uploadError) throw uploadError;
-            const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
-            onChange({ ...data, background_url: urlData.publicUrl });
+            const url = await uploadToImageKit(file, '/pagebuilder');
+            onChange({ ...data, background_url: url });
         } catch (error: any) {
             console.error("Error uploading image:", error);
             alert(`Error uploading image: ${error.message}`);
