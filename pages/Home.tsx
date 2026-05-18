@@ -40,8 +40,8 @@ const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = (
   return (
     <section className="container mx-auto px-4 md:px-8 mb-16 relative group/slider">
       <div className="flex justify-between items-end mb-6">
-        <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#00a651] pl-4">{section.title}</h2>
-        <Link to={`/products?filter=${section.filterType}${section.filterValue ? `&value=${section.filterValue}` : ''}`} className="text-[10px] md:text-sm font-bold text-[#00a651] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
+        <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4">{section.title}</h2>
+        <Link to={`/products?filter=${section.filterType}${section.filterValue ? `&value=${section.filterValue}` : ''}`} className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
       </div>
       <div className="relative">
         <button
@@ -49,7 +49,7 @@ const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = (
             const container = document.getElementById(sliderId);
             if (container) container.scrollBy({ left: -300, behavior: 'smooth' });
           }}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-gray-400 hover:text-[#00a651] z-10 opacity-0 group-hover/slider:opacity-100 transition-opacity disabled:opacity-0"
+          className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-gray-400 hover:text-[#e92c5d] z-10 opacity-0 group-hover/slider:opacity-100 transition-opacity disabled:opacity-0"
         >
           <ArrowRight size={20} className="rotate-180" />
         </button>
@@ -73,7 +73,7 @@ const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = (
             const container = document.getElementById(sliderId);
             if (container) container.scrollBy({ left: 300, behavior: 'smooth' });
           }}
-          className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-gray-400 hover:text-[#00a651] z-10 opacity-0 group-hover/slider:opacity-100 transition-opacity"
+          className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-gray-400 hover:text-[#e92c5d] z-10 opacity-0 group-hover/slider:opacity-100 transition-opacity"
         >
           <ArrowRight size={20} />
         </button>
@@ -88,15 +88,15 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
   return (
     <section className="container mx-auto px-4 md:px-8 mb-16">
       <div className="flex justify-between items-end mb-6">
-        <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#00a651] pl-4">{section.title}</h2>
-        <Link to={`/products?filter=${section.filterType}${section.filterValue ? `&value=${section.filterValue}` : ''}`} className="text-[10px] md:text-sm font-bold text-[#00a651] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
+        <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4">{section.title}</h2>
+        <Link to={`/products?filter=${section.filterType}${section.filterValue ? `&value=${section.filterValue}` : ''}`} className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
       </div>
 
       <div className={`grid grid-cols-1 ${isNoBanner ? '' : 'lg:grid-cols-4'} gap-6`}>
         {section.banner && !isNoBanner && (
-          <div className="hidden lg:block bg-gradient-to-b from-[#00a651] to-[#008c44] rounded-xl p-8 relative overflow-hidden text-white h-full">
+          <div className="hidden lg:block bg-gradient-to-b from-[#e92c5d] to-[#c81d4a] rounded-xl p-8 relative overflow-hidden text-white h-full">
             <h3 className="text-3xl font-bold mb-4 font-serif italic">{section.banner.title}</h3>
-            <p className="mb-8 text-emerald-100 opacity-90">{section.banner.description}</p>
+            <p className="mb-8 text-rose-100 opacity-90">{section.banner.description}</p>
             <Link to={section.banner.link} className="bg-yellow-400 text-gray-900 px-6 py-2 rounded-full font-bold hover:bg-yellow-300 transition-colors w-fit flex items-center gap-2">
               {section.banner.buttonText} ➝
             </Link>
@@ -267,10 +267,10 @@ const Home: React.FC = () => {
                     <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div>
                     {(banner.title || banner.subtitle) && (
                       <div className="absolute top-1/2 -translate-y-1/2 left-12 max-w-md text-white drop-shadow-md p-4">
-                        {banner.subtitle && <p className="text-[#00a651] bg-white/90 px-3 py-1 rounded w-fit font-bold uppercase tracking-wider mb-4 text-xs">{banner.subtitle}</p>}
+                        {banner.subtitle && <p className="text-[#e92c5d] bg-white/90 px-3 py-1 rounded w-fit font-bold uppercase tracking-wider mb-4 text-xs">{banner.subtitle}</p>}
                         {banner.title && <h2 className="text-4xl md:text-5xl font-black leading-tight mb-8 drop-shadow-lg">{banner.title}</h2>}
                         {banner.link && (
-                          <a href={banner.link} className="inline-block bg-[#00a651] hover:bg-[#008c44] text-white px-8 py-3.5 rounded-full font-bold transition-all shadow-lg hover:shadow-emerald-500/50 uppercase tracking-widest text-xs">
+                          <a href={banner.link} className="inline-block bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-8 py-3.5 rounded-full font-bold transition-all shadow-lg hover:shadow-rose-500/50 uppercase tracking-widest text-xs">
                             Shop Now ➝
                           </a>
                         )}
@@ -281,24 +281,24 @@ const Home: React.FC = () => {
                 {sliderBanners.length > 1 && (
                   <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
                     {sliderBanners.map((_, idx) => (
-                      <button key={idx} onClick={() => setCurrentSlide(idx)} className={`h-2 rounded-full transition-all duration-300 ${idx === currentSlide ? 'bg-[#00a651] w-8' : 'bg-white/50 w-2 hover:bg-white'}`} />
+                      <button key={idx} onClick={() => setCurrentSlide(idx)} className={`h-2 rounded-full transition-all duration-300 ${idx === currentSlide ? 'bg-[#e92c5d] w-8' : 'bg-white/50 w-2 hover:bg-white'}`} />
                     ))}
                   </div>
                 )}
               </>
             ) : (
               <div className="absolute inset-0 flex">
-                <div className="w-1/2 bg-[#f0f9f4] relative">
+                <div className="w-1/2 bg-[#fdf2f5] relative">
                   <img src="https://images.unsplash.com/photo-1580915411954-282cb1b0d780?auto=format&fit=crop&q=80&w=800" className="w-full h-full object-cover opacity-80" alt="delivery" />
-                  <div className="absolute inset-0 bg-emerald-500/10"></div>
+                  <div className="absolute inset-0 bg-rose-500/10"></div>
                 </div>
                 <div className="w-1/2 relative">
                   <img src="https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&q=80&w=800" className="w-full h-full object-cover" alt="farmer" />
                 </div>
-                <button className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md text-gray-400 hover:text-[#00a651] z-20">
+                <button className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md text-gray-400 hover:text-[#e92c5d] z-20">
                   <ArrowRight size={20} className="rotate-180" />
                 </button>
-                <button className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md text-gray-400 hover:text-[#00a651] z-20">
+                <button className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md text-gray-400 hover:text-[#e92c5d] z-20">
                   <ArrowRight size={20} />
                 </button>
               </div>
@@ -313,18 +313,18 @@ const Home: React.FC = () => {
                 <img src={rightTopBanner.image_url} alt={rightTopBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
                 <div className="relative z-10 p-3 lg:p-8 text-white">
-                  {rightTopBanner.subtitle && <span className="font-bold text-[8px] lg:text-xs mb-1 lg:mb-2 block uppercase tracking-wider text-emerald-300">{rightTopBanner.subtitle}</span>}
+                  {rightTopBanner.subtitle && <span className="font-bold text-[8px] lg:text-xs mb-1 lg:mb-2 block uppercase tracking-wider text-rose-300">{rightTopBanner.subtitle}</span>}
                   {rightTopBanner.title && <h3 className="text-xs lg:text-2xl font-black mb-1 lg:mb-4 leading-tight">{rightTopBanner.title}</h3>}
                   {rightTopBanner.link && <a href={rightTopBanner.link} className="inline-flex items-center gap-1 lg:gap-2 text-[8px] lg:text-sm font-bold hover:underline">Shop Now <ArrowRight size={10} className="lg:w-3.5 lg:h-3.5" /></a>}
                 </div>
               </div>
             ) : (
-              <div className="rounded-xl bg-[#f0f9f4] relative overflow-hidden border border-emerald-50 aspect-[2/1] h-auto lg:h-auto lg:aspect-auto lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group">
+              <div className="rounded-xl bg-[#fdf2f5] relative overflow-hidden border border-rose-50 aspect-[2/1] h-auto lg:h-auto lg:aspect-auto lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group">
                 <div className="absolute top-0 left-0 bottom-0 z-20 w-[60%] flex flex-col justify-center pl-3 lg:static lg:w-full lg:block lg:pl-0">
-                  <span className="text-[#00a651] font-bold text-[8px] lg:text-xs mb-0.5 lg:mb-1 block uppercase tracking-wider">Only This Week</span>
+                  <span className="text-[#e92c5d] font-bold text-[8px] lg:text-xs mb-0.5 lg:mb-1 block uppercase tracking-wider">Only This Week</span>
                   <h3 className="text-[10px] lg:text-xl font-bold text-gray-800 mb-0.5 lg:mb-1 leading-tight break-words">Quality eggs <br className="lg:hidden" /> at an price</h3>
                   <p className="text-gray-500 text-[8px] lg:text-xs mb-1.5 lg:mb-4">Eat one every day</p>
-                  <button className="bg-[#00a651] text-white text-[8px] lg:text-xs px-2 lg:px-5 py-1 lg:py-2.5 rounded-full font-bold hover:bg-[#008c44] transition-colors flex items-center gap-1 lg:gap-2 group w-fit">
+                  <button className="bg-[#e92c5d] text-white text-[8px] lg:text-xs px-2 lg:px-5 py-1 lg:py-2.5 rounded-full font-bold hover:bg-[#c81d4a] transition-colors flex items-center gap-1 lg:gap-2 group w-fit">
                     Shop Now <ArrowRight size={8} className="lg:w-3.5 lg:h-3.5 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
@@ -340,7 +340,7 @@ const Home: React.FC = () => {
                 <img src={rightBottomBanner.image_url} alt={rightBottomBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
                 <div className="relative z-10 p-3 lg:p-8 text-white">
-                  {rightBottomBanner.subtitle && <span className="font-bold text-[8px] lg:text-xs mb-1 lg:mb-2 block uppercase tracking-wider text-emerald-300">{rightBottomBanner.subtitle}</span>}
+                  {rightBottomBanner.subtitle && <span className="font-bold text-[8px] lg:text-xs mb-1 lg:mb-2 block uppercase tracking-wider text-rose-300">{rightBottomBanner.subtitle}</span>}
                   {rightBottomBanner.title && <h3 className="text-xs lg:text-2xl font-black mb-1 lg:mb-4 leading-tight">{rightBottomBanner.title}</h3>}
                   {rightBottomBanner.link && <a href={rightBottomBanner.link} className="inline-flex items-center gap-1 lg:gap-2 text-[8px] lg:text-sm font-bold hover:underline">Shop Now <ArrowRight size={10} className="lg:w-3.5 lg:h-3.5" /></a>}
                 </div>
@@ -348,10 +348,10 @@ const Home: React.FC = () => {
             ) : (
               <div className="rounded-xl bg-[#fff5f5] relative overflow-hidden border border-red-50 aspect-[2/1] h-auto lg:h-auto lg:aspect-auto lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group">
                 <div className="absolute top-0 left-0 bottom-0 z-20 w-[60%] flex flex-col justify-center pl-3 lg:static lg:w-full lg:block lg:pl-0">
-                  <span className="text-[#00a651] font-bold text-[8px] lg:text-xs mb-0.5 lg:mb-1 block uppercase tracking-wider">Fuel Your Day</span>
+                  <span className="text-[#e92c5d] font-bold text-[8px] lg:text-xs mb-0.5 lg:mb-1 block uppercase tracking-wider">Fuel Your Day</span>
                   <h3 className="text-[10px] lg:text-xl font-bold text-gray-800 mb-0.5 lg:mb-1 leading-tight break-words">Nutritious bites <br className="lg:hidden" /> for mind</h3>
                   <p className="text-gray-500 text-[8px] lg:text-xs mb-1.5 lg:mb-4">Start fresh...</p>
-                  <button className="bg-[#00a651] text-white text-[8px] lg:text-xs px-2 lg:px-5 py-1 lg:py-2.5 rounded-full font-bold hover:bg-[#008c44] transition-colors flex items-center gap-1 lg:gap-2 group w-fit">
+                  <button className="bg-[#e92c5d] text-white text-[8px] lg:text-xs px-2 lg:px-5 py-1 lg:py-2.5 rounded-full font-bold hover:bg-[#c81d4a] transition-colors flex items-center gap-1 lg:gap-2 group w-fit">
                     Shop Now <ArrowRight size={8} className="lg:w-3.5 lg:h-3.5 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
@@ -383,7 +383,7 @@ const Home: React.FC = () => {
               { icon: Award, title: 'Genuine Product' },
             ].map((feat, idx) => (
               <div key={idx} className="flex items-center gap-3 min-w-[200px] md:min-w-0 flex-shrink-0 snap-start px-2 md:px-0 select-none">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-[#00a651] text-white rounded-md flex items-center justify-center flex-shrink-0 shadow-sm">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-[#e92c5d] text-white rounded-md flex items-center justify-center flex-shrink-0 shadow-sm">
                   <feat.icon size={20} className="md:w-6 md:h-6" strokeWidth={2} />
                 </div>
                 <div>
@@ -465,8 +465,8 @@ const Home: React.FC = () => {
       {/* Best Items for you Section */}
       <section className="container mx-auto px-4 md:px-8 mb-16">
         <div className="flex justify-between items-end mb-6">
-          <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#00a651] pl-4">Best Items for you</h2>
-          <Link to="/products" className="text-[10px] md:text-sm font-bold text-[#00a651] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
+          <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4">Best Items for you</h2>
+          <Link to="/products" className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6">
           {randomProducts.map(product => (

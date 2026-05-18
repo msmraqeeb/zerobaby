@@ -37,7 +37,7 @@ const Cart: React.FC = () => {
         <img src="https://cdn-icons-png.flaticon.com/512/11329/11329060.png" alt="Empty Cart" className="w-32 h-32 mb-6 opacity-50 mix-blend-multiply" />
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Your Cart is Empty</h2>
         <p className="text-gray-500 mb-8">Looks like you haven't added anything to your cart yet.</p>
-        <Link to="/" className="bg-emerald-500 text-white px-8 py-3 rounded-full font-bold hover:bg-emerald-600 transition-colors">
+        <Link to="/" className="bg-rose-500 text-white px-8 py-3 rounded-full font-bold hover:bg-rose-600 transition-colors">
           Start Shopping
         </Link>
       </div>
@@ -76,7 +76,7 @@ const Cart: React.FC = () => {
                         <div>
                           <h3 className="font-bold text-gray-800 leading-tight text-sm">{item.name}</h3>
                           {item.selectedVariantName && (
-                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1 block">{item.selectedVariantName}</span>
+                            <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest mt-1 block">{item.selectedVariantName}</span>
                           )}
                         </div>
                       </div>
@@ -91,14 +91,14 @@ const Cart: React.FC = () => {
                         <div className="flex items-center border border-gray-100 rounded-xl bg-gray-50/50 p-1">
                           <button 
                             onClick={() => updateQuantity(cartItemId, -1)}
-                            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:bg-white hover:text-emerald-500 rounded-lg transition-all"
+                            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:bg-white hover:text-rose-500 rounded-lg transition-all"
                           >
                             <Minus size={14} />
                           </button>
                           <span className="w-8 text-center text-sm font-black text-gray-700">{item.quantity}</span>
                           <button 
                             onClick={() => updateQuantity(cartItemId, 1)}
-                            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:bg-white hover:text-emerald-500 rounded-lg transition-all"
+                            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:bg-white hover:text-rose-500 rounded-lg transition-all"
                           >
                             <Plus size={14} />
                           </button>
@@ -116,7 +116,7 @@ const Cart: React.FC = () => {
             </div>
 
             <div className="mt-8 flex justify-between items-center px-2">
-              <Link to="/products" className="text-emerald-600 font-black text-sm flex items-center gap-2 hover:translate-x-[-4px] transition-transform">
+              <Link to="/products" className="text-rose-600 font-black text-sm flex items-center gap-2 hover:translate-x-[-4px] transition-transform">
                 <ArrowRight size={18} className="rotate-180" /> CONTINUE SHOPPING
               </Link>
             </div>
@@ -138,13 +138,13 @@ const Cart: React.FC = () => {
                 </div>
                 
                 {appliedCoupon && (
-                  <div className="flex justify-between items-center bg-[#f0f9f4] p-3 rounded-xl border border-emerald-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="flex justify-between items-center bg-[#fdf2f5] p-3 rounded-xl border border-rose-100 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex flex-col">
-                       <span className="text-[10px] font-black text-[#00a651] uppercase tracking-widest">Coupon Applied</span>
+                       <span className="text-[10px] font-black text-[#e92c5d] uppercase tracking-widest">Coupon Applied</span>
                        <span className="text-sm font-bold text-[#1a3a34]">{appliedCoupon.code}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                       <span className="font-black text-[#00a651]">-৳{discount.toFixed(2)}</span>
+                       <span className="font-black text-[#e92c5d]">-৳{discount.toFixed(2)}</span>
                        <button onClick={removeCoupon} className="text-gray-300 hover:text-red-500 transition-colors"><XCircle size={16}/></button>
                     </div>
                   </div>
@@ -166,7 +166,7 @@ const Cart: React.FC = () => {
                        value={couponInput}
                        onChange={e => setCouponInput(e.target.value.toUpperCase())}
                        onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
-                       className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all placeholder:text-gray-300" 
+                       className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-rose-500 focus:ring-4 focus:ring-rose-50 transition-all placeholder:text-gray-300" 
                      />
                      <button 
                         onClick={handleApplyCoupon}
@@ -183,7 +183,7 @@ const Cart: React.FC = () => {
                 </div>
               )}
 
-              <Link to="/checkout" className="block w-full bg-[#00a651] hover:bg-[#008c44] text-white font-black py-5 rounded-[1.2rem] text-center transition-all shadow-xl shadow-emerald-50 active:scale-95 uppercase tracking-widest text-sm">
+              <Link to="/checkout" className="block w-full bg-[#e92c5d] hover:bg-[#c81d4a] text-white font-black py-5 rounded-[1.2rem] text-center transition-all shadow-xl shadow-rose-50 active:scale-95 uppercase tracking-widest text-sm">
                 Proceed to Checkout
               </Link>
             </div>

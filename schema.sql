@@ -1,4 +1,4 @@
--- SMart Grocery Super Admin Schema (V7)
+-- zerobaby Super Admin Schema (V7)
 -- This script FIXES RLS "violate policy" errors for orders, wishlist, and addresses.
 -- SAFE to run multiple times. Data stays intact.
 

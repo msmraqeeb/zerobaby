@@ -146,15 +146,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, label,
               fileInputRef.current?.click();
             }}
             disabled={isUploading}
-            className={`flex items-center gap-1.5 bg-white border border-gray-300 px-3 py-1 rounded-md text-xs font-bold text-emerald-700 shadow-sm hover:bg-gray-50 ${isUploading ? 'opacity-50 cursor-wait' : ''}`}
+            className={`flex items-center gap-1.5 bg-white border border-gray-300 px-3 py-1 rounded-md text-xs font-bold text-rose-700 shadow-sm hover:bg-gray-50 ${isUploading ? 'opacity-50 cursor-wait' : ''}`}
           >
             <Maximize2 size={12} /> {isUploading ? 'Uploading...' : 'Add Media'}
           </button>
           <HelpCircle size={14} className="text-gray-400 cursor-help" />
         </div>
         <div className="flex bg-gray-200/50 p-0.5 rounded-lg">
-          <button type="button" onClick={() => setIsVisual(true)} className={`px-4 py-1 text-xs font-bold rounded-md transition-all ${isVisual ? 'bg-white shadow-sm text-emerald-700' : 'text-gray-500 hover:text-gray-700'}`}>Visual</button>
-          <button type="button" onClick={() => setIsVisual(false)} className={`px-4 py-1 text-xs font-bold rounded-md transition-all ${!isVisual ? 'bg-white shadow-sm text-emerald-700' : 'text-gray-500 hover:text-gray-700'}`}>Code</button>
+          <button type="button" onClick={() => setIsVisual(true)} className={`px-4 py-1 text-xs font-bold rounded-md transition-all ${isVisual ? 'bg-white shadow-sm text-rose-700' : 'text-gray-500 hover:text-gray-700'}`}>Visual</button>
+          <button type="button" onClick={() => setIsVisual(false)} className={`px-4 py-1 text-xs font-bold rounded-md transition-all ${!isVisual ? 'bg-white shadow-sm text-rose-700' : 'text-gray-500 hover:text-gray-700'}`}>Code</button>
         </div>
       </div>
 
@@ -184,7 +184,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, label,
                       { label: 'Heading 6', val: 'h6' },
                       { label: 'Preformatted', val: 'pre' }
                     ].map(item => (
-                      <button key={item.val} type="button" onMouseDown={(e) => { e.preventDefault(); execCommand('formatBlock', item.val); }} className="w-full text-left px-5 py-2.5 hover:bg-emerald-50 text-xs font-bold text-gray-700 transition-colors">{item.label}</button>
+                      <button key={item.val} type="button" onMouseDown={(e) => { e.preventDefault(); execCommand('formatBlock', item.val); }} className="w-full text-left px-5 py-2.5 hover:bg-rose-50 text-xs font-bold text-gray-700 transition-colors">{item.label}</button>
                     ))}
                   </div>
                 )}
@@ -262,7 +262,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, label,
                             key={char}
                             type="button"
                             onMouseDown={(e) => { e.preventDefault(); insertAtCursor(char); }}
-                            className="w-9 h-9 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow-sm rounded-xl flex items-center justify-center text-lg font-medium transition-all active:scale-90 bg-gray-50 border border-transparent"
+                            className="w-9 h-9 hover:bg-rose-50 hover:text-rose-700 hover:shadow-sm rounded-xl flex items-center justify-center text-lg font-medium transition-all active:scale-90 bg-gray-50 border border-transparent"
                           >
                             {char}
                           </button>
@@ -291,7 +291,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, label,
             contentEditable
             onInput={handleInput}
             onPaste={handlePaste}
-            className="w-full h-full p-6 outline-none prose prose-emerald max-w-none overflow-y-auto focus:ring-0 selection:bg-emerald-100 rich-editor-visual"
+            className="w-full h-full p-6 outline-none prose prose-emerald max-w-none overflow-y-auto focus:ring-0 selection:bg-rose-100 rich-editor-visual"
             style={{ minHeight: isFullscreen ? '100%' : height }}
             onBlur={handleInput}
           />
@@ -299,7 +299,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, label,
           <textarea
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full h-full p-6 outline-none font-mono text-sm bg-gray-900 text-emerald-400 resize-none border-none custom-scrollbar"
+            className="w-full h-full p-6 outline-none font-mono text-sm bg-gray-900 text-rose-400 resize-none border-none custom-scrollbar"
             style={{ minHeight: isFullscreen ? '100%' : height }}
             placeholder="<html>Code here...</html>"
           />

@@ -176,7 +176,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ initialContent, onChan
     return (
         <div className="space-y-8">
             {blocks.map((block, index) => (
-                <div key={block.id} className="bg-white border-2 border-gray-100 rounded-3xl shadow-sm hover:border-emerald-100 transition-colors group">
+                <div key={block.id} className="bg-white border-2 border-gray-100 rounded-3xl shadow-sm hover:border-rose-100 transition-colors group">
                     {/* Block Header */}
                     <div className="bg-gray-50 px-6 py-3 flex items-center justify-between border-b border-gray-100 rounded-t-[1.3rem]">
                         <div className="flex items-center gap-3">
@@ -226,7 +226,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ initialContent, onChan
                                 <textarea
                                     value={block.data.content}
                                     onChange={(e) => updateBlockData(block.id, { content: e.target.value })}
-                                    className="w-full h-32 p-4 border border-gray-200 rounded-xl font-mono text-sm focus:outline-none focus:border-emerald-500"
+                                    className="w-full h-32 p-4 border border-gray-200 rounded-xl font-mono text-sm focus:outline-none focus:border-rose-500"
                                 />
                                 <p className="text-xs text-gray-400 mt-2">Basic HTML is supported.</p>
                             </div>
@@ -236,8 +236,8 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ initialContent, onChan
             ))}
 
             <div className="grid grid-cols-3 gap-4">
-                <button type="button" onClick={() => addBlock('story_section')} className="flex flex-col items-center gap-2 p-6 rounded-3xl border-2 border-dashed border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/50 transition-all group">
-                    <div className="p-4 bg-white rounded-full shadow-sm text-gray-400 group-hover:text-emerald-500 transition-colors"><Layout size={24} /></div>
+                <button type="button" onClick={() => addBlock('story_section')} className="flex flex-col items-center gap-2 p-6 rounded-3xl border-2 border-dashed border-gray-200 hover:border-rose-400 hover:bg-rose-50/50 transition-all group">
+                    <div className="p-4 bg-white rounded-full shadow-sm text-gray-400 group-hover:text-rose-500 transition-colors"><Layout size={24} /></div>
                     <span className="font-bold text-gray-600">Add Story Section</span>
                 </button>
                 <button type="button" onClick={() => addBlock('values_grid')} className="flex flex-col items-center gap-2 p-6 rounded-3xl border-2 border-dashed border-gray-200 hover:border-blue-400 hover:bg-blue-50/50 transition-all group">
@@ -248,8 +248,8 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ initialContent, onChan
                     <div className="p-4 bg-white rounded-full shadow-sm text-gray-400 group-hover:text-orange-500 transition-colors"><ImageIcon size={24} /></div>
                     <span className="font-bold text-gray-600">Add Hero Section</span>
                 </button>
-                <button type="button" onClick={() => addBlock('cta_section')} className="flex flex-col items-center gap-2 p-6 rounded-3xl border-2 border-dashed border-gray-200 hover:border-emerald-700 hover:bg-emerald-50 transition-all group">
-                    <div className="p-4 bg-white rounded-full shadow-sm text-gray-400 group-hover:text-emerald-700 transition-colors"><Zap size={24} /></div>
+                <button type="button" onClick={() => addBlock('cta_section')} className="flex flex-col items-center gap-2 p-6 rounded-3xl border-2 border-dashed border-gray-200 hover:border-rose-700 hover:bg-rose-50 transition-all group">
+                    <div className="p-4 bg-white rounded-full shadow-sm text-gray-400 group-hover:text-rose-700 transition-colors"><Zap size={24} /></div>
                     <span className="font-bold text-gray-600">Add CTA Section</span>
                 </button>
                 <button type="button" onClick={() => addBlock('contact_section')} className="flex flex-col items-center gap-2 p-6 rounded-3xl border-2 border-dashed border-gray-200 hover:border-teal-600 hover:bg-teal-50 transition-all group">
@@ -289,19 +289,19 @@ const StoryBlockEditor = ({ data, onChange }: { data: any, onChange: (d: any) =>
             <div className="space-y-4">
                 <div>
                     <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Badge Text</label>
-                    <input type="text" value={data.badge} onChange={e => onChange({ ...data, badge: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-bold text-emerald-600 focus:outline-none focus:border-emerald-500" placeholder="OUR STORY" />
+                    <input type="text" value={data.badge} onChange={e => onChange({ ...data, badge: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-bold text-rose-600 focus:outline-none focus:border-rose-500" placeholder="OUR STORY" />
                 </div>
                 <div>
                     <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Title 1 (Black)</label>
-                    <input type="text" value={data.title} onChange={e => onChange({ ...data, title: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-gray-900 text-lg focus:outline-none focus:border-emerald-500" />
+                    <input type="text" value={data.title} onChange={e => onChange({ ...data, title: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-gray-900 text-lg focus:outline-none focus:border-rose-500" />
                 </div>
                 <div>
                     <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Title 2 (Green)</label>
-                    <input type="text" value={data.title2} onChange={e => onChange({ ...data, title2: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-emerald-500 text-lg focus:outline-none focus:border-emerald-500" placeholder="Second line..." />
+                    <input type="text" value={data.title2} onChange={e => onChange({ ...data, title2: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-rose-500 text-lg focus:outline-none focus:border-rose-500" placeholder="Second line..." />
                 </div>
                 <div>
                     <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Description</label>
-                    <textarea value={data.description} onChange={e => onChange({ ...data, description: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-600 h-32 focus:outline-none focus:border-emerald-500" />
+                    <textarea value={data.description} onChange={e => onChange({ ...data, description: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-600 h-32 focus:outline-none focus:border-rose-500" />
                 </div>
             </div>
             <div className="space-y-4">
@@ -318,12 +318,12 @@ const StoryBlockEditor = ({ data, onChange }: { data: any, onChange: (d: any) =>
                         </div>
                     </div>
                 ) : (
-                    <label className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50 hover:bg-emerald-50 hover:border-emerald-300 cursor-pointer transition-colors group">
-                        <div className="p-3 bg-white rounded-full shadow-sm text-gray-400 group-hover:text-emerald-500 mb-3 transition-colors">
+                    <label className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50 hover:bg-rose-50 hover:border-rose-300 cursor-pointer transition-colors group">
+                        <div className="p-3 bg-white rounded-full shadow-sm text-gray-400 group-hover:text-rose-500 mb-3 transition-colors">
                             <Grid size={24} />
                             {/* Reusing Grid icon temporarily as placeholder or specific Upload icon */}
                         </div>
-                        <span className="text-sm font-bold text-gray-500 group-hover:text-emerald-600">Click to Upload Image</span>
+                        <span className="text-sm font-bold text-gray-500 group-hover:text-rose-600">Click to Upload Image</span>
                         <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                     </label>
                 )}
@@ -351,7 +351,7 @@ const HeroSectionEditor = ({ data, onChange }: { data: any, onChange: (d: any) =
                 <div className="space-y-4">
                     <div>
                         <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Heading (H1)</label>
-                        <input type="text" value={data.title} onChange={e => onChange({ ...data, title: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-gray-900 text-2xl focus:outline-none focus:border-emerald-500" />
+                        <input type="text" value={data.title} onChange={e => onChange({ ...data, title: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-gray-900 text-2xl focus:outline-none focus:border-rose-500" />
                     </div>
                 </div>
                 <div className="space-y-4">
@@ -360,7 +360,7 @@ const HeroSectionEditor = ({ data, onChange }: { data: any, onChange: (d: any) =
                         <div className="relative group rounded-xl overflow-hidden h-32 bg-gray-900">
                             <img src={data.background_url} alt="Background" className="w-full h-full object-cover opacity-60" />
                             <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-                                <label className="cursor-pointer bg-white text-gray-800 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-50">
+                                <label className="cursor-pointer bg-white text-gray-800 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-rose-50">
                                     Change
                                     <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                                 </label>
@@ -368,8 +368,8 @@ const HeroSectionEditor = ({ data, onChange }: { data: any, onChange: (d: any) =
                             </div>
                         </div>
                     ) : (
-                        <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:bg-emerald-50 hover:border-emerald-300 cursor-pointer transition-colors group">
-                            <span className="text-sm font-bold text-gray-400 group-hover:text-emerald-600 flex items-center gap-2"><ImageIcon size={16} /> Upload Background</span>
+                        <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:bg-rose-50 hover:border-rose-300 cursor-pointer transition-colors group">
+                            <span className="text-sm font-bold text-gray-400 group-hover:text-rose-600 flex items-center gap-2"><ImageIcon size={16} /> Upload Background</span>
                             <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                         </label>
                     )}
@@ -377,7 +377,7 @@ const HeroSectionEditor = ({ data, onChange }: { data: any, onChange: (d: any) =
             </div>
             <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Paragraph</label>
-                <textarea value={data.description} onChange={e => onChange({ ...data, description: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-600 h-24 focus:outline-none focus:border-emerald-500" />
+                <textarea value={data.description} onChange={e => onChange({ ...data, description: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-600 h-24 focus:outline-none focus:border-rose-500" />
             </div>
         </div>
     );
@@ -388,16 +388,16 @@ const CtaSectionEditor = ({ data, onChange }: { data: any, onChange: (d: any) =>
         <div className="space-y-6">
             <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Main Heading</label>
-                <textarea value={data.title} onChange={e => onChange({ ...data, title: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-gray-900 text-xl focus:outline-none focus:border-emerald-500 h-24" placeholder="Heading..." />
+                <textarea value={data.title} onChange={e => onChange({ ...data, title: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-gray-900 text-xl focus:outline-none focus:border-rose-500 h-24" placeholder="Heading..." />
             </div>
             <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Subtitle</label>
-                <input type="text" value={data.subtitle} onChange={e => onChange({ ...data, subtitle: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-600 focus:outline-none focus:border-emerald-500" placeholder="Subtitle..." />
+                <input type="text" value={data.subtitle} onChange={e => onChange({ ...data, subtitle: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-600 focus:outline-none focus:border-rose-500" placeholder="Subtitle..." />
             </div>
 
             <div className="grid grid-cols-2 gap-6 p-6 bg-gray-50 rounded-2xl border border-gray-100">
                 <div className="space-y-4">
-                    <label className="text-xs font-black text-emerald-600 uppercase tracking-widest">Button 1 (Primary)</label>
+                    <label className="text-xs font-black text-rose-600 uppercase tracking-widest">Button 1 (Primary)</label>
                     <div>
                         <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Text</label>
                         <input type="text" value={data.button1_text} onChange={e => onChange({ ...data, button1_text: e.target.value })} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold" />
@@ -446,7 +446,7 @@ const IconPicker = ({ value, onChange }: { value: string, onChange: (val: string
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-14 h-14 flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:border-emerald-500 hover:ring-2 hover:ring-emerald-500/20 transition-all text-gray-600"
+                className="w-14 h-14 flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:border-rose-500 hover:ring-2 hover:ring-rose-500/20 transition-all text-gray-600"
             >
                 <SelectedIcon size={24} />
             </button>
@@ -458,7 +458,7 @@ const IconPicker = ({ value, onChange }: { value: string, onChange: (val: string
                             key={opt.value}
                             type="button"
                             onClick={() => { onChange(opt.value); setIsOpen(false); }}
-                            className={`p-3 rounded-xl flex items-center justify-center transition-all ${value === opt.value ? 'bg-emerald-50 text-emerald-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
+                            className={`p-3 rounded-xl flex items-center justify-center transition-all ${value === opt.value ? 'bg-rose-50 text-rose-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
                             title={opt.label}
                         >
                             <opt.icon size={20} />
@@ -536,11 +536,11 @@ const ContactSectionEditor = ({ data, onChange }: { data: any, onChange: (d: any
             <div className="grid grid-cols-2 gap-6">
                 <div>
                     <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Section Title</label>
-                    <input type="text" value={data.title} onChange={e => onChange({ ...data, title: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-gray-800 focus:outline-none focus:border-emerald-500" />
+                    <input type="text" value={data.title} onChange={e => onChange({ ...data, title: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-gray-800 focus:outline-none focus:border-rose-500" />
                 </div>
                 <div>
                     <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Section Subtitle</label>
-                    <input type="text" value={data.subtitle} onChange={e => onChange({ ...data, subtitle: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-600 focus:outline-none focus:border-emerald-500" />
+                    <input type="text" value={data.subtitle} onChange={e => onChange({ ...data, subtitle: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-600 focus:outline-none focus:border-rose-500" />
                 </div>
             </div>
 
@@ -556,7 +556,7 @@ const ContactSectionEditor = ({ data, onChange }: { data: any, onChange: (d: any
                         <button type="button" onClick={() => removeItem(index)} className="text-red-400 p-2 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
                     </div>
                 ))}
-                <button type="button" onClick={addItem} className="w-full py-3 border-2 border-dashed border-gray-200 rounded-2xl text-gray-400 font-bold text-sm hover:border-emerald-400 hover:text-emerald-500 transition-colors">+ Add Item</button>
+                <button type="button" onClick={addItem} className="w-full py-3 border-2 border-dashed border-gray-200 rounded-2xl text-gray-400 font-bold text-sm hover:border-rose-400 hover:text-rose-500 transition-colors">+ Add Item</button>
             </div>
         </div>
     );
@@ -582,11 +582,11 @@ const FaqContactEditor = ({ data, onChange }: { data: any, onChange: (d: any) =>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label className="block text-xs font-bold text-gray-400 uppercase mb-2">FAQ Title</label>
-                    <input type="text" value={data.title} onChange={e => onChange({ ...data, title: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-gray-800 focus:outline-none focus:border-emerald-500" />
+                    <input type="text" value={data.title} onChange={e => onChange({ ...data, title: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-black text-gray-800 focus:outline-none focus:border-rose-500" />
                 </div>
                 <div>
                     <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Form Title</label>
-                    <input type="text" value={data.formTitle} onChange={e => onChange({ ...data, formTitle: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-bold text-emerald-600 focus:outline-none focus:border-emerald-500" />
+                    <input type="text" value={data.formTitle} onChange={e => onChange({ ...data, formTitle: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl font-bold text-rose-600 focus:outline-none focus:border-rose-500" />
                 </div>
             </div>
 
@@ -595,11 +595,11 @@ const FaqContactEditor = ({ data, onChange }: { data: any, onChange: (d: any) =>
                 {data.faqs.map((faq: any, index: number) => (
                     <div key={index} className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-3 relative group">
                         <button type="button" onClick={() => removeFaq(index)} className="absolute top-2 right-2 text-red-300 hover:text-red-500 p-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={16} /></button>
-                        <input type="text" value={faq.question} onChange={e => updateFaq(index, 'question', e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg font-bold text-sm text-emerald-800" placeholder="Question" />
-                        <textarea value={faq.answer} onChange={e => updateFaq(index, 'answer', e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-emerald-500" placeholder="Answer" rows={2} />
+                        <input type="text" value={faq.question} onChange={e => updateFaq(index, 'question', e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg font-bold text-sm text-rose-800" placeholder="Question" />
+                        <textarea value={faq.answer} onChange={e => updateFaq(index, 'answer', e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:border-rose-500" placeholder="Answer" rows={2} />
                     </div>
                 ))}
-                <button type="button" onClick={addFaq} className="w-full py-3 border-2 border-dashed border-gray-200 rounded-2xl text-gray-400 font-bold text-sm hover:border-emerald-400 hover:text-emerald-500 transition-colors">+ Add FAQ</button>
+                <button type="button" onClick={addFaq} className="w-full py-3 border-2 border-dashed border-gray-200 rounded-2xl text-gray-400 font-bold text-sm hover:border-rose-400 hover:text-rose-500 transition-colors">+ Add FAQ</button>
             </div>
         </div>
     );

@@ -25,7 +25,7 @@ const CategoryMenuItem: React.FC<{ category: CategoryNode }> = ({ category }) =>
 
   return (
     <div
-      className="relative px-4 py-2 hover:bg-[#ffa319] hover:text-white transition-colors cursor-pointer text-gray-700 text-sm"
+      className="relative px-4 py-2 hover:bg-[#f47b20] hover:text-white transition-colors cursor-pointer text-gray-700 text-sm"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -53,7 +53,7 @@ const MobileCategoryItem: React.FC<{ category: CategoryNode; level: number; onCl
   return (
     <div>
       <div
-        className={`flex items-center justify-between py-2 text-gray-600 hover:text-[#00a651] transition-colors cursor-pointer ${level === 0 ? 'px-4' : 'pr-4'}`}
+        className={`flex items-center justify-between py-2 text-gray-600 hover:text-[#e92c5d] transition-colors cursor-pointer ${level === 0 ? 'px-4' : 'pr-4'}`}
         style={{ paddingLeft: level === 0 ? '16px' : `${level * 16 + 16}px` }}
         onClick={(e) => {
           if (hasChildren) {
@@ -164,7 +164,7 @@ const Header: React.FC = () => {
   return (
     <header className="w-full flex flex-col font-sans z-50">
       {/* Main Header - Dark Green */}
-      <div className="bg-[#00a651] py-3 md:py-4 px-4 md:px-8">
+      <div className="bg-black py-3 md:py-4 px-4 md:px-8">
         <div className="container mx-auto">
           <div className="flex flex-wrap items-center justify-between gap-4">
 
@@ -200,7 +200,7 @@ const Header: React.FC = () => {
                 >
                   <ShoppingCart size={24} />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold border-2 border-[#00a651]">
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold border-2 border-[#e92c5d]">
                       {cartCount}
                     </span>
                   )}
@@ -226,7 +226,7 @@ const Header: React.FC = () => {
                 />
                 <button
                   onClick={handleSearch}
-                  className="bg-[#ffa319] text-white px-4 md:px-6 font-semibold hover:bg-[#e69217] transition-all flex items-center gap-2 text-sm whitespace-nowrap"
+                  className="bg-[#E92C5D] text-white px-4 md:px-6 font-semibold hover:bg-[#C81D4A] transition-all flex items-center gap-2 text-sm whitespace-nowrap"
                 >
                   <Search size={18} />
                   <span className="hidden sm:inline">Search</span>
@@ -241,9 +241,9 @@ const Header: React.FC = () => {
                       <Link to={`/product/${product.slug}`} className="flex items-center gap-3 flex-1 min-w-0" onClick={() => setShowResults(false)}>
                         <img src={product.images[0]} className="w-12 h-12 object-cover rounded border border-gray-100" alt={product.name} />
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-gray-800 truncate group-hover:text-[#00a651] transition-colors">{product.name}</h4>
+                          <h4 className="text-sm font-medium text-gray-800 truncate group-hover:text-[#e92c5d] transition-colors">{product.name}</h4>
                           <div className="flex items-center gap-2">
-                            <span className="text-[#00a651] font-bold text-sm">৳{product.price}</span>
+                            <span className="text-[#e92c5d] font-bold text-sm">৳{product.price}</span>
                             {product.originalPrice && <span className="text-gray-400 text-xs line-through">৳{product.originalPrice}</span>}
                           </div>
                         </div>
@@ -253,7 +253,7 @@ const Header: React.FC = () => {
                           e.stopPropagation();
                           addToCart(product);
                         }}
-                        className="bg-gray-100 text-gray-600 hover:bg-[#00a651] hover:text-white p-2 rounded-full transition-all opacity-80 hover:opacity-100 hover:scale-105 active:scale-95"
+                        className="bg-gray-100 text-gray-600 hover:bg-[#e92c5d] hover:text-white p-2 rounded-full transition-all opacity-80 hover:opacity-100 hover:scale-105 active:scale-95"
                         title="Add to Cart"
                       >
                         <ShoppingCart size={16} />
@@ -284,7 +284,7 @@ const Header: React.FC = () => {
                 >
                   <ShoppingCart size={24} />
                   {cartCount > 0 && (
-                    <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold border-2 border-[#00a651]">
+                    <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold border-2 border-[#e92c5d]">
                       {cartCount}
                     </span>
                   )}
@@ -323,18 +323,18 @@ const Header: React.FC = () => {
                 {storeInfo.logo_url ? (
                   <img src={storeInfo.logo_url} alt={storeInfo.name} className="h-8 w-auto object-contain" />
                 ) : (
-                  <ShoppingCart size={24} className="text-[#00a651]" />
+                  <ShoppingCart size={24} className="text-[#e92c5d]" />
                 )}
               </Link>
             </div>
 
             <div className="relative group text-left">
-              <button className="flex items-center gap-2 bg-[#f0f9f4] text-[#00a651] px-4 py-1.5 rounded text-sm font-semibold border border-[#00a651]/10 hover:bg-[#e8f5ed] transition-colors peer">
+              <button className="flex items-center gap-2 bg-[#fdf2f5] text-[#e92c5d] px-4 py-1.5 rounded text-sm font-semibold border border-[#e92c5d]/10 hover:bg-[#fcebf0] transition-colors peer">
                 All Categories
                 <ChevronDown size={16} />
               </button>
               <div className="absolute top-full left-0 w-64 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible peer-hover:opacity-100 peer-hover:visible hover:opacity-100 hover:visible transition-all z-50">
-                <Link to="/products" className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#ffa319] hover:text-white font-medium transition-colors">
+                <Link to="/products" className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f47b20] hover:text-white font-medium transition-colors">
                   All Products
                 </Link>
                 {categoryTree.map(cat => (
@@ -344,12 +344,12 @@ const Header: React.FC = () => {
             </div>
 
             <nav className="flex gap-6 text-sm font-medium text-gray-600">
-              <Link to="/" className={`${location.pathname === '/' ? 'text-[#00a651]' : 'hover:text-[#00a651]'} transition-colors`}>Home</Link>
-              <Link to="/products" className={`${location.pathname === '/products' ? 'text-[#00a651]' : 'hover:text-[#00a651]'} transition-colors`}>Products</Link>
-              <Link to="/my-account" className={`${location.pathname === '/my-account' ? 'text-[#00a651]' : 'hover:text-[#00a651]'} transition-colors`}>My Account</Link>
-              <Link to="/blog" className={`${location.pathname.startsWith('/blog') ? 'text-[#00a651]' : 'hover:text-[#00a651]'} transition-colors`}>Blog</Link>
+              <Link to="/" className={`${location.pathname === '/' ? 'text-[#e92c5d]' : 'hover:text-[#e92c5d]'} transition-colors`}>Home</Link>
+              <Link to="/products" className={`${location.pathname === '/products' ? 'text-[#e92c5d]' : 'hover:text-[#e92c5d]'} transition-colors`}>Products</Link>
+              <Link to="/my-account" className={`${location.pathname === '/my-account' ? 'text-[#e92c5d]' : 'hover:text-[#e92c5d]'} transition-colors`}>My Account</Link>
+              <Link to="/blog" className={`${location.pathname.startsWith('/blog') ? 'text-[#e92c5d]' : 'hover:text-[#e92c5d]'} transition-colors`}>Blog</Link>
               {isAdmin && (
-                <Link to="/admin" className={`${location.pathname.startsWith('/admin') ? 'text-[#00a651]' : 'hover:text-[#00a651]'} transition-colors font-bold`}>Dashboard</Link>
+                <Link to="/admin" className={`${location.pathname.startsWith('/admin') ? 'text-[#e92c5d]' : 'hover:text-[#e92c5d]'} transition-colors font-bold`}>Dashboard</Link>
               )}
             </nav>
           </div>
@@ -369,7 +369,7 @@ const Header: React.FC = () => {
                 onFocus={() => setShowResults(true)}
                 onBlur={() => setTimeout(() => setShowResults(false), 200)}
               />
-              <button className="bg-[#00a651] text-white px-3 hover:bg-[#008c44] transition-colors">
+              <button className="bg-[#e92c5d] text-white px-3 hover:bg-[#c81d4a] transition-colors">
                 <Search size={14} />
               </button>
             </div>
@@ -382,9 +382,9 @@ const Header: React.FC = () => {
                     <Link to={`/product/${product.slug}`} className="flex items-center gap-2 flex-1 min-w-0" onClick={() => setShowResults(false)}>
                       <img src={product.images[0]} className="w-8 h-8 object-cover rounded border border-gray-100" alt={product.name} />
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-medium text-gray-800 truncate group-hover:text-[#00a651] transition-colors">{product.name}</h4>
+                        <h4 className="text-xs font-medium text-gray-800 truncate group-hover:text-[#e92c5d] transition-colors">{product.name}</h4>
                         <div className="flex items-center gap-1">
-                          <span className="text-[#00a651] font-bold text-xs">৳{product.price}</span>
+                          <span className="text-[#e92c5d] font-bold text-xs">৳{product.price}</span>
                           {product.originalPrice && <span className="text-gray-400 text-[10px] line-through">৳{product.originalPrice}</span>}
                         </div>
                       </div>
@@ -394,7 +394,7 @@ const Header: React.FC = () => {
                         e.stopPropagation();
                         addToCart(product);
                       }}
-                      className="bg-gray-100 text-gray-600 hover:bg-[#00a651] hover:text-white p-1.5 rounded-full transition-all opacity-80 hover:opacity-100"
+                      className="bg-gray-100 text-gray-600 hover:bg-[#e92c5d] hover:text-white p-1.5 rounded-full transition-all opacity-80 hover:opacity-100"
                       title="Add to Cart"
                     >
                       <ShoppingCart size={14} />
@@ -420,12 +420,12 @@ const Header: React.FC = () => {
         {/* Drawer Panel */}
         <div className={`absolute top-0 left-0 w-[80%] max-w-[300px] h-full bg-white shadow-2xl transition-transform duration-300 ease-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           {/* Drawer Header */}
-          <div className="bg-[#0b2416] p-4 flex items-center justify-between">
+          <div className="bg-[#2a0c16] p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               {storeInfo.logo_url ? (
                 <img src={storeInfo.logo_url} alt={storeInfo.name} className="h-8 w-auto object-contain brightness-0 invert" />
               ) : (
-                <span className="text-white font-bold text-lg">SMART GROCERY</span>
+                <span className="text-white font-bold text-lg">zerobaby</span>
               )}
             </div>
             <button onClick={() => setIsMobileMenuOpen(false)} className="text-white/80 hover:text-white transition-colors">
@@ -436,9 +436,9 @@ const Header: React.FC = () => {
           {/* Drawer Content */}
           <nav className="flex flex-col h-[calc(100%-64px)] overflow-y-auto">
             {user ? (
-              <div className="bg-emerald-50 p-6 border-b border-emerald-100">
+              <div className="bg-rose-50 p-6 border-b border-rose-100">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-[#00a651] rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  <div className="w-12 h-12 bg-[#e92c5d] rounded-full flex items-center justify-center text-white font-bold text-xl">
                     {userProfile?.full_name?.[0] || 'U'}
                   </div>
                   <div>
@@ -453,7 +453,7 @@ const Header: React.FC = () => {
               </div>
             ) : (
               <div className="p-6 border-b border-gray-100">
-                <Link to="/login" className="flex items-center justify-center gap-2 bg-[#00a651] text-white w-full py-3 rounded-lg font-bold shadow-lg shadow-emerald-100 active:scale-95 transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/login" className="flex items-center justify-center gap-2 bg-[#e92c5d] text-white w-full py-3 rounded-lg font-bold shadow-lg shadow-rose-100 active:scale-95 transition-all" onClick={() => setIsMobileMenuOpen(false)}>
                   <User size={18} /> Login / Register
                 </Link>
               </div>
@@ -482,7 +482,7 @@ const Header: React.FC = () => {
 
             {isAdmin && (
               <div className="mt-auto p-4 border-t border-gray-100">
-                <Link to="/admin" className="block text-center font-bold text-[#00a651] bg-[#e6fbf2] py-3 rounded-lg border border-[#00a651]/20" onClick={() => setIsMobileMenuOpen(false)}>Admin Dashboard</Link>
+                <Link to="/admin" className="block text-center font-bold text-[#e92c5d] bg-[#fdf2f5] py-3 rounded-lg border border-[#e92c5d]/20" onClick={() => setIsMobileMenuOpen(false)}>Admin Dashboard</Link>
               </div>
             )}
           </nav>

@@ -36,14 +36,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Top Left: Heart Icon */}
       <button 
         onClick={handleToggleWishlist}
-        className={`absolute top-4 left-4 p-1.5 transition-all z-10 hover:scale-110 active:scale-95 ${isInWishlist ? 'text-red-500' : 'text-emerald-500'}`}
+        className={`absolute top-4 left-4 p-1.5 transition-all z-10 hover:scale-110 active:scale-95 ${isInWishlist ? 'text-red-500' : 'text-rose-500'}`}
       >
         <Heart size={18} fill={isInWishlist ? "currentColor" : "none"} />
       </button>
 
       {/* Top Right: Discount Badge - Only if there's an ACTUAL discount */}
       {(product.badge || (isDiscounted && discountPercent > 0)) && (
-        <span className="absolute top-4 right-4 bg-[#00a651] text-white text-[10px] font-black px-2.5 py-1 rounded-full z-10 shadow-sm tracking-widest">
+        <span className="absolute top-4 right-4 bg-[#e92c5d] text-white text-[10px] font-black px-2.5 py-1 rounded-full z-10 shadow-sm tracking-widest">
           {product.badge || `${discountPercent}%`}
         </span>
       )}
@@ -62,7 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Price & Cart Row */}
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-[#00a651] text-base flex items-baseline gap-0.5">
+            <span className="font-bold text-[#e92c5d] text-base flex items-baseline gap-0.5">
               <span className="text-sm font-medium">৳</span>{product.price.toFixed(2)}
             </span>
             {/* PERMANENT FIX: Strikethrough price only renders if it is strictly greater than the current selling price */}
@@ -78,7 +78,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               e.preventDefault();
               addToCart(product);
             }}
-            className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-[#00a651] hover:bg-[#00a651] hover:text-white hover:border-[#00a651] transition-all"
+            className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-[#e92c5d] hover:bg-[#e92c5d] hover:text-white hover:border-[#e92c5d] transition-all"
           >
             <ShoppingCart size={16} />
           </button>
@@ -86,7 +86,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Product Name Below Price */}
         <Link to={`/product/${product.slug}`} className="block">
-          <h3 className="text-[13px] font-medium text-gray-700 leading-tight hover:text-[#00a651] transition-colors line-clamp-2">
+          <h3 className="text-[13px] font-medium text-gray-700 leading-tight hover:text-[#e92c5d] transition-colors line-clamp-2">
             {product.name}
           </h3>
         </Link>

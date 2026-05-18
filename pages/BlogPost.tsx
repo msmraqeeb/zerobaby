@@ -12,7 +12,7 @@ const BlogPost: React.FC = () => {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-4">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">Blog Post Not Found</h2>
-                <Link to="/blog" className="text-[#00a651] hover:underline flex items-center gap-2">
+                <Link to="/blog" className="text-[#e92c5d] hover:underline flex items-center gap-2">
                     <ArrowLeft size={16} /> Back to Blog
                 </Link>
             </div>
@@ -30,7 +30,7 @@ const BlogPost: React.FC = () => {
                 />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                     <div className="container mx-auto px-4 text-center text-white">
-                        <div className="inline-block bg-[#00a651] px-4 py-1 rounded-full text-sm font-semibold mb-4">
+                        <div className="inline-block bg-[#e92c5d] px-4 py-1 rounded-full text-sm font-semibold mb-4">
                             {post.tags[0]}
                         </div>
                         <h1 className="text-4xl md:text-5xl font-bold mb-6 max-w-4xl mx-auto leading-tight">
@@ -54,10 +54,10 @@ const BlogPost: React.FC = () => {
                 <div className="bg-white rounded-xl shadow-xl p-8 md:p-12">
                     {/* Share/Actions Header */}
                     <div className="flex items-center justify-between pb-8 border-b border-gray-100 mb-8">
-                        <Link to="/blog" className="text-gray-500 hover:text-[#00a651] flex items-center gap-2 text-sm font-medium transition-colors">
+                        <Link to="/blog" className="text-gray-500 hover:text-[#e92c5d] flex items-center gap-2 text-sm font-medium transition-colors">
                             <ArrowLeft size={18} /> Back to Blog
                         </Link>
-                        <button className="text-gray-500 hover:text-[#00a651] transition-colors p-2 hover:bg-gray-50 rounded-full" title="Share">
+                        <button className="text-gray-500 hover:text-[#e92c5d] transition-colors p-2 hover:bg-gray-50 rounded-full" title="Share">
                             <Share2 size={20} />
                         </button>
                     </div>

@@ -107,7 +107,7 @@ const MyAccount: React.FC = () => {
 
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'Delivered': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+      case 'Delivered': return 'bg-rose-50 text-rose-600 border-rose-100';
       case 'Cancelled': return 'bg-red-50 text-red-600 border-red-100';
       case 'Processing': return 'bg-blue-50 text-blue-600 border-blue-100';
       default: return 'bg-amber-50 text-amber-600 border-amber-100';
@@ -122,7 +122,7 @@ const MyAccount: React.FC = () => {
           <aside className="lg:col-span-1">
             <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6 sticky top-24">
                <div className="flex flex-col items-center text-center mb-8">
-                 <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center text-white font-black text-3xl mb-4 shadow-lg shadow-emerald-100">
+                 <div className="w-20 h-20 bg-rose-500 rounded-full flex items-center justify-center text-white font-black text-3xl mb-4 shadow-lg shadow-rose-100">
                    {displayName.charAt(0).toUpperCase()}
                  </div>
                  <div className="min-w-0 w-full">
@@ -141,7 +141,7 @@ const MyAccount: React.FC = () => {
                   <button 
                     key={item.id}
                     onClick={() => setActiveTab(item.id as AccountTab)}
-                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all font-bold text-sm ${activeTab === item.id ? 'bg-emerald-50 text-emerald-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all font-bold text-sm ${activeTab === item.id ? 'bg-rose-50 text-rose-600' : 'text-gray-500 hover:bg-gray-50'}`}
                   >
                     <item.icon size={18} />
                     {item.label}
@@ -169,7 +169,7 @@ const MyAccount: React.FC = () => {
                         required
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-emerald-500 transition-all" 
+                        className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-rose-500 transition-all" 
                       />
                     </div>
                     <div className="space-y-3">
@@ -178,13 +178,13 @@ const MyAccount: React.FC = () => {
                     </div>
                   </div>
                   {updateSuccess && (
-                    <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                    <div className="flex items-center gap-2 text-rose-600 bg-rose-50 p-4 rounded-xl border border-rose-100">
                       <CheckCircle2 size={18} />
                       <span className="text-xs font-bold">Profile updated successfully!</span>
                     </div>
                   )}
                   <div className="flex justify-end">
-                    <button type="submit" disabled={isUpdating} className="bg-[#00a651] text-white font-black px-12 py-4 rounded-2xl uppercase tracking-widest text-[11px] shadow-lg shadow-emerald-50 hover:bg-[#008c44] transition-all">
+                    <button type="submit" disabled={isUpdating} className="bg-[#e92c5d] text-white font-black px-12 py-4 rounded-2xl uppercase tracking-widest text-[11px] shadow-lg shadow-rose-50 hover:bg-[#c81d4a] transition-all">
                       {isUpdating ? <Loader2 className="animate-spin" /> : 'Save Changes'}
                     </button>
                   </div>
@@ -202,19 +202,19 @@ const MyAccount: React.FC = () => {
 
                 {userOrders.length === 0 ? (
                   <div className="bg-white rounded-[24px] border border-gray-100 p-20 flex flex-col items-center text-center">
-                    <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-6">
+                    <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 mb-6">
                       <ShoppingBag size={32} />
                     </div>
                     <h4 className="text-lg font-black text-gray-800 mb-2">No Orders Yet</h4>
                     <p className="text-sm text-gray-500 mb-8 max-w-xs">You haven't placed any orders with us. Start shopping to see your history here.</p>
-                    <button onClick={() => navigate('/products')} className="bg-emerald-500 text-white font-black px-8 py-3 rounded-xl uppercase text-xs tracking-widest hover:bg-emerald-600 transition-all">Browse Store</button>
+                    <button onClick={() => navigate('/products')} className="bg-rose-500 text-white font-black px-8 py-3 rounded-xl uppercase text-xs tracking-widest hover:bg-rose-600 transition-all">Browse Store</button>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {userOrders.map((order) => (
                       <div key={order.id} className="bg-white rounded-[24px] border border-gray-100 p-6 flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-md transition-all">
                         <div className="flex items-center gap-5 w-full md:w-auto">
-                          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-gray-100">
+                          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-rose-600 border border-gray-100">
                             <Package size={24} />
                           </div>
                           <div className="space-y-1">
@@ -233,7 +233,7 @@ const MyAccount: React.FC = () => {
                         </div>
                         <button 
                           onClick={() => navigate(`/order-success/${order.id}`, { state: { order } })}
-                          className="w-full md:w-auto bg-gray-50 hover:bg-emerald-50 text-gray-500 hover:text-emerald-600 font-black py-3 px-6 rounded-xl text-xs uppercase tracking-widest transition-all"
+                          className="w-full md:w-auto bg-gray-50 hover:bg-rose-50 text-gray-500 hover:text-rose-600 font-black py-3 px-6 rounded-xl text-xs uppercase tracking-widest transition-all"
                         >
                           View Details
                         </button>
@@ -256,7 +256,7 @@ const MyAccount: React.FC = () => {
                         setAddressForm({ fullName: '', phone: '', addressLine: '', district: '', area: '' });
                         setShowAddressForm(true);
                       }}
-                      className="flex items-center gap-2 bg-[#00a651] text-white px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#008c44] shadow-xl shadow-emerald-100 transition-all active:scale-95"
+                      className="flex items-center gap-2 bg-[#e92c5d] text-white px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#c81d4a] shadow-xl shadow-rose-100 transition-all active:scale-95"
                     >
                       <Plus size={16} /> Add New
                     </button>
@@ -265,7 +265,7 @@ const MyAccount: React.FC = () => {
 
                 {addresses.length === 0 && !showAddressForm ? (
                   <div className="bg-white rounded-[2rem] border border-gray-100 p-24 flex flex-col items-center text-center shadow-sm">
-                    <div className="w-24 h-24 bg-emerald-50 rounded-[2rem] flex items-center justify-center text-[#00a651] mb-8 border border-emerald-100">
+                    <div className="w-24 h-24 bg-rose-50 rounded-[2rem] flex items-center justify-center text-[#e92c5d] mb-8 border border-rose-100">
                       <MapPin size={40} />
                     </div>
                     <h4 className="text-xl font-black text-gray-800 mb-2 uppercase tracking-tighter">No addresses yet</h4>
@@ -279,7 +279,7 @@ const MyAccount: React.FC = () => {
                         <div className="absolute top-8 right-8 flex gap-3">
                            <button 
                              onClick={() => startEditAddress(addr)}
-                             className="text-gray-300 hover:text-[#00a651] transition-all p-2 bg-gray-50 rounded-xl hover:bg-emerald-50"
+                             className="text-gray-300 hover:text-[#e92c5d] transition-all p-2 bg-gray-50 rounded-xl hover:bg-rose-50"
                              title="Edit Address"
                            >
                              <Edit3 size={18} />
@@ -296,7 +296,7 @@ const MyAccount: React.FC = () => {
                         <div className="flex items-start">
                           <div className="flex items-center gap-6">
                             {/* Rounded-square icon background from screenshot */}
-                            <div className="w-16 h-16 bg-[#e6fbf2] rounded-[1.25rem] flex items-center justify-center text-[#00a651] shadow-sm shrink-0">
+                            <div className="w-16 h-16 bg-[#fdf2f5] rounded-[1.25rem] flex items-center justify-center text-[#e92c5d] shadow-sm shrink-0">
                               <MapPin size={28} />
                             </div>
                             <div className="space-y-1">
@@ -319,7 +319,7 @@ const MyAccount: React.FC = () => {
                 )}
 
                 {showAddressForm && (
-                  <div className="bg-white rounded-[2.5rem] p-10 md:p-14 shadow-2xl border border-emerald-50 animate-in slide-in-from-top-4 duration-500">
+                  <div className="bg-white rounded-[2.5rem] p-10 md:p-14 shadow-2xl border border-rose-50 animate-in slide-in-from-top-4 duration-500">
                     <div className="flex items-center justify-between mb-10">
                       <h3 className="text-2xl font-black text-gray-800 tracking-tight uppercase">
                         {editingAddressId ? 'Edit Address' : 'New Address'}
@@ -330,15 +330,15 @@ const MyAccount: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-2">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
-                          <input required value={addressForm.fullName} onChange={e => setAddressForm({...addressForm, fullName: e.target.value})} className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#00a651] transition-all" />
+                          <input required value={addressForm.fullName} onChange={e => setAddressForm({...addressForm, fullName: e.target.value})} className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all" />
                         </div>
                         <div className="space-y-2">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
-                          <input required value={addressForm.phone} onChange={e => setAddressForm({...addressForm, phone: e.target.value})} className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#00a651] transition-all" />
+                          <input required value={addressForm.phone} onChange={e => setAddressForm({...addressForm, phone: e.target.value})} className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all" />
                         </div>
                         <div className="space-y-2 md:col-span-2">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Street Address / House / Road</label>
-                          <input required value={addressForm.addressLine} onChange={e => setAddressForm({...addressForm, addressLine: e.target.value})} className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#00a651] transition-all" />
+                          <input required value={addressForm.addressLine} onChange={e => setAddressForm({...addressForm, addressLine: e.target.value})} className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all" />
                         </div>
                         <div className="space-y-2">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">District</label>
@@ -347,7 +347,7 @@ const MyAccount: React.FC = () => {
                               required 
                               value={addressForm.district} 
                               onChange={e => setAddressForm({...addressForm, district: e.target.value, area: ''})} 
-                              className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#00a651] transition-all appearance-none"
+                              className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all appearance-none"
                             >
                               <option value="">Select District</option>
                               {Object.keys(DISTRICT_AREA_DATA).map(d => <option key={d} value={d}>{d}</option>)}
@@ -363,7 +363,7 @@ const MyAccount: React.FC = () => {
                               disabled={!addressForm.district}
                               value={addressForm.area} 
                               onChange={e => setAddressForm({...addressForm, area: e.target.value})} 
-                              className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#00a651] transition-all appearance-none disabled:opacity-50"
+                              className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all appearance-none disabled:opacity-50"
                             >
                               <option value="">Select Area</option>
                               {addressForm.district && DISTRICT_AREA_DATA[addressForm.district].map(a => <option key={a} value={a}>{a}</option>)}
@@ -374,7 +374,7 @@ const MyAccount: React.FC = () => {
                       </div>
                       <div className="pt-6 flex gap-6">
                         <button type="button" onClick={() => setShowAddressForm(false)} className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-400 font-black py-5 rounded-[1.5rem] uppercase text-xs tracking-widest transition-all">Cancel</button>
-                        <button type="submit" className="flex-[2] bg-[#00a651] hover:bg-[#008c44] text-white font-black py-5 rounded-[1.5rem] uppercase text-xs tracking-widest shadow-2xl shadow-emerald-100 transition-all active:scale-95">
+                        <button type="submit" className="flex-[2] bg-[#e92c5d] hover:bg-[#c81d4a] text-white font-black py-5 rounded-[1.5rem] uppercase text-xs tracking-widest shadow-2xl shadow-rose-100 transition-all active:scale-95">
                           {editingAddressId ? 'Update Address' : 'Save Address'}
                         </button>
                       </div>
@@ -399,7 +399,7 @@ const MyAccount: React.FC = () => {
                     </div>
                     <h4 className="text-xl font-black text-gray-800 mb-2 uppercase tracking-tighter">Wishlist Empty</h4>
                     <p className="text-sm text-gray-500 mb-8 max-w-xs font-medium">Keep track of your favorite healthy picks. Browse our store to add items here.</p>
-                    <button onClick={() => navigate('/products')} className="bg-[#00a651] text-white font-black px-10 py-4 rounded-2xl uppercase text-xs tracking-widest hover:bg-[#008c44] transition-all shadow-xl shadow-emerald-100">Start Exploring</button>
+                    <button onClick={() => navigate('/products')} className="bg-[#e92c5d] text-white font-black px-10 py-4 rounded-2xl uppercase text-xs tracking-widest hover:bg-[#c81d4a] transition-all shadow-xl shadow-rose-100">Start Exploring</button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

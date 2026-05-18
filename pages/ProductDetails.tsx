@@ -81,7 +81,7 @@ const ProductDetails: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
         <h2 className="text-2xl font-bold text-gray-800">Product not found</h2>
-        <Link to="/" className="text-emerald-500 font-bold hover:underline mt-4 inline-block">Return Home</Link>
+        <Link to="/" className="text-rose-500 font-bold hover:underline mt-4 inline-block">Return Home</Link>
       </div>
     );
   }
@@ -181,10 +181,10 @@ const ProductDetails: React.FC = () => {
               />
               {displayImages.length > 1 && !variantImage && (
                 <>
-                  <button onClick={() => setActiveImageIdx(prev => (prev === 0 ? displayImages.length - 1 : prev - 1))} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-emerald-500">
+                  <button onClick={() => setActiveImageIdx(prev => (prev === 0 ? displayImages.length - 1 : prev - 1))} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-rose-500">
                     <ChevronLeft size={24} />
                   </button>
-                  <button onClick={() => setActiveImageIdx(prev => (prev === displayImages.length - 1 ? 0 : prev + 1))} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-emerald-500">
+                  <button onClick={() => setActiveImageIdx(prev => (prev === displayImages.length - 1 ? 0 : prev + 1))} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-rose-500">
                     <ChevronRight size={24} />
                   </button>
                 </>
@@ -197,7 +197,7 @@ const ProductDetails: React.FC = () => {
                   <button
                     key={idx}
                     onClick={() => setActiveImageIdx(idx)}
-                    className={`w-20 h-20 rounded-xl border-2 shrink-0 p-2 bg-white transition-all ${activeImageIdx === idx ? 'border-emerald-500 shadow-md' : 'border-gray-100 hover:border-emerald-200'}`}
+                    className={`w-20 h-20 rounded-xl border-2 shrink-0 p-2 bg-white transition-all ${activeImageIdx === idx ? 'border-rose-500 shadow-md' : 'border-gray-100 hover:border-rose-200'}`}
                   >
                     <img src={img} className="w-full h-full object-contain" />
                   </button>
@@ -205,19 +205,19 @@ const ProductDetails: React.FC = () => {
               </div>
             )}
             {variantImage && (
-              <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest text-center">Selected variant image shown</p>
+              <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest text-center">Selected variant image shown</p>
             )}
           </div>
 
           <div className="lg:w-1/2 space-y-6">
             <div className="space-y-4">
-              <span className="text-[11px] font-black text-[#00a651] uppercase tracking-[2px] bg-[#e6fbf2] px-4 py-1.5 rounded-full inline-block">
+              <span className="text-[11px] font-black text-[#e92c5d] uppercase tracking-[2px] bg-[#fdf2f5] px-4 py-1.5 rounded-full inline-block">
                 {product.category}
               </span>
               <h1 className="text-3xl md:text-4xl font-black text-gray-800 tracking-tight leading-tight flex flex-wrap items-center gap-2">
                 {product.name}
                 {currentVariant && (
-                  <span className="text-[#00a651] font-bold">
+                  <span className="text-[#e92c5d] font-bold">
                     ({Object.values(currentVariant.attributeValues).join(', ')})
                   </span>
                 )}
@@ -225,7 +225,7 @@ const ProductDetails: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-5 py-2">
-              <span className="text-5xl font-black text-[#00a651] flex items-center gap-1.5">
+              <span className="text-5xl font-black text-[#e92c5d] flex items-center gap-1.5">
                 <span className="text-3xl font-medium">৳</span>{displayPrice.toFixed(2)}
               </span>
               {displayOriginalPrice && displayOriginalPrice > displayPrice && (
@@ -238,7 +238,7 @@ const ProductDetails: React.FC = () => {
             {/* Short Description Section Styled exactly as screenshot (Vertical Green Line) */}
             {product.shortDescription && (
               <div className="relative pl-8 py-1 my-6">
-                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#00a651] rounded-full"></div>
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#e92c5d] rounded-full"></div>
                 <div
                   className="text-[16px] text-gray-600 leading-relaxed italic prose prose-sm max-w-none font-medium"
                   dangerouslySetInnerHTML={{ __html: product.shortDescription }}
@@ -258,8 +258,8 @@ const ProductDetails: React.FC = () => {
                         key={val}
                         onClick={() => handleAttrSelect(attr.name, val)}
                         className={`px-8 py-4 border-2 rounded-[15px] text-sm font-bold transition-all min-w-[110px] shadow-sm ${isActive
-                          ? 'bg-[#00a651] border-black text-white shadow-xl'
-                          : 'bg-white border-gray-100 text-gray-500 hover:border-[#00a651]'
+                          ? 'bg-[#e92c5d] border-black text-white shadow-xl'
+                          : 'bg-white border-gray-100 text-gray-500 hover:border-[#e92c5d]'
                           }`}
                       >
                         {val}
@@ -279,15 +279,15 @@ const ProductDetails: React.FC = () => {
 
             <div className="flex items-center gap-6 pt-6">
               <div className="flex items-center border-2 border-gray-100 rounded-[20px] overflow-hidden h-16 shadow-sm bg-gray-50/50">
-                <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="px-6 h-full hover:bg-white text-gray-400 hover:text-[#00a651] transition-colors"><Minus size={20} /></button>
+                <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="px-6 h-full hover:bg-white text-gray-400 hover:text-[#e92c5d] transition-colors"><Minus size={20} /></button>
                 <span className="w-14 text-center font-black text-gray-800 text-xl">{quantity}</span>
-                <button onClick={() => setQuantity(prev => prev + 1)} className="px-6 h-full hover:bg-white text-gray-400 hover:text-[#00a651] transition-colors"><Plus size={20} /></button>
+                <button onClick={() => setQuantity(prev => prev + 1)} className="px-6 h-full hover:bg-white text-gray-400 hover:text-[#e92c5d] transition-colors"><Plus size={20} /></button>
               </div>
               <button
                 onClick={handleAddToCart}
                 className={`flex-1 font-black py-5 px-10 rounded-[20px] transition-all flex items-center justify-center gap-4 h-16 shadow-2xl uppercase tracking-widest text-sm ${product.variants && product.variants.length > 0 && !currentVariant
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
-                  : 'bg-[#00a651] hover:bg-[#008c44] text-white shadow-emerald-100 active:scale-95'
+                  : 'bg-[#e92c5d] hover:bg-[#c81d4a] text-white shadow-rose-100 active:scale-95'
                   }`}
               >
                 <ShoppingCart size={22} />
@@ -307,7 +307,7 @@ const ProductDetails: React.FC = () => {
         <div className="mt-12 bg-white rounded-xl p-8 border border-gray-100 shadow-sm">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-800 mb-2">Product Details</h2>
-            <div className="w-12 h-1 bg-[#00a651] rounded-full"></div>
+            <div className="w-12 h-1 bg-[#e92c5d] rounded-full"></div>
           </div>
           <div
             className="text-gray-600 leading-relaxed text-sm"
@@ -319,9 +319,9 @@ const ProductDetails: React.FC = () => {
         <div className="mt-24">
           <div className="flex items-center justify-between mb-12">
             <h2 className="text-3xl font-black text-[#004d40] uppercase tracking-tight">Customer Reviews</h2>
-            <div className="hidden md:flex items-center gap-2 bg-[#e6fbf2] px-6 py-2 rounded-full">
+            <div className="hidden md:flex items-center gap-2 bg-[#fdf2f5] px-6 py-2 rounded-full">
               <Star size={18} className="text-yellow-400 fill-current" />
-              <span className="text-lg font-black text-[#00a651]">{ratingStats.average} / 5.0</span>
+              <span className="text-lg font-black text-[#e92c5d]">{ratingStats.average} / 5.0</span>
             </div>
           </div>
 
@@ -351,7 +351,7 @@ const ProductDetails: React.FC = () => {
                       <span className="text-sm font-bold text-gray-800 w-3">{star}</span>
                       <Star size={14} className="text-gray-300" />
                       <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#00a651] rounded-full" style={{ width: `${percent}%` }}></div>
+                        <div className="h-full bg-[#e92c5d] rounded-full" style={{ width: `${percent}%` }}></div>
                       </div>
                       <span className="text-xs font-bold text-gray-400 w-8 text-right">{percent}%</span>
                     </div>
@@ -372,7 +372,7 @@ const ProductDetails: React.FC = () => {
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
                   placeholder="Describe your experience with this product..."
-                  className="w-full border border-gray-200 rounded-xl p-4 h-32 outline-none focus:border-[#00a651] transition-all text-sm placeholder:text-gray-300 resize-none bg-gray-50/30"
+                  className="w-full border border-gray-200 rounded-xl p-4 h-32 outline-none focus:border-[#e92c5d] transition-all text-sm placeholder:text-gray-300 resize-none bg-gray-50/30"
                 />
 
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -416,7 +416,7 @@ const ProductDetails: React.FC = () => {
                   <div key={rev.id} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start mb-6">
                       <div className="flex gap-4 items-center">
-                        <div className="w-10 h-10 rounded-full bg-[#00a651] flex items-center justify-center text-white font-black text-sm shadow-md">
+                        <div className="w-10 h-10 rounded-full bg-[#e92c5d] flex items-center justify-center text-white font-black text-sm shadow-md">
                           {rev.authorName.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -431,8 +431,8 @@ const ProductDetails: React.FC = () => {
                     <p className="text-gray-600 text-sm leading-relaxed italic">"{rev.comment}"</p>
 
                     {rev.reply && (
-                      <div className="mt-6 pl-6 border-l-2 border-[#00a651] py-2 bg-emerald-50/30 rounded-r-xl">
-                        <span className="text-[10px] font-black text-[#00a651] uppercase tracking-wider block mb-1">Reply</span>
+                      <div className="mt-6 pl-6 border-l-2 border-[#e92c5d] py-2 bg-rose-50/30 rounded-r-xl">
+                        <span className="text-[10px] font-black text-[#e92c5d] uppercase tracking-wider block mb-1">Reply</span>
                         <p className="text-gray-800 text-sm font-medium">"{rev.reply}"</p>
                       </div>
                     )}

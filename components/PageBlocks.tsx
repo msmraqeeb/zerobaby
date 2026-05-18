@@ -20,7 +20,7 @@ export const StorySection: React.FC<{ data: any }> = ({ data }) => {
         <div className="flex flex-col lg:flex-row gap-12 items-center">
             <div className="lg:w-1/2 space-y-6">
                 {data.badge && (
-                    <span className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest inline-block">
+                    <span className="bg-rose-50 text-rose-600 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest inline-block">
                         {data.badge}
                     </span>
                 )}
@@ -33,7 +33,7 @@ export const StorySection: React.FC<{ data: any }> = ({ data }) => {
                 </div>
             </div>
             <div className="lg:w-1/2 relative group">
-                <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-emerald-100 transform transition-transform group-hover:scale-[1.01] duration-500">
+                <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-rose-100 transform transition-transform group-hover:scale-[1.01] duration-500">
                     <img
                         src={data.image_url}
                         alt={data.title}
@@ -58,7 +58,7 @@ export const ValuesGrid: React.FC<{ data: any }> = ({ data }) => {
                     const Icon = ICONS[item.icon] || Star;
                     return (
                         <div key={idx} className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                            <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 group-hover:bg-[#10B981] group-hover:text-white transition-all duration-300">
+                            <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 group-hover:bg-[#10B981] group-hover:text-white transition-all duration-300">
                                 <Icon size={28} />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
@@ -103,24 +103,24 @@ export const CtaSection: React.FC<{ data: any }> = ({ data }) => {
     return (
         <div className="bg-[#003d29] rounded-[2.5rem] p-12 md:p-16 text-center relative overflow-hidden group">
             {/* Decorative Overlay */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
 
             <div className="relative z-10 max-w-3xl mx-auto space-y-8">
                 <h2 className="text-3xl md:text-5xl font-black text-white leading-tight whitespace-pre-line tracking-tight">
                     {data.title}
                 </h2>
-                <p className="text-emerald-100/80 text-lg font-medium max-w-xl mx-auto">
+                <p className="text-rose-100/80 text-lg font-medium max-w-xl mx-auto">
                     {data.subtitle}
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                     {data.button1_text && (
-                        <Link to={data.button1_link || '#'} className="bg-[#10B981] text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-emerald-400 transition-all hover:scale-105 shadow-lg shadow-emerald-900/20 active:scale-95 w-full sm:w-auto">
+                        <Link to={data.button1_link || '#'} className="bg-[#10B981] text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-rose-400 transition-all hover:scale-105 shadow-lg shadow-rose-900/20 active:scale-95 w-full sm:w-auto">
                             {data.button1_text}
                         </Link>
                     )}
                     {data.button2_text && (
-                        <Link to={data.button2_link || '#'} className="border-2 border-emerald-800/50 text-emerald-100 px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-emerald-900/30 hover:text-white hover:border-emerald-500/50 transition-all active:scale-95 w-full sm:w-auto">
+                        <Link to={data.button2_link || '#'} className="border-2 border-rose-800/50 text-rose-100 px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-rose-900/30 hover:text-white hover:border-rose-500/50 transition-all active:scale-95 w-full sm:w-auto">
                             {data.button2_text}
                         </Link>
                     )}
@@ -142,7 +142,7 @@ export const ContactSection: React.FC<{ data: any }> = ({ data }) => {
                     const Icon = ICONS[item.icon] || Info;
                     return (
                         <div key={idx} className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center group">
-                            <div className="w-16 h-16 bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-gray-600 mb-6 mx-auto group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500 transition-all duration-300">
+                            <div className="w-16 h-16 bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-gray-600 mb-6 mx-auto group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all duration-300">
                                 <Icon size={32} strokeWidth={1.5} />
                             </div>
                             <h3 className="text-lg font-black text-gray-900 mb-2">{item.label}</h3>
@@ -169,13 +169,13 @@ export const FaqContactSection: React.FC<{ data: any }> = ({ data }) => {
                     {data.faqs?.map((faq: any, idx: number) => {
                         const isOpen = openIndex === idx;
                         return (
-                            <div key={idx} className={`border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300 ${isOpen ? 'bg-emerald-50/50 border-emerald-100' : 'bg-white'}`}>
+                            <div key={idx} className={`border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300 ${isOpen ? 'bg-rose-50/50 border-rose-100' : 'bg-white'}`}>
                                 <button
                                     onClick={() => setOpenIndex(isOpen ? null : idx)}
                                     className="w-full flex justify-between items-center p-6 text-left"
                                 >
-                                    <span className={`font-bold text-lg ${isOpen ? 'text-emerald-800' : 'text-gray-700'}`}>{faq.question}</span>
-                                    <div className={`p-2 rounded-full transition-colors ${isOpen ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-50 text-gray-400'}`}>
+                                    <span className={`font-bold text-lg ${isOpen ? 'text-rose-800' : 'text-gray-700'}`}>{faq.question}</span>
+                                    <div className={`p-2 rounded-full transition-colors ${isOpen ? 'bg-rose-100 text-rose-600' : 'bg-gray-50 text-gray-400'}`}>
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
                                             <polyline points="6 9 12 15 18 9"></polyline>
                                         </svg>
@@ -199,17 +199,17 @@ export const FaqContactSection: React.FC<{ data: any }> = ({ data }) => {
                     <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert('Message sent!'); }}>
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-gray-400 uppercase ml-1">Your Name</label>
-                            <input type="text" className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl font-bold text-gray-800 focus:outline-none focus:border-emerald-500 transition-colors" placeholder="John Doe" />
+                            <input type="text" className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl font-bold text-gray-800 focus:outline-none focus:border-rose-500 transition-colors" placeholder="John Doe" />
                         </div>
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-gray-400 uppercase ml-1">Your Email</label>
-                            <input type="email" className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl font-bold text-gray-800 focus:outline-none focus:border-emerald-500 transition-colors" placeholder="john@example.com" />
+                            <input type="email" className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl font-bold text-gray-800 focus:outline-none focus:border-rose-500 transition-colors" placeholder="john@example.com" />
                         </div>
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-gray-400 uppercase ml-1">Your Message</label>
-                            <textarea className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl text-gray-800 focus:outline-none focus:border-emerald-500 transition-colors h-32 resize-none" placeholder="How can we help you?" />
+                            <textarea className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl text-gray-800 focus:outline-none focus:border-rose-500 transition-colors h-32 resize-none" placeholder="How can we help you?" />
                         </div>
-                        <button type="submit" className="w-auto px-10 py-4 bg-[#10B981] text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-emerald-600 transition-all hover:scale-105 shadow-lg shadow-emerald-200">
+                        <button type="submit" className="w-auto px-10 py-4 bg-[#10B981] text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-rose-600 transition-all hover:scale-105 shadow-lg shadow-rose-200">
                             Send Now
                         </button>
                     </form>

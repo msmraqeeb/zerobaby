@@ -77,7 +77,7 @@ const FloatingContact = () => {
                 {phone && (
                     <button
                         onClick={() => handleLink(phone, 'tel')}
-                        className="w-12 h-12 bg-[#00a651] rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform"
+                        className="w-12 h-12 bg-[#e92c5d] rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform"
                         title="Phone"
                     >
                         <Phone size={24} />

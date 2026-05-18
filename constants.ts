@@ -67,10 +67,10 @@ export const BLOG_POSTS: BlogPost[] = [
 
 
 export const THEME_COLOR = "emerald"; // mapped to tailwind classes
-export const PRIMARY_BG = "bg-emerald-500";
-export const PRIMARY_TEXT = "text-emerald-500";
-export const HOVER_TEXT = "hover:text-emerald-600";
-export const BTN_PRIMARY = "bg-emerald-500 hover:bg-emerald-600 text-white";
+export const PRIMARY_BG = "bg-rose-500";
+export const PRIMARY_TEXT = "text-rose-500";
+export const HOVER_TEXT = "hover:text-rose-600";
+export const BTN_PRIMARY = "bg-rose-500 hover:bg-rose-600 text-white";
 
 export const INITIAL_CATEGORIES: Category[] = [];
 

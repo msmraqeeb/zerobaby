@@ -48,7 +48,7 @@ const CategorySidebarItem: React.FC<{
   return (
     <div className="w-full">
       <div
-        className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${isSelected ? 'bg-emerald-50 text-emerald-600' : 'text-gray-600 hover:bg-gray-50'}`}
+        className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${isSelected ? 'bg-rose-50 text-rose-600' : 'text-gray-600 hover:bg-gray-50'}`}
         onClick={() => onSelect(category.name)}
         style={{ paddingLeft: `${(category.level * 12) + 12}px` }}
       >
@@ -61,7 +61,7 @@ const CategorySidebarItem: React.FC<{
         {hasChildren && (
           <button
             onClick={handleToggle}
-            className={`p-1 rounded-md hover:bg-gray-200 transition-colors ${isSelected ? 'text-emerald-600' : 'text-gray-400'}`}
+            className={`p-1 rounded-md hover:bg-gray-200 transition-colors ${isSelected ? 'text-rose-600' : 'text-gray-400'}`}
           >
             {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           </button>
@@ -295,13 +295,13 @@ const Products: React.FC = () => {
             {/* Category Filter */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
               <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Filter size={18} className="text-emerald-500" />
+                <Filter size={18} className="text-rose-500" />
                 Categories
               </h3>
               <div className="space-y-1">
                 <button
                   onClick={() => setSelectedCategory('All')}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === 'All' ? 'bg-emerald-50 text-emerald-600' : 'text-gray-600 hover:bg-gray-50'}`}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === 'All' ? 'bg-rose-50 text-rose-600' : 'text-gray-600 hover:bg-gray-50'}`}
                 >
                   All Categories
                 </button>
@@ -321,7 +321,7 @@ const Products: React.FC = () => {
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
               <h3 className="font-bold text-gray-800 mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Coins size={18} className="text-emerald-500" />
+                  <Coins size={18} className="text-rose-500" />
                   Price Range
                 </div>
                 <span className="text-xs font-black text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">
@@ -332,7 +332,7 @@ const Products: React.FC = () => {
               <div className="relative h-2 w-full bg-gray-100 rounded-full mb-6">
                 {/* Track Fill */}
                 <div
-                  className="absolute h-full bg-emerald-500 rounded-full"
+                  className="absolute h-full bg-rose-500 rounded-full"
                   style={{
                     left: `${((priceRange[0] - minMax[0]) / (minMax[1] - minMax[0])) * 100}%`,
                     right: `${100 - ((priceRange[1] - minMax[0]) / (minMax[1] - minMax[0])) * 100}%`
@@ -349,7 +349,7 @@ const Products: React.FC = () => {
                     const val = Math.min(Number(e.target.value), priceRange[1] - 1);
                     setPriceRange([val, priceRange[1]]);
                   }}
-                  className="absolute w-full h-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-emerald-500 [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-emerald-500 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:cursor-pointer outline-none z-30"
+                  className="absolute w-full h-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-rose-500 [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-rose-500 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:cursor-pointer outline-none z-30"
                 />
                 <input
                   type="range"
@@ -360,7 +360,7 @@ const Products: React.FC = () => {
                     const val = Math.max(Number(e.target.value), priceRange[0] + 1);
                     setPriceRange([priceRange[0], val]);
                   }}
-                  className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-emerald-500 [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-emerald-500 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:cursor-pointer outline-none z-40"
+                  className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-rose-500 [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-rose-500 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:cursor-pointer outline-none z-40"
                 />
               </div>
 
@@ -373,7 +373,7 @@ const Products: React.FC = () => {
             {/* Brand Filter */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
               <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <SlidersHorizontal size={18} className="text-emerald-500" />
+                <SlidersHorizontal size={18} className="text-rose-500" />
                 Brands
               </h3>
               <div className="space-y-2">
@@ -387,11 +387,11 @@ const Products: React.FC = () => {
                           type="checkbox"
                           checked={selectedBrands.includes(brand.name)}
                           onChange={() => toggleBrand(brand.name)}
-                          className="peer h-5 w-5 appearance-none rounded border-2 border-gray-200 checked:bg-emerald-500 checked:border-emerald-500 transition-all"
+                          className="peer h-5 w-5 appearance-none rounded border-2 border-gray-200 checked:bg-rose-500 checked:border-rose-500 transition-all"
                         />
                         <Check size={14} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
                       </div>
-                      <span className="text-sm font-medium text-gray-600 group-hover:text-emerald-500 transition-colors">{brand.name}</span>
+                      <span className="text-sm font-medium text-gray-600 group-hover:text-rose-500 transition-colors">{brand.name}</span>
                     </label>
                   ))
                 )}
@@ -402,7 +402,7 @@ const Products: React.FC = () => {
             {Object.entries(availableAttributes).map(([attrName, values]) => (
               <div key={attrName} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm animate-in fade-in duration-500">
                 <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                   {attrName}
                 </h3>
                 <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
@@ -413,11 +413,11 @@ const Products: React.FC = () => {
                           type="checkbox"
                           checked={selectedAttributes[attrName]?.includes(val) || false}
                           onChange={() => toggleAttribute(attrName, val)}
-                          className="peer h-5 w-5 appearance-none rounded border-2 border-gray-200 checked:bg-emerald-500 checked:border-emerald-500 transition-all"
+                          className="peer h-5 w-5 appearance-none rounded border-2 border-gray-200 checked:bg-rose-500 checked:border-rose-500 transition-all"
                         />
                         <Check size={14} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
                       </div>
-                      <span className="text-sm font-medium text-gray-600 group-hover:text-emerald-500 transition-colors">{val}</span>
+                      <span className="text-sm font-medium text-gray-600 group-hover:text-rose-500 transition-colors">{val}</span>
                     </label>
                   ))}
                 </div>
@@ -448,7 +448,7 @@ const Products: React.FC = () => {
             {/* Reset Action */}
             <button
               onClick={resetFilters}
-              className="w-full flex items-center justify-center gap-2 py-4 text-sm font-bold text-gray-400 hover:text-emerald-500 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all"
+              className="w-full flex items-center justify-center gap-2 py-4 text-sm font-bold text-gray-400 hover:text-rose-500 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all"
             >
               <RotateCcw size={16} />
               Reset All Filters
@@ -460,13 +460,13 @@ const Products: React.FC = () => {
             <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-sm font-medium text-gray-500">
                 Showing <span className="font-bold text-gray-800">{filteredProducts.length}</span> results
-                {selectedCategory !== 'All' && <span> in <span className="text-emerald-500 font-bold">{selectedCategory}</span></span>}
+                {selectedCategory !== 'All' && <span> in <span className="text-rose-500 font-bold">{selectedCategory}</span></span>}
               </p>
 
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-gray-400 font-medium">Sort by:</span>
-                  <select className="bg-gray-50 border border-gray-100 rounded-lg px-3 py-1.5 font-bold text-gray-700 outline-none focus:border-emerald-500">
+                  <select className="bg-gray-50 border border-gray-100 rounded-lg px-3 py-1.5 font-bold text-gray-700 outline-none focus:border-rose-500">
                     <option>Default Sorting</option>
                     <option>Price: Low to High</option>
                     <option>Price: High to Low</option>
@@ -484,7 +484,7 @@ const Products: React.FC = () => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-2">No products found</h3>
                 <p className="text-gray-500 max-w-xs">We couldn't find any products matching your current filters. Try adjusting your selection!</p>
-                <button onClick={resetFilters} className="mt-8 bg-emerald-500 text-white px-8 py-3 rounded-full font-bold hover:bg-emerald-600 transition-all">
+                <button onClick={resetFilters} className="mt-8 bg-rose-500 text-white px-8 py-3 rounded-full font-bold hover:bg-rose-600 transition-all">
                   Clear all filters
                 </button>
               </div>
