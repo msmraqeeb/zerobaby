@@ -25,13 +25,13 @@ const CategoryMenuItem: React.FC<{ category: CategoryNode }> = ({ category }) =>
 
   return (
     <div
-      className="relative px-4 py-2 hover:bg-[#f47b20] hover:text-white transition-colors cursor-pointer text-gray-700 text-sm"
+      className="relative px-4 py-2 hover:bg-[#F43F5E] hover:text-white transition-colors cursor-pointer text-gray-700 text-sm"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link to={`/ products ? category = ${encodeURIComponent(category.name)} `} className="flex items-center justify-between w-full">
+      <Link to={`/category/${category.slug || encodeURIComponent(category.name)}`} className="flex items-center justify-between w-full">
         <span>{category.name}</span>
-        {hasChildren && <ChevronRight size={14} className={`opacity - 60 ${isHovered ? 'text-white' : ''} `} />}
+        {hasChildren && <ChevronRight size={14} className={`opacity-60 ${isHovered ? 'text-white' : ''}`} />}
       </Link>
 
       {/* Flyout Submenu */}
@@ -75,7 +75,7 @@ const MobileCategoryItem: React.FC<{ category: CategoryNode; level: number; onCl
           </div>
         ) : (
           <Link
-            to={`/products?category=${encodeURIComponent(category.name)}`}
+            to={`/category/${category.slug || encodeURIComponent(category.name)}`}
             className="flex items-center w-full text-sm"
             onClick={onClose}
           >
@@ -334,7 +334,7 @@ const Header: React.FC = () => {
                 <ChevronDown size={16} />
               </button>
               <div className="absolute top-full left-0 w-64 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible peer-hover:opacity-100 peer-hover:visible hover:opacity-100 hover:visible transition-all z-50">
-                <Link to="/products" className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f47b20] hover:text-white font-medium transition-colors">
+                <Link to="/products" className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#F43F5E] hover:text-white font-medium transition-colors">
                   All Products
                 </Link>
                 {categoryTree.map(cat => (

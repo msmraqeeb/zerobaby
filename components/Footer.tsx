@@ -74,7 +74,7 @@ const Footer: React.FC = () => {
                 .slice(0, 5)
                 .map(cat => (
                   <li key={cat.id}>
-                    <Link to={`/products?category=${encodeURIComponent(cat.name)}`} className="hover:text-rose-500 transition-colors">
+                    <Link to={`/category/${cat.slug || encodeURIComponent(cat.name)}`} className="hover:text-rose-500 transition-colors">
                       {cat.name}
                     </Link>
                   </li>

@@ -7,9 +7,10 @@ import { Link } from 'react-router-dom';
 
 interface ProductCardProps {
   product: Product;
+  className?: string;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) => {
   const { addToCart, wishlist, toggleWishlist, user } = useStore();
   const isInWishlist = wishlist.includes(product.id);
 
@@ -32,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     : 0;
 
   return (
-    <div className="group border border-gray-100 rounded-xl bg-white overflow-hidden hover:shadow-lg transition-all duration-300 relative flex flex-col">
+    <div className={`group border border-gray-100 rounded-xl bg-white overflow-hidden hover:shadow-lg transition-all duration-300 relative flex flex-col ${className}`}>
       {/* Top Left: Heart Icon */}
       <button 
         onClick={handleToggleWishlist}
@@ -49,7 +50,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       )}
 
       {/* Image Area */}
-      <Link to={`/product/${product.slug}`} className="h-52 p-4 flex items-center justify-center bg-transparent group-hover:bg-gray-50/50 transition-colors block">
+      <Link to={`/product/${product.slug}`} className="aspect-square w-full p-4 flex items-center justify-center bg-transparent group-hover:bg-gray-50/50 transition-colors block relative">
         <img 
           src={primaryImage} 
           alt={product.name} 

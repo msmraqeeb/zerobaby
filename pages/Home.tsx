@@ -63,8 +63,8 @@ const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = (
           className="flex gap-4 md:gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory cursor-grab active:cursor-grabbing"
         >
           {products.map(product => (
-            <div key={product.id} className="min-w-[160px] md:min-w-[300px] snap-center flex-shrink-0 select-none">
-              <ProductCard product={product} />
+            <div key={product.id} className="w-[150px] md:w-[240px] lg:w-[260px] snap-center flex-shrink-0 select-none">
+              <ProductCard product={product} className="w-full" />
             </div>
           ))}
         </div>
@@ -92,7 +92,7 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
         <Link to={`/products?filter=${section.filterType}${section.filterValue ? `&value=${section.filterValue}` : ''}`} className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
       </div>
 
-      <div className={`grid grid-cols-1 ${isNoBanner ? '' : 'lg:grid-cols-4'} gap-6`}>
+      <div className={`grid grid-cols-1 ${isNoBanner ? '' : 'lg:grid-cols-5'} gap-6`}>
         {section.banner && !isNoBanner && (
           <div className="hidden lg:block bg-gradient-to-b from-[#e92c5d] to-[#c81d4a] rounded-xl p-8 relative overflow-hidden text-white h-full">
             <h3 className="text-3xl font-bold mb-4 font-serif italic">{section.banner.title}</h3>
@@ -105,11 +105,11 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
         )}
 
         <div className={`
-          ${!isNoBanner ? (section.banner ? 'lg:col-span-3' : 'lg:col-span-4') : ''} 
-          grid grid-cols-2 lg:grid-cols-${isNoBanner ? '5' : (section.banner ? '3' : '4')} gap-3 md:gap-6
+          ${!isNoBanner ? (section.banner ? 'lg:col-span-4' : 'lg:col-span-5') : ''} 
+          grid grid-cols-2 lg:grid-cols-${isNoBanner ? '5' : (section.banner ? '4' : '5')} gap-3 md:gap-6
         `}>
-          {products.slice(0, isNoBanner ? 10 : (section.banner ? 6 : 8)).map(product => (
-            <ProductCard key={`${section.id}-${product.id}`} product={product} />
+          {products.slice(0, isNoBanner ? 10 : (section.banner ? 8 : 10)).map(product => (
+            <ProductCard key={`${section.id}-${product.id}`} product={product} className="max-w-[260px] mx-auto w-full" />
           ))}
         </div>
       </div>
@@ -158,31 +158,40 @@ const PromoBannersSection = () => {
         className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-6 snap-x snap-mandatory scrollbar-hide cursor-grab active:cursor-grabbing"
       >
         {/* Banner 1 */}
-        <div className="w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative">
+        <Link
+          to="/category/toys-&-stationery"
+          className="w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
+        >
           <img
-            src="https://dnaziaddhwmqalwrdgex.supabase.co/storage/v1/object/public/product-images/mini-banner-1.png"
+            src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.1.png"
             className="w-full h-auto object-contain md:object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
             alt="Promo Banner 1"
           />
-        </div>
+        </Link>
 
         {/* Banner 2 */}
-        <div className="w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative">
+        <Link
+          to="/category/apparels"
+          className="w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
+        >
           <img
-            src="https://dnaziaddhwmqalwrdgex.supabase.co/storage/v1/object/public/product-images/mini-banner-2.png"
+            src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.2.png"
             className="w-full h-auto object-contain md:object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
             alt="Promo Banner 2"
           />
-        </div>
+        </Link>
 
         {/* Banner 3 */}
-        <div className="w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative">
+        <Link
+          to="/category/childcare"
+          className="w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
+        >
           <img
-            src="https://dnaziaddhwmqalwrdgex.supabase.co/storage/v1/object/public/product-images/mini-banner-3.png"
+            src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.3.png"
             className="w-full h-auto object-contain md:object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
             alt="Promo Banner 3"
           />
-        </div>
+        </Link>
       </div>
     </section>
   );
@@ -191,12 +200,18 @@ const PromoBannersSection = () => {
 const DualBannerSection = () => (
   <section className="container mx-auto px-4 md:px-8 mb-16">
     <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
-      <div className="rounded-2xl overflow-hidden shadow-sm group aspect-[2/1] h-auto md:aspect-auto md:h-[280px]">
-        <img src="https://dnaziaddhwmqalwrdgex.supabase.co/storage/v1/object/public/product-images/home-banner-1.png" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Special Offer 1" />
-      </div>
-      <div className="rounded-2xl overflow-hidden shadow-sm group aspect-[2/1] h-auto md:aspect-auto md:h-[280px]">
-        <img src="https://dnaziaddhwmqalwrdgex.supabase.co/storage/v1/object/public/product-images/home-banner-2.png" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Special Offer 2" />
-      </div>
+      <Link
+        to="/category/toiletries"
+        className="rounded-2xl overflow-hidden shadow-sm group aspect-[2/1] h-auto md:aspect-auto md:h-[280px] block"
+      >
+        <img src="https://ik.imagekit.io/vrtbi4wsn/banners/banner1.4.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Special Offer 1" />
+      </Link>
+      <Link
+        to="/category/baby-foods"
+        className="rounded-2xl overflow-hidden shadow-sm group aspect-[2/1] h-auto md:aspect-auto md:h-[280px] block"
+      >
+        <img src="https://ik.imagekit.io/vrtbi4wsn/banners/banner1.5.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Special Offer 2" />
+      </Link>
     </div>
   </section>
 );
@@ -261,23 +276,57 @@ const Home: React.FC = () => {
           <div className="lg:col-span-2 relative rounded-xl overflow-hidden h-[200px] md:h-[450px]">
             {sliderBanners.length > 0 ? (
               <>
-                {sliderBanners.map((banner, idx) => (
-                  <div key={banner.id} className={`absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
-                    <img src={banner.image_url} alt={banner.title} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div>
-                    {(banner.title || banner.subtitle) && (
-                      <div className="absolute top-1/2 -translate-y-1/2 left-12 max-w-md text-white drop-shadow-md p-4">
-                        {banner.subtitle && <p className="text-[#e92c5d] bg-white/90 px-3 py-1 rounded w-fit font-bold uppercase tracking-wider mb-4 text-xs">{banner.subtitle}</p>}
-                        {banner.title && <h2 className="text-4xl md:text-5xl font-black leading-tight mb-8 drop-shadow-lg">{banner.title}</h2>}
-                        {banner.link && (
-                          <a href={banner.link} className="inline-block bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-8 py-3.5 rounded-full font-bold transition-all shadow-lg hover:shadow-rose-500/50 uppercase tracking-widest text-xs">
-                            Shop Now ➝
-                          </a>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {sliderBanners.map((banner, idx) => {
+                  const linkStr = banner.link || '';
+                  
+                  // Parse customized settings from link field
+                  const parts = linkStr.split('|');
+                  const actualLink = parts[0] || '';
+                  let align = 'left';
+                  let color = 'light';
+                  let show_btn = 'true';
+                  let desc = '';
+
+                  for (let i = 1; i < parts.length; i++) {
+                    const part = parts[i];
+                    if (part.startsWith('align:')) align = part.substring(6);
+                    else if (part.startsWith('color:')) color = part.substring(6);
+                    else if (part.startsWith('show_btn:')) show_btn = part.substring(9);
+                    else if (part.startsWith('desc:')) desc = decodeURIComponent(part.substring(5));
+                  }
+
+                  const isDarkText = color === 'dark';
+
+                  return (
+                    <div key={banner.id} className={`absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
+                      <img src={banner.image_url} alt={banner.title} className="w-full h-full object-cover" />
+                      {(banner.title || banner.subtitle || desc) && (
+                        <div className={`absolute top-1/2 -translate-y-1/2 max-w-md drop-shadow-md p-4 flex flex-col ${isDarkText ? 'text-gray-900' : 'text-white'} ${align === 'right' ? 'right-12 items-end text-right' : 'left-12 items-start text-left'}`}>
+                          {banner.subtitle && (
+                            <p className={`px-3 py-1 rounded w-fit font-bold uppercase tracking-wider mb-4 text-xs ${isDarkText ? 'bg-rose-500 text-white shadow-sm' : 'text-[#e92c5d] bg-white/90 shadow-sm'}`}>
+                              {banner.subtitle}
+                            </p>
+                          )}
+                          {banner.title && (
+                            <h2 className={`text-3xl md:text-5xl font-black leading-tight mb-3 ${isDarkText ? 'text-gray-900 drop-shadow-none' : 'text-white'}`} style={{ textShadow: isDarkText ? 'none' : '0 2px 8px rgba(0,0,0,0.4)' }}>
+                              {banner.title}
+                            </h2>
+                          )}
+                          {desc && (
+                            <p className={`text-xs md:text-sm mb-6 font-semibold max-w-sm ${isDarkText ? 'text-gray-700' : 'text-white/90'}`} style={{ textShadow: isDarkText ? 'none' : '0 1px 4px rgba(0,0,0,0.4)' }}>
+                              {desc}
+                            </p>
+                          )}
+                          {show_btn === 'true' && (
+                            <a href={actualLink || '/products'} className="inline-block bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-8 py-3.5 rounded-full font-bold transition-all shadow-lg hover:shadow-rose-500/50 uppercase tracking-widest text-[10px] md:text-xs">
+                              Shop Now ➝
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
                 {sliderBanners.length > 1 && (
                   <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
                     {sliderBanners.map((_, idx) => (
@@ -308,17 +357,64 @@ const Home: React.FC = () => {
           {/* Right Banners (Right 1/3) */}
           <div className="grid grid-cols-2 lg:flex lg:flex-col gap-3 lg:gap-6 h-full pb-2 lg:pb-0">
             {/* Top Banner */}
-            {rightTopBanner ? (
-              <div className="rounded-xl relative overflow-hidden flex flex-col justify-center group aspect-[2/1] h-auto lg:h-[215px] lg:aspect-auto lg:flex-1">
-                <img src={rightTopBanner.image_url} alt={rightTopBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
-                <div className="relative z-10 p-3 lg:p-8 text-white">
-                  {rightTopBanner.subtitle && <span className="font-bold text-[8px] lg:text-xs mb-1 lg:mb-2 block uppercase tracking-wider text-rose-300">{rightTopBanner.subtitle}</span>}
-                  {rightTopBanner.title && <h3 className="text-xs lg:text-2xl font-black mb-1 lg:mb-4 leading-tight">{rightTopBanner.title}</h3>}
-                  {rightTopBanner.link && <a href={rightTopBanner.link} className="inline-flex items-center gap-1 lg:gap-2 text-[8px] lg:text-sm font-bold hover:underline">Shop Now <ArrowRight size={10} className="lg:w-3.5 lg:h-3.5" /></a>}
+            {rightTopBanner ? (() => {
+              const linkStr = rightTopBanner.link || '';
+              const parts = linkStr.split('|');
+              const actualLink = parts[0] || '';
+              let align = 'left';
+              let color = 'light';
+              let show_btn = 'true';
+              let desc = '';
+
+              for (let i = 1; i < parts.length; i++) {
+                const part = parts[i];
+                if (part.startsWith('align:')) align = part.substring(6);
+                else if (part.startsWith('color:')) color = part.substring(6);
+                else if (part.startsWith('show_btn:')) show_btn = part.substring(9);
+                else if (part.startsWith('desc:')) desc = decodeURIComponent(part.substring(5));
+              }
+
+              const isDarkText = color === 'dark';
+              const isRightAlign = align === 'right';
+
+              return (
+                <div className={`rounded-xl relative overflow-hidden flex flex-col justify-center group aspect-[2/1] h-auto lg:h-[215px] lg:aspect-auto lg:flex-1 p-3 lg:p-8 ${isRightAlign ? 'items-end' : 'items-start'}`}>
+                  <img src={rightTopBanner.image_url} alt={rightTopBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  {!isDarkText && <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>}
+                  <div className={`relative z-10 w-full flex flex-col ${isRightAlign ? 'items-end text-right' : 'items-start text-left'}`}>
+                    {rightTopBanner.subtitle && (
+                      <span className={`font-black text-[8px] lg:text-xs mb-1 lg:mb-2 block uppercase tracking-wider ${isDarkText ? 'text-[#e92c5d]' : 'text-rose-300'}`}>
+                        {rightTopBanner.subtitle}
+                      </span>
+                    )}
+                    {rightTopBanner.title && (
+                      <h3 
+                        className={`text-xs lg:text-2xl font-black mb-1 lg:mb-2 leading-tight ${isDarkText ? 'text-gray-900' : 'text-white'}`}
+                        style={{ textShadow: isDarkText ? 'none' : '0 2px 4px rgba(0,0,0,0.3)' }}
+                      >
+                        {rightTopBanner.title}
+                      </h3>
+                    )}
+                    {desc && (
+                      <p 
+                        className={`text-[8px] lg:text-xs mb-2 lg:mb-4 max-w-[80%] font-semibold leading-relaxed ${isDarkText ? 'text-gray-600' : 'text-white/80'}`}
+                        style={{ textShadow: isDarkText ? 'none' : '0 1px 2px rgba(0,0,0,0.3)' }}
+                      >
+                        {desc}
+                      </p>
+                    )}
+                    {show_btn === 'true' && (
+                      <a 
+                        href={actualLink || '/products'} 
+                        className="inline-flex items-center justify-center gap-1 bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-3 py-1 lg:px-5 lg:py-2 rounded-full font-bold text-[8px] lg:text-xs transition-all shadow-md hover:shadow-rose-500/30 uppercase tracking-widest w-fit"
+                      >
+                        Shop Now <ArrowRight size={10} className="w-2.5 h-2.5 group-hover:translate-x-0.5 transition-transform" />
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ) : (
+              );
+            })() : (
               <div className="rounded-xl bg-[#fdf2f5] relative overflow-hidden border border-rose-50 aspect-[2/1] h-auto lg:h-auto lg:aspect-auto lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group">
                 <div className="absolute top-0 left-0 bottom-0 z-20 w-[60%] flex flex-col justify-center pl-3 lg:static lg:w-full lg:block lg:pl-0">
                   <span className="text-[#e92c5d] font-bold text-[8px] lg:text-xs mb-0.5 lg:mb-1 block uppercase tracking-wider">Only This Week</span>
@@ -335,17 +431,64 @@ const Home: React.FC = () => {
             )}
 
             {/* Bottom Banner */}
-            {rightBottomBanner ? (
-              <div className="rounded-xl relative overflow-hidden flex flex-col justify-center group aspect-[2/1] h-auto lg:h-[215px] lg:aspect-auto lg:flex-1">
-                <img src={rightBottomBanner.image_url} alt={rightBottomBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
-                <div className="relative z-10 p-3 lg:p-8 text-white">
-                  {rightBottomBanner.subtitle && <span className="font-bold text-[8px] lg:text-xs mb-1 lg:mb-2 block uppercase tracking-wider text-rose-300">{rightBottomBanner.subtitle}</span>}
-                  {rightBottomBanner.title && <h3 className="text-xs lg:text-2xl font-black mb-1 lg:mb-4 leading-tight">{rightBottomBanner.title}</h3>}
-                  {rightBottomBanner.link && <a href={rightBottomBanner.link} className="inline-flex items-center gap-1 lg:gap-2 text-[8px] lg:text-sm font-bold hover:underline">Shop Now <ArrowRight size={10} className="lg:w-3.5 lg:h-3.5" /></a>}
+            {rightBottomBanner ? (() => {
+              const linkStr = rightBottomBanner.link || '';
+              const parts = linkStr.split('|');
+              const actualLink = parts[0] || '';
+              let align = 'left';
+              let color = 'light';
+              let show_btn = 'true';
+              let desc = '';
+
+              for (let i = 1; i < parts.length; i++) {
+                const part = parts[i];
+                if (part.startsWith('align:')) align = part.substring(6);
+                else if (part.startsWith('color:')) color = part.substring(6);
+                else if (part.startsWith('show_btn:')) show_btn = part.substring(9);
+                else if (part.startsWith('desc:')) desc = decodeURIComponent(part.substring(5));
+              }
+
+              const isDarkText = color === 'dark';
+              const isRightAlign = align === 'right';
+
+              return (
+                <div className={`rounded-xl relative overflow-hidden flex flex-col justify-center group aspect-[2/1] h-auto lg:h-[215px] lg:aspect-auto lg:flex-1 p-3 lg:p-8 ${isRightAlign ? 'items-end' : 'items-start'}`}>
+                  <img src={rightBottomBanner.image_url} alt={rightBottomBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  {!isDarkText && <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>}
+                  <div className={`relative z-10 w-full flex flex-col ${isRightAlign ? 'items-end text-right' : 'items-start text-left'}`}>
+                    {rightBottomBanner.subtitle && (
+                      <span className={`font-black text-[8px] lg:text-xs mb-1 lg:mb-2 block uppercase tracking-wider ${isDarkText ? 'text-[#e92c5d]' : 'text-rose-300'}`}>
+                        {rightBottomBanner.subtitle}
+                      </span>
+                    )}
+                    {rightBottomBanner.title && (
+                      <h3 
+                        className={`text-xs lg:text-2xl font-black mb-1 lg:mb-2 leading-tight ${isDarkText ? 'text-gray-900' : 'text-white'}`}
+                        style={{ textShadow: isDarkText ? 'none' : '0 2px 4px rgba(0,0,0,0.3)' }}
+                      >
+                        {rightBottomBanner.title}
+                      </h3>
+                    )}
+                    {desc && (
+                      <p 
+                        className={`text-[8px] lg:text-xs mb-2 lg:mb-4 max-w-[80%] font-semibold leading-relaxed ${isDarkText ? 'text-gray-600' : 'text-white/80'}`}
+                        style={{ textShadow: isDarkText ? 'none' : '0 1px 2px rgba(0,0,0,0.3)' }}
+                      >
+                        {desc}
+                      </p>
+                    )}
+                    {show_btn === 'true' && (
+                      <a 
+                        href={actualLink || '/products'} 
+                        className="inline-flex items-center justify-center gap-1 bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-3 py-1 lg:px-5 lg:py-2 rounded-full font-bold text-[8px] lg:text-xs transition-all shadow-md hover:shadow-rose-500/30 uppercase tracking-widest w-fit"
+                      >
+                        Shop Now <ArrowRight size={10} className="w-2.5 h-2.5 group-hover:translate-x-0.5 transition-transform" />
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ) : (
+              );
+            })() : (
               <div className="rounded-xl bg-[#fff5f5] relative overflow-hidden border border-red-50 aspect-[2/1] h-auto lg:h-auto lg:aspect-auto lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group">
                 <div className="absolute top-0 left-0 bottom-0 z-20 w-[60%] flex flex-col justify-center pl-3 lg:static lg:w-full lg:block lg:pl-0">
                   <span className="text-[#e92c5d] font-bold text-[8px] lg:text-xs mb-0.5 lg:mb-1 block uppercase tracking-wider">Fuel Your Day</span>
@@ -470,7 +613,7 @@ const Home: React.FC = () => {
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6">
           {randomProducts.map(product => (
-            <ProductCard key={`best-${product.id}`} product={product} />
+            <ProductCard key={`best-${product.id}`} product={product} className="max-w-[260px] mx-auto w-full" />
           ))}
         </div>
       </section>

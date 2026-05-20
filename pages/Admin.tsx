@@ -30,7 +30,7 @@ const Admin: React.FC = () => {
     updateShippingSettings, refreshAllData, updateOrder, deleteReview, replyToReview,
     storeInfo: currentStoreInfo, updateStoreInfo,
     addPage, updatePage, deletePage,
-    banners, addBanner, deleteBanner,
+    banners, addBanner, updateBanner, deleteBanner,
     homeSections, addHomeSection, updateHomeSection, deleteHomeSection,
     blogPosts, addBlogPost, updateBlogPost, deleteBlogPost
   } = useStore();
@@ -75,8 +75,8 @@ const Admin: React.FC = () => {
   const [shipForm, setShipForm] = useState<ShippingSettings>(shippingSettings);
   const [storeForm, setStoreForm] = useState<StoreInfo>({ name: '', logo_url: '', address: '', phone: '', email: '', socials: {} });
   const [pageForm, setPageForm] = useState<Omit<Page, 'id' | 'createdAt'>>({ title: '', slug: '', content: '', isPublished: true });
-  const [bannerForm, setBannerForm] = useState<{ type: 'slider' | 'right_top' | 'right_bottom'; title: string; subtitle: string; image_url: string; link: string; sort_order: number; is_active: boolean }>({
-    type: 'slider', title: '', subtitle: '', image_url: '', link: '', sort_order: 0, is_active: true
+  const [bannerForm, setBannerForm] = useState<{ type: 'slider' | 'right_top' | 'right_bottom'; title: string; subtitle: string; image_url: string; link: string; align: 'left' | 'right'; color: 'light' | 'dark'; show_btn: boolean; desc: string; sort_order: number; is_active: boolean }>({
+    type: 'slider', title: '', subtitle: '', image_url: '', link: '', align: 'left', color: 'light', show_btn: true, desc: '', sort_order: 0, is_active: true
   });
   const [sectionForm, setSectionForm] = useState<Omit<HomeSection, 'id'>>({
     title: '', type: 'slider', filterType: 'all', sortOrder: 0, isActive: true,
@@ -178,7 +178,11 @@ const Admin: React.FC = () => {
   }, [orders, coupons, users, reportStartDate, reportEndDate]);
 
   const [showAttrForm, setShowAttrForm] = useState(false);
-  const [draftAttr, setDraftAttr] = useState({ name: '', options: [] as string[], currentOption: '' });
+  const [draftAttr, setDraftAttr] = useState({ globalAttrId: '', name: '', options: [] as string[], currentOption: '' });
+  const [showOptionsDropdown, setShowOptionsDropdown] = useState(false);
+  const [showInlineBrandForm, setShowInlineBrandForm] = useState(false);
+  const [newBrandName, setNewBrandName] = useState('');
+  const [isCreatingBrand, setIsCreatingBrand] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -571,17 +575,63 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
       tempAttributes: [...prev.tempAttributes, { name: draftAttr.name, options: draftAttr.options }]
     }));
     setShowAttrForm(false);
-    setDraftAttr({ name: '', options: [], currentOption: '' });
+    setDraftAttr({ globalAttrId: '', name: '', options: [], currentOption: '' });
   };
 
   const handleGlobalAttrSelect = (attrId: string) => {
     const selected = attributes.find(a => a.id === attrId);
     if (selected) {
       setDraftAttr({
+        globalAttrId: attrId,
         name: selected.name,
-        options: selected.values.map(v => v.value),
+        options: [],
         currentOption: ''
       });
+    } else {
+      setDraftAttr({
+        globalAttrId: '',
+        name: '',
+        options: [],
+        currentOption: ''
+      });
+    }
+  };
+
+  const handleCreateNewGlobalValue = async (valText: string) => {
+    if (!draftAttr.globalAttrId) return;
+    const selected = attributes.find(a => a.id === draftAttr.globalAttrId);
+    if (!selected) return;
+
+    const exists = selected.values.some(v => v.value.toLowerCase() === valText.toLowerCase());
+    if (exists) {
+      const actualVal = selected.values.find(v => v.value.toLowerCase() === valText.toLowerCase())?.value || valText;
+      if (!draftAttr.options.includes(actualVal)) {
+        setDraftAttr(prev => ({
+          ...prev,
+          options: [...prev.options, actualVal],
+          currentOption: ''
+        }));
+      }
+      return;
+    }
+
+    const newValue = {
+      id: Math.random().toString(36).substr(2, 9),
+      value: valText
+    };
+
+    const updatedValues = [...selected.values, newValue];
+
+    try {
+      await updateAttribute(selected.id, selected.name, updatedValues);
+      setDraftAttr(prev => ({
+        ...prev,
+        options: [...prev.options, valText],
+        currentOption: ''
+      }));
+    } catch (error) {
+      console.error("Failed to create new attribute value:", error);
+      alert("Failed to save new option to database.");
     }
   };
 
@@ -654,6 +704,22 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     } catch (err: any) { alert(err.message); }
   };
 
+  const handleCreateBrandInline = async () => {
+    if (!newBrandName.trim()) return;
+    setIsCreatingBrand(true);
+    const slug = newBrandName.toLowerCase().trim().replace(/[\s_-]+/g, '-');
+    try {
+      await addBrand({ name: newBrandName.trim(), slug, logo_url: '' });
+      setProdForm(prev => ({ ...prev, brand: newBrandName.trim() }));
+      setShowInlineBrandForm(false);
+      setNewBrandName('');
+    } catch (err: any) {
+      alert("Failed to create brand: " + err.message);
+    } finally {
+      setIsCreatingBrand(false);
+    }
+  };
+
   const startEditProduct = (p: Product) => {
     const hasSale = p.originalPrice !== undefined && p.originalPrice > p.price;
     const reconstructedAttrs: { name: string, options: string[] }[] = [];
@@ -705,12 +771,66 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     setIsAdding(null);
   };
 
+  const startEditBanner = (b: any) => {
+    const linkStr = b.link || '';
+    const parts = linkStr.split('|');
+    const actualLink = parts[0] || '';
+    
+    let align = 'left';
+    let color = 'light';
+    let show_btn = true;
+    let desc = '';
+
+    for (let i = 1; i < parts.length; i++) {
+      const part = parts[i];
+      if (part.startsWith('align:')) align = part.substring(6);
+      else if (part.startsWith('color:')) color = part.substring(6);
+      else if (part.startsWith('show_btn:')) show_btn = part.substring(9) === 'true';
+      else if (part.startsWith('desc:')) desc = decodeURIComponent(part.substring(5));
+    }
+
+    setBannerForm({
+      type: b.type,
+      title: b.title || '',
+      subtitle: b.subtitle || '',
+      image_url: b.image_url || '',
+      link: actualLink,
+      align: align as any,
+      color: color as any,
+      show_btn: show_btn,
+      desc: desc,
+      sort_order: b.sort_order,
+      is_active: b.is_active ?? true
+    });
+    setEditingItem({ type: 'banner', data: b });
+    setIsAdding(null);
+  };
+
   const handleBannerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await addBanner(bannerForm);
-      setBannerForm({ type: 'slider', title: '', subtitle: '', image_url: '', link: '', sort_order: 0, is_active: true });
-      setIsAdding(null);
+      const finalLink = bannerForm.link + 
+        `|align:${bannerForm.align}` + 
+        `|color:${bannerForm.color}` + 
+        `|show_btn:${bannerForm.show_btn}` + 
+        `|desc:${encodeURIComponent(bannerForm.desc)}`;
+
+      const submitData = {
+        type: bannerForm.type,
+        title: bannerForm.title,
+        subtitle: bannerForm.subtitle,
+        image_url: bannerForm.image_url,
+        link: finalLink,
+        sort_order: bannerForm.sort_order,
+        is_active: bannerForm.is_active
+      };
+
+      if (editingItem?.type === 'banner') {
+        await updateBanner(editingItem.data.id, submitData);
+      } else {
+        await addBanner(submitData);
+      }
+      closeForms();
     } catch (err: any) { alert(err.message); }
   };
 
@@ -799,7 +919,12 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     setBlogForm({ title: '', excerpt: '', content: '', author: '', imageUrl: '', slug: '', tags: [] });
 
     setPageForm({ title: '', slug: '', content: '', isPublished: true });
+    setBannerForm({ type: 'slider', title: '', subtitle: '', image_url: '', link: '', align: 'left', color: 'light', show_btn: true, desc: '', sort_order: 0, is_active: true });
     setShowAttrForm(false);
+    setDraftAttr({ globalAttrId: '', name: '', options: [], currentOption: '' });
+    setShowOptionsDropdown(false);
+    setShowInlineBrandForm(false);
+    setNewBrandName('');
   };
 
   const handleCategorySubmit = async (e: React.FormEvent) => {
@@ -1232,11 +1357,14 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
               </button>
             </div>
 
-            {isAdding === 'banner' && (
+            {(isAdding === 'banner' || editingItem?.type === 'banner') && (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
                 <div className="bg-white rounded-3xl p-8 w-full max-w-2xl shadow-2xl relative animate-in zoom-in-95 duration-200">
                   <button onClick={closeForms} className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-full transition-colors"><X size={20} /></button>
-                  <h3 className="text-xl font-black text-gray-800 mb-6 flex items-center gap-2"><ImageIcon className="text-[#e92c5d]" /> Add New Banner</h3>
+                  <h3 className="text-xl font-black text-gray-800 mb-6 flex items-center gap-2">
+                    <ImageIcon className="text-[#e92c5d]" />
+                    {editingItem?.type === 'banner' ? 'Edit the banner' : 'Add New Banner'}
+                  </h3>
                   <form onSubmit={handleBannerSubmit} className="space-y-6">
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-3">
@@ -1257,7 +1385,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                       <div className="flex items-center gap-4">
                         {bannerForm.image_url && <img src={bannerForm.image_url} alt="Preview" className="w-20 h-20 object-cover rounded-xl border border-gray-200" />}
                         <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 text-gray-500 hover:text-[#e92c5d] px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest border border-gray-100 transition-all flex items-center gap-2">
-                          <ImageIcon size={16} /> Upload Image
+                          <ImageIcon size={16} /> {editingItem?.type === 'banner' ? 'Change Image' : 'Upload Image'}
                           <input type="file" accept="image/*" onChange={handleBannerImageUpload} className="hidden" />
                         </label>
                       </div>
@@ -1266,7 +1394,36 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                       <div className="space-y-3"><label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Title (Optional)</label><input value={bannerForm.title} onChange={e => setBannerForm({ ...bannerForm, title: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all" placeholder="Big Sale" /></div>
                       <div className="space-y-3"><label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Subtitle (Optional)</label><input value={bannerForm.subtitle} onChange={e => setBannerForm({ ...bannerForm, subtitle: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all" placeholder="Up to 50% off" /></div>
                     </div>
-                    <div className="space-y-3"><label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Link (Optional)</label><input value={bannerForm.link} onChange={e => setBannerForm({ ...bannerForm, link: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all" placeholder="/category/vegetables" /></div>
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Short Description (Optional)</label>
+                      <input value={bannerForm.desc} onChange={e => setBannerForm({ ...bannerForm, desc: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all" placeholder="Enter custom short description for the banner" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="space-y-3"><label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Link (Optional)</label><input value={bannerForm.link} onChange={e => setBannerForm({ ...bannerForm, link: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all" placeholder="/category/vegetables" /></div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Text Alignment</label>
+                        <select value={bannerForm.align} onChange={e => setBannerForm({ ...bannerForm, align: e.target.value as any })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all">
+                          <option value="left">Left Alignment</option>
+                          <option value="right">Right Alignment</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Text Color</label>
+                        <select value={bannerForm.color} onChange={e => setBannerForm({ ...bannerForm, color: e.target.value as any })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all">
+                          <option value="light">Light Text (For Dark/Image Banners)</option>
+                          <option value="dark">Dark Text (For White/Light Banners)</option>
+                        </select>
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Shop Now Button</label>
+                        <select value={bannerForm.show_btn ? 'true' : 'false'} onChange={e => setBannerForm({ ...bannerForm, show_btn: e.target.value === 'true' })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:bg-white focus:border-[#e92c5d] transition-all">
+                          <option value="true">Show Button</option>
+                          <option value="false">Hide Button (Optional)</option>
+                        </select>
+                      </div>
+                    </div>
                     <button type="submit" className="w-full bg-[#e92c5d] hover:bg-[#c81d4a] text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-rose-200 transition-all active:scale-95">Save Banner</button>
                   </form>
                 </div>
@@ -1293,7 +1450,10 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                       <p className="text-sm text-gray-500 mb-4">{banner.subtitle || 'No subtitle'}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-gray-400 px-2 py-1 bg-gray-50 rounded-lg border border-gray-100">Order: {banner.sort_order}</span>
-                        <button onClick={() => deleteBanner(banner.id)} className="bg-red-50 text-red-500 p-2 rounded-xl hover:bg-red-500 hover:text-white transition-colors"><Trash2 size={16} /></button>
+                        <div className="flex gap-2">
+                          <button onClick={() => startEditBanner(banner)} className="bg-gray-50 text-gray-600 p-2 rounded-xl hover:bg-rose-50 hover:text-[#e92c5d] transition-colors"><Pencil size={16} /></button>
+                          <button onClick={() => deleteBanner(banner.id)} className="bg-red-50 text-red-500 p-2 rounded-xl hover:bg-red-500 hover:text-white transition-colors"><Trash2 size={16} /></button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1324,7 +1484,10 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                       <p className="text-sm text-gray-500 mb-4">{banner.subtitle || 'No subtitle'}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-gray-400 px-2 py-1 bg-gray-50 rounded-lg border border-gray-100">Order: {banner.sort_order}</span>
-                        <button onClick={() => deleteBanner(banner.id)} className="bg-red-50 text-red-500 p-2 rounded-xl hover:bg-red-500 hover:text-white transition-colors"><Trash2 size={16} /></button>
+                        <div className="flex gap-2">
+                          <button onClick={() => startEditBanner(banner)} className="bg-gray-50 text-gray-600 p-2 rounded-xl hover:bg-rose-50 hover:text-[#e92c5d] transition-colors"><Pencil size={16} /></button>
+                          <button onClick={() => deleteBanner(banner.id)} className="bg-red-50 text-red-500 p-2 rounded-xl hover:bg-red-500 hover:text-white transition-colors"><Trash2 size={16} /></button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1771,7 +1934,80 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                   </div>
                   <div className="grid grid-cols-2 gap-8">
                     <div className="space-y-2"><label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Category</label><select required value={prodForm.category} onChange={e => setProdForm({ ...prodForm, category: e.target.value })} className="w-full bg-[#f9fdfb] border border-[#d1e7dd] rounded-xl px-6 py-4 text-sm font-bold appearance-none"><option value="">Select Category</option>{hierarchicalCategories.map(c => <option key={c.id} value={c.name}>{'\u00A0'.repeat(c.level * 4) + (c.level > 0 ? '↳ ' : '') + c.name}</option>)}</select></div>
-                    <div className="space-y-2"><label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Brand</label><select value={prodForm.brand} onChange={e => setProdForm({ ...prodForm, brand: e.target.value })} className="w-full bg-[#f9fdfb] border border-[#d1e7dd] rounded-xl px-6 py-4 text-sm font-bold appearance-none"><option value="">No Brand</option>{brands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}</select></div>
+                    <div className="space-y-2 relative">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Brand</label>
+                      <div className="relative">
+                        <select 
+                          value={prodForm.brand} 
+                          onChange={e => {
+                            if (e.target.value === '__create_new__') {
+                              setShowInlineBrandForm(true);
+                              setProdForm(p => ({ ...p, brand: '' }));
+                            } else {
+                              setProdForm(p => ({ ...p, brand: e.target.value }));
+                            }
+                          }} 
+                          className="w-full bg-[#f9fdfb] border border-[#d1e7dd] rounded-xl px-6 py-4 text-sm font-bold appearance-none bg-white"
+                        >
+                          <option value="">No Brand</option>
+                          {brands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+                          <option value="__create_new__" className="text-[#e92c5d] font-bold">+ Create New Brand...</option>
+                        </select>
+                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" size={18} />
+                      </div>
+                      
+                      {showInlineBrandForm && (
+                        <div className="mt-2.5 p-4 bg-gray-50 border border-gray-150 rounded-2xl flex gap-2.5 items-center animate-in slide-in-from-top-2 duration-200">
+                          <input
+                            placeholder="Enter new brand name..."
+                            value={newBrandName}
+                            onChange={e => setNewBrandName(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleCreateBrandInline())}
+                            className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-1 focus:ring-rose-500"
+                            disabled={isCreatingBrand}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleCreateBrandInline}
+                            disabled={isCreatingBrand || !newBrandName.trim()}
+                            className="bg-[#e92c5d] text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-[#c81d4a] active:scale-95 transition-all shadow-md disabled:opacity-50"
+                          >
+                            {isCreatingBrand ? "..." : "Create"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowInlineBrandForm(false);
+                              setNewBrandName('');
+                            }}
+                            className="text-gray-400 hover:text-red-500 transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">SKU</label>
+                      <input 
+                        required 
+                        placeholder="e.g. ZB-001" 
+                        value={prodForm.sku} 
+                        onChange={e => setProdForm({ ...prodForm, sku: e.target.value })} 
+                        className="w-full bg-[#f9fdfb] border border-[#d1e7dd] rounded-xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-[#e92c5d]" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Unit</label>
+                      <input 
+                        placeholder="e.g. Pack, kg, pcs" 
+                        value={prodForm.unit} 
+                        onChange={e => setProdForm({ ...prodForm, unit: e.target.value })} 
+                        className="w-full bg-[#f9fdfb] border border-[#d1e7dd] rounded-xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-[#e92c5d]" 
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2"><label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Short Description</label><RichTextEditor value={prodForm.shortDescription} onChange={val => setProdForm({ ...prodForm, shortDescription: val })} label="Brief Overview" height="150px" /></div>
                   <div className="space-y-2 pt-10"><label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Description</label><RichTextEditor value={prodForm.description} onChange={val => setProdForm({ ...prodForm, description: val })} label="Long Product Content" height="300px" /></div>
@@ -1810,13 +2046,131 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                             <label className="text-[13px] font-medium text-gray-600">Attribute Name</label>
                             <input placeholder="e.g. Color" value={draftAttr.name} onChange={(e) => setDraftAttr(p => ({ ...p, name: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium outline-none focus:ring-1 focus:ring-rose-500" />
                           </div>
-                          <div className="flex-[2] space-y-2">
+                          <div className="flex-[2] space-y-2 relative">
                             <label className="text-[13px] font-medium text-gray-600">Options</label>
-                            <div className="flex gap-2">
-                              <input placeholder="e.g. Red" value={draftAttr.currentOption} onChange={(e) => setDraftAttr(prev => ({ ...prev, currentOption: e.target.value }))} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddOption())} className="flex-1 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium outline-none focus:ring-1 focus:ring-rose-500" />
-                              <button type="button" onClick={handleAddOption} className="bg-[#e92c5d] text-white px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-[#c81d4a] transition-all active:scale-95">Add</button>
-                            </div>
-                            <p className="text-[12px] text-rose-600/70 font-medium">Enter an option and click Add or press Enter.</p>
+                            {draftAttr.globalAttrId ? (
+                              <div className="relative">
+                                <div className="flex gap-2">
+                                  <div className="relative flex-1">
+                                    <input 
+                                      placeholder="Search options or type new one..." 
+                                      value={draftAttr.currentOption} 
+                                      onChange={(e) => {
+                                        setDraftAttr(prev => ({ ...prev, currentOption: e.target.value }));
+                                        setShowOptionsDropdown(true);
+                                      }}
+                                      onFocus={() => setShowOptionsDropdown(true)}
+                                      className="w-full border border-gray-200 rounded-xl pl-4 pr-10 py-3.5 text-sm font-medium outline-none focus:ring-1 focus:ring-rose-500 bg-white" 
+                                    />
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                                  </div>
+                                  <button 
+                                    type="button" 
+                                    onClick={async () => {
+                                      if (!draftAttr.currentOption.trim()) return;
+                                      const selected = attributes.find(a => a.id === draftAttr.globalAttrId);
+                                      if (selected) {
+                                        const exists = selected.values.some(v => v.value.toLowerCase() === draftAttr.currentOption.trim().toLowerCase());
+                                        if (!exists) {
+                                          await handleCreateNewGlobalValue(draftAttr.currentOption.trim());
+                                        } else {
+                                          const actualVal = selected.values.find(v => v.value.toLowerCase() === draftAttr.currentOption.trim().toLowerCase())?.value || draftAttr.currentOption.trim();
+                                          if (!draftAttr.options.includes(actualVal)) {
+                                            setDraftAttr(prev => ({
+                                              ...prev,
+                                              options: [...prev.options, actualVal],
+                                              currentOption: ''
+                                            }));
+                                          }
+                                        }
+                                      }
+                                    }} 
+                                    className="bg-[#e92c5d] text-white px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-[#c81d4a] transition-all active:scale-95 shadow-md"
+                                  >
+                                    Add
+                                  </button>
+                                </div>
+                                
+                                {showOptionsDropdown && (
+                                  <>
+                                    <div className="fixed inset-0 z-10" onClick={() => setShowOptionsDropdown(false)}></div>
+                                    <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl p-3 max-h-60 overflow-y-auto z-20 animate-in slide-in-from-top-2 duration-200">
+                                      {(() => {
+                                        const selected = attributes.find(a => a.id === draftAttr.globalAttrId);
+                                        if (!selected) return null;
+                                        
+                                        const filteredValues = selected.values.filter(v => 
+                                          v.value.toLowerCase().includes(draftAttr.currentOption.toLowerCase())
+                                        );
+                                        
+                                        const exactMatch = selected.values.some(v => 
+                                          v.value.toLowerCase() === draftAttr.currentOption.trim().toLowerCase()
+                                        );
+                                        
+                                        return (
+                                          <div className="space-y-1">
+                                            {filteredValues.map(v => {
+                                              const isSelected = draftAttr.options.includes(v.value);
+                                              return (
+                                                <button
+                                                  key={v.id}
+                                                  type="button"
+                                                  onClick={() => {
+                                                    setDraftAttr(prev => {
+                                                      const newOptions = isSelected 
+                                                        ? prev.options.filter(o => o !== v.value) 
+                                                        : [...prev.options, v.value];
+                                                      return { ...prev, options: newOptions };
+                                                    });
+                                                  }}
+                                                  className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-left text-sm font-medium transition-all ${
+                                                    isSelected 
+                                                      ? 'bg-rose-50/50 text-[#e92c5d] font-bold border border-rose-100/30' 
+                                                      : 'hover:bg-gray-50 text-gray-700'
+                                                  }`}
+                                                >
+                                                  <span>{v.value}</span>
+                                                  {isSelected && <Check size={16} className="text-[#e92c5d]" />}
+                                                </button>
+                                              );
+                                            })}
+                                            
+                                            {filteredValues.length === 0 && (
+                                              <p className="text-xs text-gray-400 text-center py-4 font-medium italic">
+                                                No matching global options found.
+                                              </p>
+                                            )}
+                                            
+                                            {draftAttr.currentOption.trim() && !exactMatch && (
+                                              <button
+                                                type="button"
+                                                onClick={async () => {
+                                                  await handleCreateNewGlobalValue(draftAttr.currentOption.trim());
+                                                }}
+                                                className="w-full flex items-center gap-2 px-4 py-3 mt-2 rounded-xl text-left text-xs font-black text-[#e92c5d] bg-[#fff0f3] hover:bg-[#ffe3e8] border border-[#ffccd5] transition-all"
+                                              >
+                                                <Plus size={14} className="text-[#e92c5d]" />
+                                                <span>Create &amp; select option "{draftAttr.currentOption.trim()}"</span>
+                                              </button>
+                                            )}
+                                          </div>
+                                        );
+                                      })()}
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="flex gap-2">
+                                <input placeholder="e.g. Red" value={draftAttr.currentOption} onChange={(e) => setDraftAttr(prev => ({ ...prev, currentOption: e.target.value }))} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddOption())} className="flex-1 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium outline-none focus:ring-1 focus:ring-rose-500 bg-white" />
+                                <button type="button" onClick={handleAddOption} className="bg-[#e92c5d] text-white px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-[#c81d4a] transition-all active:scale-95 shadow-md">Add</button>
+                              </div>
+                            )}
+                            <p className="text-[12px] text-rose-600/70 font-medium">
+                              {draftAttr.globalAttrId 
+                                ? "Select options from the dropdown or type a custom one to create & add it." 
+                                : "Enter an option and click Add or press Enter."}
+                            </p>
                           </div>
                         </div>
                         {draftAttr.options.length > 0 && (
@@ -1830,7 +2184,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                               ))}
                             </div>
                             <div className="flex justify-end pt-2">
-                              <button type="button" onClick={commitDraftAttribute} className="bg-[#004d40] text-white px-10 py-3.5 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-lg hover:bg-black transition-all">Confirm Attribute Block</button>
+                              <button type="button" onClick={commitDraftAttribute} className="bg-[#e92c5d] text-white px-10 py-3.5 rounded-xl font-black uppercase text-[11px] tracking-widest shadow-lg hover:bg-[#c81d4a] transition-all">Confirm Attribute Block</button>
                             </div>
                           </div>
                         )}

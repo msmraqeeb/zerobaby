@@ -20,7 +20,7 @@ interface StoreContextType {
   deleteBlogPost: (id: string) => Promise<void>;
   banners: Banner[];
   addBanner: (banner: Omit<Banner, 'id'>) => Promise<void>;
-
+  updateBanner: (id: string, banner: Partial<Banner>) => Promise<void>;
   deleteBanner: (id: string) => Promise<void>;
 
   homeSections: HomeSection[];
@@ -734,6 +734,14 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
         // Use generic insert if specific RLS fails first time
         const { error } = await supabase.from('banners').insert([b]);
+        if (error) {
+          console.error("Supabase RLS Error:", error);
+          throw error;
+        }
+        await fetchData(user);
+      },
+      updateBanner: async (id, b) => {
+        const { error } = await supabase.from('banners').update(b).eq('id', id);
         if (error) {
           console.error("Supabase RLS Error:", error);
           throw error;
