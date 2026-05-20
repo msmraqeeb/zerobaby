@@ -176,7 +176,7 @@ export interface StoreInfo {
 export interface HomeSection {
   id: string;
   title: string;
-  type: 'slider' | 'grid' | 'grid-no-banner';
+  type: 'slider' | 'grid' | 'grid-no-banner' | 'banner-full' | 'banner-double' | 'banner-triple';
   filterType: 'category' | 'sale' | 'featured' | 'all';
   filterValue?: string;
   sortOrder: number;
@@ -188,6 +188,10 @@ export interface HomeSection {
     buttonText: string;
     link: string;
   };
+  banners?: {
+    imageUrl: string;
+    link?: string;
+  }[];
 }
 
 export interface BlogPost {

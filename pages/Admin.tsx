@@ -80,7 +80,8 @@ const Admin: React.FC = () => {
   });
   const [sectionForm, setSectionForm] = useState<Omit<HomeSection, 'id'>>({
     title: '', type: 'slider', filterType: 'all', sortOrder: 0, isActive: true,
-    banner: { title: '', description: '', imageUrl: '', buttonText: 'Shop Now', link: '/products' }
+    banner: { title: '', description: '', imageUrl: '', buttonText: 'Shop Now', link: '/products' },
+    banners: []
   });
   const [blogForm, setBlogForm] = useState<Omit<BlogPost, 'id' | 'date'>>({
     title: '', excerpt: '', content: '', author: '', imageUrl: '', slug: '', tags: []
@@ -681,6 +682,32 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
       finalOriginal = pBase;
     }
 
+    let finalVariants = prodForm.variants;
+
+    // Auto-generate variants on submit if the variants table was not generated manually,
+    // but the product has attribute options specified.
+    const selectedAttrs = prodForm.tempAttributes.filter(a => a.options.length > 0);
+    if ((!finalVariants || finalVariants.length === 0) && selectedAttrs.length > 0) {
+      const cartesian = (...args: any[][]) => args.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+      const combinations = selectedAttrs.length === 1
+        ? selectedAttrs[0].options.map(opt => [opt])
+        : cartesian(...selectedAttrs.map(a => a.options));
+
+      finalVariants = combinations.map((combo: string[], idx: number) => {
+        const attrValues: Record<string, string> = {};
+        selectedAttrs.forEach((attr, i) => { attrValues[attr.name] = combo[i]; });
+        return {
+          id: Math.random().toString(36).substr(2, 9),
+          attributeValues: attrValues,
+          price: finalPrice,
+          originalPrice: finalOriginal,
+          sku: `${prodForm.sku || 'PROD'}-${idx}`,
+          stock: 100,
+          image: prodForm.images[0] || ''
+        };
+      });
+    }
+
     const data: Omit<Product, 'id'> = {
       name: prodForm.name,
       price: finalPrice,
@@ -693,7 +720,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
       sku: prodForm.sku,
       brand: prodForm.brand,
       isFeatured: prodForm.isFeatured,
-      variants: prodForm.variants,
+      variants: finalVariants,
       slug: prodForm.name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '')
     };
 
@@ -862,10 +889,30 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     }
   };
 
+  const handleHomeSectionBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    setIsUploadingImage(true);
+    try {
+      const url = await uploadToImageKit(file, '/sections');
+      const newBanners = [...(sectionForm.banners || [])];
+      for (let i = 0; i <= index; i++) {
+        if (!newBanners[i]) newBanners[i] = { imageUrl: '', link: '' };
+      }
+      newBanners[index] = { ...newBanners[index], imageUrl: url };
+      setSectionForm({ ...sectionForm, banners: newBanners });
+    } catch (error: any) {
+      alert('Error uploading image: ' + error.message);
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
   const startEditSection = (s: HomeSection) => {
     setSectionForm({
       title: s.title, type: s.type, filterType: s.filterType, filterValue: s.filterValue, sortOrder: s.sortOrder, isActive: s.isActive,
-      banner: s.banner
+      banner: s.banner,
+      banners: s.banners || []
     });
     setEditingItem({ type: 'section', data: s });
     setIsAdding(null);
@@ -915,7 +962,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
 
     setCouponForm({ code: '', discountType: 'Fixed', discountValue: 0, minimumSpend: 0, expiryDate: '', status: 'Active', autoApply: false });
     setCouponForm({ code: '', discountType: 'Fixed', discountValue: 0, minimumSpend: 0, expiryDate: '', status: 'Active', autoApply: false });
-    setSectionForm({ title: '', type: 'slider', filterType: 'all', sortOrder: 0, isActive: true, banner: { title: '', description: '', imageUrl: '', buttonText: 'Shop Now', link: '/products' } });
+    setSectionForm({ title: '', type: 'slider', filterType: 'all', sortOrder: 0, isActive: true, banner: { title: '', description: '', imageUrl: '', buttonText: 'Shop Now', link: '/products' }, banners: [] });
     setBlogForm({ title: '', excerpt: '', content: '', author: '', imageUrl: '', slug: '', tags: [] });
 
     setPageForm({ title: '', slug: '', content: '', isPublished: true });
@@ -1268,25 +1315,32 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                       <option value="slider">Slider (1 Row)</option>
                       <option value="grid">Grid (2 Rows + Banner)</option>
                       <option value="grid-no-banner">Grid (2 Rows, No Banner)</option>
+                      <option value="banner-full">Full Width Banner</option>
+                      <option value="banner-double">Double Banner (2 Column)</option>
+                      <option value="banner-triple">Triple Banner (3 Column)</option>
                     </select>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Filter Type</label>
-                    <select value={sectionForm.filterType} onChange={e => setSectionForm({ ...sectionForm, filterType: e.target.value as any })} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none">
-                      <option value="all">All Products</option>
-                      <option value="sale">On Sale</option>
-                      <option value="featured">Featured</option>
-                      <option value="category">Specific Category</option>
-                    </select>
-                  </div>
-                  {sectionForm.filterType === 'category' && (
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Category</label>
-                      <select value={sectionForm.filterValue} onChange={e => setSectionForm({ ...sectionForm, filterValue: e.target.value })} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none">
-                        <option value="">Select Category</option>
-                        {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                      </select>
-                    </div>
+                  {sectionForm.type !== 'banner-full' && sectionForm.type !== 'banner-double' && sectionForm.type !== 'banner-triple' && (
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Filter Type</label>
+                        <select value={sectionForm.filterType} onChange={e => setSectionForm({ ...sectionForm, filterType: e.target.value as any })} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none">
+                          <option value="all">All Products</option>
+                          <option value="sale">On Sale</option>
+                          <option value="featured">Featured</option>
+                          <option value="category">Specific Category</option>
+                        </select>
+                      </div>
+                      {sectionForm.filterType === 'category' && (
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Category</label>
+                          <select value={sectionForm.filterValue} onChange={e => setSectionForm({ ...sectionForm, filterValue: e.target.value })} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none">
+                            <option value="">Select Category</option>
+                            {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                          </select>
+                        </div>
+                      )}
+                    </>
                   )}
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Sort Order</label>
@@ -1318,6 +1372,285 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                   </div>
                 )}
 
+                {sectionForm.type === 'banner-full' && (
+                  <div className="border-t pt-6">
+                    <h3 className="font-bold text-lg mb-4 text-[#004d40]">Full Width Banner Settings</h3>
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Banner Image</label>
+                        <div className="flex gap-3 items-center">
+                          {sectionForm.banners?.[0]?.imageUrl && (
+                            <img src={sectionForm.banners[0].imageUrl} className="w-24 h-12 object-cover rounded-lg border border-slate-200" />
+                          )}
+                          <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-3 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors h-[46px]">
+                            <Upload size={16} /> {isUploadingImage ? 'Uploading...' : 'Upload'}
+                            <input type="file" onChange={(e) => handleHomeSectionBannerUpload(e, 0)} className="hidden" accept="image/*" disabled={isUploadingImage} />
+                          </label>
+                          <input
+                            placeholder="Or enter Image URL"
+                            value={sectionForm.banners?.[0]?.imageUrl || ''}
+                            onChange={e => {
+                              const newBanners = [...(sectionForm.banners || [])];
+                              if (!newBanners[0]) newBanners[0] = { imageUrl: '', link: '' };
+                              newBanners[0].imageUrl = e.target.value;
+                              setSectionForm({ ...sectionForm, banners: newBanners });
+                            }}
+                            className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Banner Link (Optional)</label>
+                        <input
+                          placeholder="e.g. /category/fruits or https://..."
+                          value={sectionForm.banners?.[0]?.link || ''}
+                          onChange={e => {
+                            const newBanners = [...(sectionForm.banners || [])];
+                            if (!newBanners[0]) newBanners[0] = { imageUrl: '', link: '' };
+                            newBanners[0].link = e.target.value;
+                            setSectionForm({ ...sectionForm, banners: newBanners });
+                          }}
+                          className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {sectionForm.type === 'banner-double' && (
+                  <div className="border-t pt-6">
+                    <h3 className="font-bold text-lg mb-4 text-[#004d40]">Double Banner Settings (2 Column)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Banner 1 */}
+                      <div className="border border-slate-100 rounded-2xl p-6 bg-slate-50/50 space-y-4">
+                        <h4 className="font-black text-sm text-gray-700">Left / First Banner</h4>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Image</label>
+                          <div className="flex gap-3 items-center">
+                            {sectionForm.banners?.[0]?.imageUrl && (
+                              <img src={sectionForm.banners[0].imageUrl} className="w-16 h-12 object-cover rounded-lg border border-slate-200" />
+                            )}
+                            <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-3 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors h-[46px]">
+                              <Upload size={16} /> {isUploadingImage ? 'Uploading...' : 'Upload'}
+                              <input type="file" onChange={(e) => handleHomeSectionBannerUpload(e, 0)} className="hidden" accept="image/*" disabled={isUploadingImage} />
+                            </label>
+                            <input
+                              placeholder="Or enter Image URL"
+                              value={sectionForm.banners?.[0]?.imageUrl || ''}
+                              onChange={e => {
+                                const newBanners = [...(sectionForm.banners || [])];
+                                if (!newBanners[0]) newBanners[0] = { imageUrl: '', link: '' };
+                                newBanners[0].imageUrl = e.target.value;
+                                setSectionForm({ ...sectionForm, banners: newBanners });
+                              }}
+                              className="flex-1 bg-white border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Link (Optional)</label>
+                          <input
+                            placeholder="e.g. /category/fruits"
+                            value={sectionForm.banners?.[0]?.link || ''}
+                            onChange={e => {
+                              const newBanners = [...(sectionForm.banners || [])];
+                              if (!newBanners[0]) newBanners[0] = { imageUrl: '', link: '' };
+                              newBanners[0].link = e.target.value;
+                              setSectionForm({ ...sectionForm, banners: newBanners });
+                            }}
+                            className="w-full bg-white border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Banner 2 */}
+                      <div className="border border-slate-100 rounded-2xl p-6 bg-slate-50/50 space-y-4">
+                        <h4 className="font-black text-sm text-gray-700">Right / Second Banner</h4>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Image</label>
+                          <div className="flex gap-3 items-center">
+                            {sectionForm.banners?.[1]?.imageUrl && (
+                              <img src={sectionForm.banners[1].imageUrl} className="w-16 h-12 object-cover rounded-lg border border-slate-200" />
+                            )}
+                            <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-3 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors h-[46px]">
+                              <Upload size={16} /> {isUploadingImage ? 'Uploading...' : 'Upload'}
+                              <input type="file" onChange={(e) => handleHomeSectionBannerUpload(e, 1)} className="hidden" accept="image/*" disabled={isUploadingImage} />
+                            </label>
+                            <input
+                              placeholder="Or enter Image URL"
+                              value={sectionForm.banners?.[1]?.imageUrl || ''}
+                              onChange={e => {
+                                const newBanners = [...(sectionForm.banners || [])];
+                                if (!newBanners[0]) newBanners[0] = { imageUrl: '', link: '' };
+                                if (!newBanners[1]) newBanners[1] = { imageUrl: '', link: '' };
+                                newBanners[1].imageUrl = e.target.value;
+                                setSectionForm({ ...sectionForm, banners: newBanners });
+                              }}
+                              className="flex-1 bg-white border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Link (Optional)</label>
+                          <input
+                            placeholder="e.g. /category/vegetables"
+                            value={sectionForm.banners?.[1]?.link || ''}
+                            onChange={e => {
+                              const newBanners = [...(sectionForm.banners || [])];
+                              if (!newBanners[0]) newBanners[0] = { imageUrl: '', link: '' };
+                              if (!newBanners[1]) newBanners[1] = { imageUrl: '', link: '' };
+                              newBanners[1].link = e.target.value;
+                              setSectionForm({ ...sectionForm, banners: newBanners });
+                            }}
+                            className="w-full bg-white border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {sectionForm.type === 'banner-triple' && (
+                  <div className="border-t pt-6">
+                    <h3 className="font-bold text-lg mb-4 text-[#004d40]">Triple Banner Settings (3 Column)</h3>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Banner 1 */}
+                      <div className="border border-slate-100 rounded-2xl p-6 bg-slate-50/50 space-y-4">
+                        <h4 className="font-black text-sm text-gray-700">Left / First Banner</h4>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Image</label>
+                          <div className="flex gap-3 items-center">
+                            {sectionForm.banners?.[0]?.imageUrl && (
+                              <img src={sectionForm.banners[0].imageUrl} className="w-16 h-12 object-cover rounded-lg border border-slate-200" />
+                            )}
+                            <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-3 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors h-[46px]">
+                              <Upload size={16} /> {isUploadingImage ? 'Uploading...' : 'Upload'}
+                              <input type="file" onChange={(e) => handleHomeSectionBannerUpload(e, 0)} className="hidden" accept="image/*" disabled={isUploadingImage} />
+                            </label>
+                            <input
+                              placeholder="Or enter Image URL"
+                              value={sectionForm.banners?.[0]?.imageUrl || ''}
+                              onChange={e => {
+                                const newBanners = [...(sectionForm.banners || [])];
+                                if (!newBanners[0]) newBanners[0] = { imageUrl: '', link: '' };
+                                newBanners[0].imageUrl = e.target.value;
+                                setSectionForm({ ...sectionForm, banners: newBanners });
+                              }}
+                              className="flex-1 bg-white border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Link (Optional)</label>
+                          <input
+                            placeholder="e.g. /category/fruits"
+                            value={sectionForm.banners?.[0]?.link || ''}
+                            onChange={e => {
+                              const newBanners = [...(sectionForm.banners || [])];
+                              if (!newBanners[0]) newBanners[0] = { imageUrl: '', link: '' };
+                              newBanners[0].link = e.target.value;
+                              setSectionForm({ ...sectionForm, banners: newBanners });
+                            }}
+                            className="w-full bg-white border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Banner 2 */}
+                      <div className="border border-slate-100 rounded-2xl p-6 bg-slate-50/50 space-y-4">
+                        <h4 className="font-black text-sm text-gray-700">Middle / Second Banner</h4>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Image</label>
+                          <div className="flex gap-3 items-center">
+                            {sectionForm.banners?.[1]?.imageUrl && (
+                              <img src={sectionForm.banners[1].imageUrl} className="w-16 h-12 object-cover rounded-lg border border-slate-200" />
+                            )}
+                            <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-3 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors h-[46px]">
+                              <Upload size={16} /> {isUploadingImage ? 'Uploading...' : 'Upload'}
+                              <input type="file" onChange={(e) => handleHomeSectionBannerUpload(e, 1)} className="hidden" accept="image/*" disabled={isUploadingImage} />
+                            </label>
+                            <input
+                              placeholder="Or enter Image URL"
+                              value={sectionForm.banners?.[1]?.imageUrl || ''}
+                              onChange={e => {
+                                const newBanners = [...(sectionForm.banners || [])];
+                                for (let i = 0; i <= 1; i++) {
+                                  if (!newBanners[i]) newBanners[i] = { imageUrl: '', link: '' };
+                                }
+                                newBanners[1].imageUrl = e.target.value;
+                                setSectionForm({ ...sectionForm, banners: newBanners });
+                              }}
+                              className="flex-1 bg-white border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Link (Optional)</label>
+                          <input
+                            placeholder="e.g. /category/vegetables"
+                            value={sectionForm.banners?.[1]?.link || ''}
+                            onChange={e => {
+                              const newBanners = [...(sectionForm.banners || [])];
+                              for (let i = 0; i <= 1; i++) {
+                                if (!newBanners[i]) newBanners[i] = { imageUrl: '', link: '' };
+                              }
+                              newBanners[1].link = e.target.value;
+                              setSectionForm({ ...sectionForm, banners: newBanners });
+                            }}
+                            className="w-full bg-white border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Banner 3 */}
+                      <div className="border border-slate-100 rounded-2xl p-6 bg-slate-50/50 space-y-4">
+                        <h4 className="font-black text-sm text-gray-700">Right / Third Banner</h4>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Image</label>
+                          <div className="flex gap-3 items-center">
+                            {sectionForm.banners?.[2]?.imageUrl && (
+                              <img src={sectionForm.banners[2].imageUrl} className="w-16 h-12 object-cover rounded-lg border border-slate-200" />
+                            )}
+                            <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-3 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors h-[46px]">
+                              <Upload size={16} /> {isUploadingImage ? 'Uploading...' : 'Upload'}
+                              <input type="file" onChange={(e) => handleHomeSectionBannerUpload(e, 2)} className="hidden" accept="image/*" disabled={isUploadingImage} />
+                            </label>
+                            <input
+                              placeholder="Or enter Image URL"
+                              value={sectionForm.banners?.[2]?.imageUrl || ''}
+                              onChange={e => {
+                                const newBanners = [...(sectionForm.banners || [])];
+                                for (let i = 0; i <= 2; i++) {
+                                  if (!newBanners[i]) newBanners[i] = { imageUrl: '', link: '' };
+                                }
+                                newBanners[2].imageUrl = e.target.value;
+                                setSectionForm({ ...sectionForm, banners: newBanners });
+                              }}
+                              className="flex-1 bg-white border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Link (Optional)</label>
+                          <input
+                            placeholder="e.g. /category/bakery"
+                            value={sectionForm.banners?.[2]?.link || ''}
+                            onChange={e => {
+                              const newBanners = [...(sectionForm.banners || [])];
+                              for (let i = 0; i <= 2; i++) {
+                                if (!newBanners[i]) newBanners[i] = { imageUrl: '', link: '' };
+                              }
+                              newBanners[2].link = e.target.value;
+                              setSectionForm({ ...sectionForm, banners: newBanners });
+                            }}
+                            className="w-full bg-white border border-slate-100 rounded-xl px-4 py-3 font-bold outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
                   <button type="button" onClick={closeForms} className="px-6 py-3 text-slate-400 font-bold uppercase text-[11px] hover:text-slate-600">Cancel</button>
                   <button type="submit" className="bg-rose-600 text-white px-10 py-3 rounded-xl font-black uppercase text-[11px] shadow-lg transition-all hover:bg-rose-700">Save Section</button>
@@ -1331,7 +1664,9 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                       <h3 className="font-black text-lg text-gray-800">{section.title}</h3>
                       <div className="flex gap-2 mt-1">
                         <span className="px-2 py-0.5 bg-rose-50 text-rose-600 text-[10px] font-black uppercase rounded">{section.type}</span>
-                        <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-black uppercase rounded">Filter: {section.filterType}</span>
+                        {section.type !== 'banner-full' && section.type !== 'banner-double' && section.type !== 'banner-triple' && (
+                          <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-black uppercase rounded">Filter: {section.filterType}</span>
+                        )}
                       </div>
                     </div>
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

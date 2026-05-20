@@ -140,31 +140,8 @@ const Products: React.FC = () => {
     }
   }, [location.search]);
 
-  // Price Range Logic
-  const [minMax, setMinMax] = useState<[number, number]>([0, 10000]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
-
-  // Initialize price range based on actual product data
-  useEffect(() => {
-    if (products.length > 0) {
-      const prices = products.map(p => p.price);
-      const min = Math.floor(Math.min(...prices));
-      const max = Math.ceil(Math.max(...prices));
-      setMinMax([min, max]);
-      setPriceRange([min, max]); // Initialize selection to full range
-    }
-  }, [products]);
-
-  // Dynamic Attribute Logic
-  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string[]>>({});
-
-  // Reset attributes when category changes to avoid stale filters
-  useEffect(() => {
-    setSelectedAttributes({});
-  }, [selectedCategory]);
-
-  const availableAttributes = useMemo(() => {
-    // 1. Get products in current category context
+  // Get all descendant categories for filtering products
+  const categoryProducts = useMemo(() => {
     const getDescendantsOnly = (catName: string): string[] => {
       if (catName === 'All') return [];
       const currentCat = categories.find(c => c.name === catName);
@@ -177,12 +154,41 @@ const Products: React.FC = () => {
     };
     const filterCategories = selectedCategory === 'All' ? [] : getDescendantsOnly(selectedCategory);
 
-    const categoryProducts = products.filter(p => {
+    return products.filter(p => {
       const categoryMatch = selectedCategory === 'All' || filterCategories.includes(p.category);
       return categoryMatch;
     });
+  }, [products, categories, selectedCategory]);
 
-    // 2. Extract attributes from variants
+  // Price Range Logic
+  const [minMax, setMinMax] = useState<[number, number]>([0, 10000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+
+  // Initialize price range based on current category products
+  useEffect(() => {
+    if (categoryProducts.length > 0) {
+      const prices = categoryProducts.map(p => p.price);
+      const min = Math.floor(Math.min(...prices));
+      const max = Math.ceil(Math.max(...prices));
+      setMinMax([min, max]);
+      setPriceRange([min, max]); // Initialize selection to active category range
+    } else {
+      setMinMax([0, 10000]);
+      setPriceRange([0, 10000]);
+    }
+  }, [categoryProducts]);
+
+  // Dynamic Attribute Logic
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string[]>>({});
+
+  // Reset attributes and brands when category changes to avoid stale filters
+  useEffect(() => {
+    setSelectedAttributes({});
+    setSelectedBrands([]);
+  }, [selectedCategory]);
+
+  // Available attributes for filter sidebar inside selected category
+  const availableAttributes = useMemo(() => {
     const attrs: Record<string, Set<string>> = {};
     categoryProducts.forEach(p => {
       if (p.variants) {
@@ -195,12 +201,21 @@ const Products: React.FC = () => {
       }
     });
 
-    // 3. Convert Sets to sorted arrays
     return Object.entries(attrs).reduce((acc, [key, valSet]) => {
       acc[key] = Array.from(valSet).sort();
       return acc;
     }, {} as Record<string, string[]>);
-  }, [products, categories, selectedCategory]);
+  }, [categoryProducts]);
+
+  // Compute available brands based on the active category products
+  const availableBrands = useMemo(() => {
+    const activeBrandNames = new Set(
+      categoryProducts
+        .map(p => p.brand)
+        .filter((b): b is string => !!b)
+    );
+    return brands.filter(brand => activeBrandNames.has(brand.name));
+  }, [brands, categoryProducts]);
 
   const toggleAttribute = (attrName: string, value: string) => {
     setSelectedAttributes(prev => {
@@ -219,28 +234,12 @@ const Products: React.FC = () => {
     const searchParams = new URLSearchParams(location.search);
     const showSaleOnly = searchParams.get('filter') === 'sale';
 
-    // Get all descendants for filtering products (we want to show products in subcategories too)
-    // We need a separate list for filtering because 'selectedCategoryFamily' now includes ANCESTORS for UI expansion.
-    // Pure descendants for filtering:
-    const getDescendantsOnly = (catName: string): string[] => {
-      if (catName === 'All') return [];
-      const currentCat = categories.find(c => c.name === catName);
-      if (!currentCat) return [catName];
-      let names = [catName];
-      categories.filter(c => c.parentId === currentCat.id).forEach(child => {
-        names = [...names, ...getDescendantsOnly(child.name)];
-      });
-      return names;
-    };
-    const filterCategories = selectedCategory === 'All' ? [] : getDescendantsOnly(selectedCategory);
-
-    return products.filter(p => {
+    return categoryProducts.filter(p => {
       const searchMatch = !searchQuery ||
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.category.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const categoryMatch = selectedCategory === 'All' || filterCategories.includes(p.category);
       const brandMatch = selectedBrands.length === 0 || (p.brand && selectedBrands.includes(p.brand));
 
       let ratingMatch = true;
@@ -263,9 +262,9 @@ const Products: React.FC = () => {
         );
       });
 
-      return searchMatch && categoryMatch && brandMatch && ratingMatch && saleMatch && attributeMatch && priceMatch;
+      return searchMatch && brandMatch && ratingMatch && saleMatch && attributeMatch && priceMatch;
     });
-  }, [products, searchQuery, selectedCategory, selectedBrands, selectedMinRating, reviews, location.search, categories, selectedAttributes, priceRange]);
+  }, [categoryProducts, searchQuery, selectedBrands, selectedMinRating, reviews, location.search, selectedAttributes, priceRange]);
 
   const toggleBrand = (brandName: string) => {
     setSelectedBrands(prev =>
@@ -377,10 +376,10 @@ const Products: React.FC = () => {
                 Brands
               </h3>
               <div className="space-y-2">
-                {brands.length === 0 ? (
+                {availableBrands.length === 0 ? (
                   <p className="text-xs text-gray-400 italic">No brands found</p>
                 ) : (
-                  brands.map(brand => (
+                  availableBrands.map(brand => (
                     <label key={brand.id} className="flex items-center gap-3 cursor-pointer group">
                       <div className="relative">
                         <input

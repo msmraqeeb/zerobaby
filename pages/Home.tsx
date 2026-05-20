@@ -216,6 +216,111 @@ const DualBannerSection = () => (
   </section>
 );
 
+const FullWidthBannerSection: React.FC<{ section: HomeSection }> = ({ section }) => {
+  const banner = section.banners?.[0];
+  if (!banner?.imageUrl) return null;
+
+  const content = (
+    <div className="w-full rounded-2xl overflow-hidden shadow-sm group relative block aspect-[3/1] md:aspect-[4/1] lg:aspect-[5/1]">
+      <img
+        src={banner.imageUrl}
+        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02] pointer-events-none"
+        alt={section.title || "Full Width Promo Banner"}
+      />
+    </div>
+  );
+
+  return (
+    <section className="container mx-auto px-4 md:px-8 mb-16 animate-in fade-in duration-500">
+      {banner.link ? (
+        <Link to={banner.link} className="block">
+          {content}
+        </Link>
+      ) : (
+        content
+      )}
+    </section>
+  );
+};
+
+const DoubleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) => {
+  const banner1 = section.banners?.[0];
+  const banner2 = section.banners?.[1];
+  if (!banner1?.imageUrl && !banner2?.imageUrl) return null;
+
+  return (
+    <section className="container mx-auto px-4 md:px-8 mb-16 animate-in fade-in duration-500">
+      <div className="grid grid-cols-2 gap-3 md:gap-6">
+        {banner1?.imageUrl && (
+          banner1.link ? (
+            <Link
+              to={banner1.link}
+              className="rounded-2xl overflow-hidden shadow-sm group block w-full"
+            >
+              <img src={banner1.imageUrl} className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none" alt="Offer 1" />
+            </Link>
+          ) : (
+            <div className="rounded-2xl overflow-hidden shadow-sm group block w-full">
+              <img src={banner1.imageUrl} className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none" alt="Offer 1" />
+            </div>
+          )
+        )}
+        {banner2?.imageUrl && (
+          banner2.link ? (
+            <Link
+              to={banner2.link}
+              className="rounded-2xl overflow-hidden shadow-sm group block w-full"
+            >
+              <img src={banner2.imageUrl} className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none" alt="Offer 2" />
+            </Link>
+          ) : (
+            <div className="rounded-2xl overflow-hidden shadow-sm group block w-full">
+              <img src={banner2.imageUrl} className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none" alt="Offer 2" />
+            </div>
+          )
+        )}
+      </div>
+    </section>
+  );
+};
+
+const TripleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) => {
+  const banner1 = section.banners?.[0];
+  const banner2 = section.banners?.[1];
+  const banner3 = section.banners?.[2];
+  if (!banner1?.imageUrl && !banner2?.imageUrl && !banner3?.imageUrl) return null;
+
+  return (
+    <section className="container mx-auto px-4 md:px-8 mb-16 animate-in fade-in duration-500">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
+        {[banner1, banner2, banner3].map((banner, index) => {
+          if (!banner?.imageUrl) return null;
+          const content = (
+            <div className="rounded-2xl overflow-hidden shadow-sm group block w-full relative">
+              <img
+                src={banner.imageUrl}
+                className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none"
+                alt={`Triple Banner Offer ${index + 1}`}
+              />
+            </div>
+          );
+          return (
+            <div key={index} className="w-full">
+              {banner.link ? (
+                <Link to={banner.link} className="block w-full">
+                  {content}
+                </Link>
+              ) : (
+                content
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+};
+
 const Home: React.FC = () => {
   const { products, banners, homeSections, categories } = useStore();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -576,7 +681,13 @@ const Home: React.FC = () => {
           }
 
           let sectionContent = null;
-          if (items.length === 0) {
+          if (section.type === 'banner-full') {
+            sectionContent = <FullWidthBannerSection key={section.id} section={section} />;
+          } else if (section.type === 'banner-double') {
+            sectionContent = <DoubleBannerSection key={section.id} section={section} />;
+          } else if (section.type === 'banner-triple') {
+            sectionContent = <TripleBannerSection key={section.id} section={section} />;
+          } else if (items.length === 0) {
             sectionContent = (
               <section key={section.id} className="container mx-auto px-4 md:px-8 mb-16 opacity-50">
                 <h2 className="text-2xl font-bold text-gray-800 border-l-4 border-gray-300 pl-4 mb-6">{section.title}</h2>

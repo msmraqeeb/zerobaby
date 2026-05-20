@@ -173,6 +173,16 @@ const CategoryPage: React.FC = () => {
     }, {} as Record<string, string[]>);
   }, [categoryProducts]);
 
+  // Compute available brands based on the active category products
+  const availableBrands = useMemo(() => {
+    const activeBrandNames = new Set(
+      categoryProducts
+        .map(p => p.brand)
+        .filter((b): b is string => !!b)
+    );
+    return brands.filter(brand => activeBrandNames.has(brand.name));
+  }, [brands, categoryProducts]);
+
   const toggleAttribute = (attrName: string, value: string) => {
     setSelectedAttributes(prev => {
       const currentValues = prev[attrName] || [];
@@ -416,10 +426,10 @@ const CategoryPage: React.FC = () => {
                 Brands
               </h3>
               <div className="space-y-2">
-                {brands.length === 0 ? (
+                {availableBrands.length === 0 ? (
                   <p className="text-xs text-gray-400 italic">No brands found</p>
                 ) : (
-                  brands.map(brand => (
+                  availableBrands.map(brand => (
                     <label key={brand.id} className="flex items-center gap-3 cursor-pointer group">
                       <div className="relative">
                         <input
