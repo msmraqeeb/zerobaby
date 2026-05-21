@@ -49,7 +49,7 @@ const OrderSuccess: React.FC = () => {
           <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mb-6">
             <CheckCircle className="text-[#e92c5d] w-12 h-12" strokeWidth={2} />
           </div>
-          <h1 className="text-3xl font-black text-[#004d40] mb-2 tracking-tight">Success!</h1>
+          <h1 className="text-3xl font-black text-[#e92c5d] mb-2 tracking-tight">Success!</h1>
           <p className="text-[#e92c5d] font-bold text-lg">Your order has been placed successfully.</p>
         </div>
 
@@ -100,7 +100,7 @@ const OrderSuccess: React.FC = () => {
 
         {/* Items Summary */}
         <div className="mb-12">
-          <div className="flex items-center gap-2 text-[#004d40] font-black text-[13px] uppercase tracking-widest mb-6">
+          <div className="flex items-center gap-2 text-[#e92c5d] font-black text-[13px] uppercase tracking-widest mb-6">
             <Package size={16} />
             <span>Items Purchased</span>
           </div>

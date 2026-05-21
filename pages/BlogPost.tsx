@@ -63,7 +63,7 @@ const BlogPost: React.FC = () => {
                     </div>
 
                     {/* Content */}
-                    <div className="prose prose-lg prose-emerald max-w-none text-gray-700">
+                    <div className="prose prose-lg prose-rose max-w-none text-gray-700">
                         <p className="lead text-xl text-gray-600 font-medium mb-8 italic">
                             {post.excerpt}
                         </p>

@@ -123,7 +123,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, label,
         .rich-editor-visual ol { list-style-type: decimal !important; padding-left: 2.5em !important; margin: 1em 0 !important; display: block !important; }
         .rich-editor-visual li { display: list-item !important; margin-bottom: 0.25em !important; }
         .rich-editor-visual blockquote { border-left: 4px solid #e5e7eb !important; padding-left: 1em !important; margin: 1em 0 !important; font-style: italic !important; color: #6b7280 !important; }
-        .rich-editor-visual a { color: #10b981 !important; text-decoration: underline !important; }
+        .rich-editor-visual a { color: #e92c5d !important; text-decoration: underline !important; }
         .rich-editor-visual p { margin-bottom: 1em !important; }
       `}</style>
 
@@ -291,7 +291,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, label,
             contentEditable
             onInput={handleInput}
             onPaste={handlePaste}
-            className="w-full h-full p-6 outline-none prose prose-emerald max-w-none overflow-y-auto focus:ring-0 selection:bg-rose-100 rich-editor-visual"
+            className="w-full h-full p-6 outline-none prose prose-rose max-w-none overflow-y-auto focus:ring-0 selection:bg-rose-100 rich-editor-visual"
             style={{ minHeight: isFullscreen ? '100%' : height }}
             onBlur={handleInput}
           />

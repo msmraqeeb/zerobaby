@@ -66,7 +66,7 @@ export const BLOG_POSTS: BlogPost[] = [
 ];
 
 
-export const THEME_COLOR = "emerald"; // mapped to tailwind classes
+export const THEME_COLOR = "rose"; // mapped to tailwind classes
 export const PRIMARY_BG = "bg-rose-500";
 export const PRIMARY_TEXT = "text-rose-500";
 export const HOVER_TEXT = "hover:text-rose-600";

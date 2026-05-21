@@ -26,7 +26,7 @@ export const StorySection: React.FC<{ data: any }> = ({ data }) => {
                 )}
                 <h2 className="text-4xl lg:text-5xl font-black text-gray-900 leading-tight">
                     {data.title}
-                    {data.title2 && <span className="block text-[#10B981] mt-1">{data.title2}</span>}
+                    {data.title2 && <span className="block text-[#e92c5d] mt-1">{data.title2}</span>}
                 </h2>
                 <div className="text-lg text-gray-600 leading-relaxed whitespace-pre-line">
                     {data.description}
@@ -58,7 +58,7 @@ export const ValuesGrid: React.FC<{ data: any }> = ({ data }) => {
                     const Icon = ICONS[item.icon] || Star;
                     return (
                         <div key={idx} className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                            <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 group-hover:bg-[#10B981] group-hover:text-white transition-all duration-300">
+                            <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 group-hover:bg-[#e92c5d] group-hover:text-white transition-all duration-300">
                                 <Icon size={28} />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
@@ -101,7 +101,7 @@ export const HeroSection: React.FC<{ data: any }> = ({ data }) => {
 
 export const CtaSection: React.FC<{ data: any }> = ({ data }) => {
     return (
-        <div className="bg-[#003d29] rounded-[2.5rem] p-12 md:p-16 text-center relative overflow-hidden group">
+        <div className="bg-[#3f0b1b] rounded-[2.5rem] p-12 md:p-16 text-center relative overflow-hidden group">
             {/* Decorative Overlay */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
@@ -115,12 +115,12 @@ export const CtaSection: React.FC<{ data: any }> = ({ data }) => {
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                     {data.button1_text && (
-                        <Link to={data.button1_link || '#'} className="bg-[#10B981] text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-rose-400 transition-all hover:scale-105 shadow-lg shadow-rose-900/20 active:scale-95 w-full sm:w-auto">
+                        <Link to={data.button1_link || '#'} className="bg-[#e92c5d] text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-[#c81d4a] transition-all hover:scale-105 shadow-lg shadow-rose-900/20 active:scale-95 w-full sm:w-auto">
                             {data.button1_text}
                         </Link>
                     )}
                     {data.button2_text && (
-                        <Link to={data.button2_link || '#'} className="border-2 border-rose-800/50 text-rose-100 px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-rose-900/30 hover:text-white hover:border-rose-500/50 transition-all active:scale-95 w-full sm:w-auto">
+                        <Link to={data.button2_link || '#'} className="border-2 border-white/20 text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-white/10 hover:text-white hover:border-white/40 transition-all active:scale-95 w-full sm:w-auto">
                             {data.button2_text}
                         </Link>
                     )}
@@ -209,7 +209,7 @@ export const FaqContactSection: React.FC<{ data: any }> = ({ data }) => {
                             <label className="text-xs font-bold text-gray-400 uppercase ml-1">Your Message</label>
                             <textarea className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl text-gray-800 focus:outline-none focus:border-rose-500 transition-colors h-32 resize-none" placeholder="How can we help you?" />
                         </div>
-                        <button type="submit" className="w-auto px-10 py-4 bg-[#10B981] text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-rose-600 transition-all hover:scale-105 shadow-lg shadow-rose-200">
+                        <button type="submit" className="w-auto px-10 py-4 bg-[#e92c5d] text-white font-black uppercase tracking-widest text-xs rounded-xl hover:bg-[#c81d4a] transition-all hover:scale-105 shadow-lg shadow-rose-200">
                             Send Now
                         </button>
                     </form>

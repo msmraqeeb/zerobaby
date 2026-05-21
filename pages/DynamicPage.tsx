@@ -42,7 +42,7 @@ const DynamicPage: React.FC = () => {
                     <div className="bg-white rounded-[2rem] shadow-sm p-8 md:p-12 mb-8 min-h-[50vh]">
                         <h1 className="text-3xl md:text-5xl font-black text-gray-900 mb-8 tracking-tight">{page.title}</h1>
                         <div
-                            className="prose prose-lg max-w-none prose-emerald"
+                            className="prose prose-lg max-w-none prose-rose"
                             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(page.content) }}
                         />
                     </div>
@@ -82,7 +82,7 @@ const DynamicPage: React.FC = () => {
                                 {block.type === 'cta_section' && <CtaSection data={block.data} />}
                                 {block.type === 'rich_text' && (
                                     <div
-                                        className="prose prose-lg max-w-none prose-emerald"
+                                        className="prose prose-lg max-w-none prose-rose"
                                         dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(block.data.content) }}
                                     />
                                 )}

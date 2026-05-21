@@ -248,7 +248,7 @@ const Checkout: React.FC = () => {
           <div className="lg:col-span-1">
              <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-rose-900/5 border border-gray-100 p-8 md:p-10 sticky top-24 overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-rose-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
-              <h2 className="text-2xl font-black text-[#004d40] mb-10 uppercase tracking-tighter border-b border-gray-50 pb-6 relative z-10">Summary</h2>
+              <h2 className="text-2xl font-black text-[#e92c5d] mb-10 uppercase tracking-tighter border-b border-gray-50 pb-6 relative z-10">Summary</h2>
               <div className="space-y-6 mb-10 max-h-[400px] overflow-y-auto pr-3 custom-scrollbar relative z-10">
                 {cart.map(item => {
                   const itemKey = item.selectedVariantId ? `${item.id}-${item.selectedVariantId}` : item.id;
@@ -279,7 +279,7 @@ const Checkout: React.FC = () => {
                 )}
 
                 <div className="flex justify-between items-center pt-8 border-t border-gray-100">
-                  <span className="text-xl font-black text-[#004d40] uppercase tracking-tighter">Total</span>
+                  <span className="text-xl font-black text-[#e92c5d] uppercase tracking-tighter">Total</span>
                   <div className="text-right">
                     <span className="text-4xl font-black text-gray-900 tracking-tighter">৳{total.toFixed(2)}</span>
                   </div>

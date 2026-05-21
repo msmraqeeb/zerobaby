@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Truck, Headphones, ShieldCheck, Award } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { useStore } from '../context/StoreContext';
-import { HomeSection, Product } from '../types';
+import { HomeSection, Product, Brand } from '../types';
 
 const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ section, products }) => {
   const sliderId = `slider-${section.id}`;
@@ -94,14 +94,33 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
 
       <div className={`grid grid-cols-1 ${isNoBanner ? '' : 'lg:grid-cols-5'} gap-6`}>
         {section.banner && !isNoBanner && (
-          <div className="hidden lg:block bg-gradient-to-b from-[#e92c5d] to-[#c81d4a] rounded-xl p-8 relative overflow-hidden text-white h-full">
-            <h3 className="text-3xl font-bold mb-4 font-serif italic">{section.banner.title}</h3>
-            <p className="mb-8 text-rose-100 opacity-90">{section.banner.description}</p>
-            <Link to={section.banner.link} className="bg-yellow-400 text-gray-900 px-6 py-2 rounded-full font-bold hover:bg-yellow-300 transition-colors w-fit flex items-center gap-2">
-              {section.banner.buttonText} ➝
-            </Link>
-            {section.banner.imageUrl && <img src={section.banner.imageUrl} alt="banner" className="absolute bottom-0 left-0 w-full h-1/2 object-cover opacity-30" />}
-          </div>
+          section.banner.imageUrl ? (
+            <div className="hidden lg:block rounded-xl overflow-hidden shadow-sm group h-full relative">
+              {section.banner.link ? (
+                <Link to={section.banner.link} className="block w-full h-full">
+                  <img
+                    src={section.banner.imageUrl}
+                    alt={section.banner.title || "banner"}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                </Link>
+              ) : (
+                <img
+                  src={section.banner.imageUrl}
+                  alt={section.banner.title || "banner"}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              )}
+            </div>
+          ) : (
+            <div className="hidden lg:block bg-gradient-to-b from-[#e92c5d] to-[#c81d4a] rounded-xl p-8 relative overflow-hidden text-white h-full">
+              <h3 className="text-3xl font-bold mb-4 font-serif italic">{section.banner.title}</h3>
+              <p className="mb-8 text-rose-100 opacity-90">{section.banner.description}</p>
+              <Link to={section.banner.link || '#'} className="bg-yellow-400 text-gray-900 px-6 py-2 rounded-full font-bold hover:bg-yellow-300 transition-colors w-fit flex items-center gap-2">
+                {section.banner.buttonText || 'Shop Now'} ➝
+              </Link>
+            </div>
+          )
         )}
 
         <div className={`
@@ -321,8 +340,128 @@ const TripleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
   );
 };
 
+const BrandScroller: React.FC<{ brands: Brand[] }> = ({ brands }) => {
+  const brandList = useMemo(() => {
+    const dbBrands = (brands || []).filter(b => b.logo_url && b.logo_url.trim() !== '');
+    if (dbBrands.length >= 6) return dbBrands;
+
+    const fallbackBrands = [
+      { id: 'fb1', name: 'Rovco', slug: 'rovco', logo_url: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&q=80&w=200' },
+      { id: 'fb2', name: 'Farlin', slug: 'farlin', logo_url: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=200' },
+      { id: 'fb3', name: 'Pampers', slug: 'pampers', logo_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=200' },
+      { id: 'fb4', name: 'Huggies', slug: 'huggies', logo_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=200' },
+      { id: 'fb5', name: 'Molfix', slug: 'molfix', logo_url: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&q=80&w=200' },
+      { id: 'fb6', name: 'Johnson\'s', slug: 'johnsons', logo_url: 'https://images.unsplash.com/photo-1608248597481-496100c80836?auto=format&fit=crop&q=80&w=200' },
+      { id: 'fb7', name: 'Gerber', slug: 'gerber', logo_url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&q=80&w=200' },
+      { id: 'fb8', name: 'Fisher-Price', slug: 'fisher-price', logo_url: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&q=80&w=200' }
+    ];
+
+    const merged = [...dbBrands];
+    fallbackBrands.forEach(fb => {
+      if (!merged.some(m => m.name.toLowerCase() === fb.name.toLowerCase()) && merged.length < 10) {
+        merged.push(fb);
+      }
+    });
+    return merged;
+  }, [brands]);
+
+  // Triple the items to ensure continuous infinite smooth marquee scroll
+  const marqueeItems = useMemo(() => {
+    if (brandList.length === 0) return [];
+    return [...brandList, ...brandList, ...brandList];
+  }, [brandList]);
+
+  if (marqueeItems.length === 0) return null;
+
+  return (
+    <section className="container mx-auto px-4 md:px-8 mb-16">
+      <div className="w-full py-8 bg-gray-50/70 rounded-2xl border border-gray-100/80 overflow-hidden relative">
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes marquee-brands-scroll {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-33.33%, 0, 0); }
+          }
+          .animate-marquee-brands {
+            display: flex;
+            width: max-content;
+            animation: marquee-brands-scroll 25s linear infinite;
+          }
+          .animate-marquee-brands:hover {
+            animation-play-state: paused;
+          }
+          .gradient-overlay-left {
+            background: linear-gradient(to right, #f9fafb, transparent);
+          }
+          .gradient-overlay-right {
+            background: linear-gradient(to left, #f9fafb, transparent);
+          }
+        `}} />
+
+        {/* Header Label */}
+        <div className="px-6 md:px-10 mb-6 flex items-center justify-between">
+          <h3 className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#e92c5d] animate-pulse" />
+            Shop By Brand
+          </h3>
+          <span className="h-[1px] flex-1 bg-gray-200/50 ml-4 hidden md:block" />
+        </div>
+
+        <div className="relative w-full overflow-hidden flex items-center">
+          {/* Shadow overlays for elegant fade boundaries */}
+          <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 z-10 pointer-events-none gradient-overlay-left" />
+          <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 z-10 pointer-events-none gradient-overlay-right" />
+
+          {/* Marquee Row */}
+          <div className="animate-marquee-brands gap-8 md:gap-12 py-2 px-4">
+            {marqueeItems.map((brand, idx) => {
+              const hasLogo = brand.logo_url && brand.logo_url.trim() !== '';
+
+              return (
+                <div 
+                  key={`${brand.id}-${idx}`}
+                  className="flex flex-col items-center gap-2 group cursor-pointer flex-shrink-0 select-none"
+                >
+                  {/* Logo wrapper frame with exactly 50x50 px child image */}
+                  <div className="w-[72px] h-[72px] rounded-full bg-white shadow-sm hover:shadow-md border border-gray-100 flex items-center justify-center transition-all duration-300 transform group-hover:scale-105 group-hover:border-rose-100 p-2 relative overflow-hidden">
+                    {hasLogo ? (
+                      <img 
+                        src={brand.logo_url} 
+                        alt={brand.name} 
+                        className="w-[50px] h-[50px] object-contain transition-all duration-300 filter grayscale group-hover:grayscale-0"
+                        onError={(e) => {
+                          // Safe fallback on image load error
+                          (e.currentTarget as HTMLImageElement).style.display = 'none';
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            const fallbackNode = document.createElement('div');
+                            fallbackNode.className = 'w-full h-full rounded-full bg-rose-50 text-[#e92c5d] font-bold flex items-center justify-center text-lg';
+                            fallbackNode.innerText = brand.name.charAt(0).toUpperCase();
+                            parent.appendChild(fallbackNode);
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full rounded-full bg-rose-50 text-[#e92c5d] font-bold flex items-center justify-center text-lg uppercase">
+                        {brand.name.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  {/* Micro Brand Label */}
+                  <span className="text-[10px] md:text-xs font-semibold text-gray-500 group-hover:text-gray-900 transition-colors">
+                    {brand.name}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const Home: React.FC = () => {
-  const { products, banners, homeSections, categories } = useStore();
+  const { products, banners, homeSections, categories, brands } = useStore();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Randomize products for "Best Items for you" section
@@ -728,6 +867,8 @@ const Home: React.FC = () => {
           ))}
         </div>
       </section>
+
+      <BrandScroller brands={brands} />
 
     </div>
   );

@@ -125,7 +125,7 @@ const Cart: React.FC = () => {
           {/* Cart Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 sticky top-24">
-              <h2 className="text-xl font-black text-[#004d40] mb-8 uppercase tracking-widest text-center border-b border-gray-50 pb-4">Cart Total</h2>
+              <h2 className="text-xl font-black text-[#e92c5d] mb-8 uppercase tracking-widest text-center border-b border-gray-50 pb-4">Cart Total</h2>
               
               <div className="space-y-4 mb-10">
                 <div className="flex justify-between text-gray-400 font-bold text-sm">
@@ -151,7 +151,7 @@ const Cart: React.FC = () => {
                 )}
 
                 <div className="border-t-2 border-dashed border-gray-100 pt-6 flex justify-between items-center">
-                  <span className="font-black text-lg text-[#004d40] uppercase tracking-tighter">Total</span>
+                  <span className="font-black text-lg text-[#e92c5d] uppercase tracking-tighter">Total</span>
                   <span className="font-black text-3xl text-gray-900 tracking-tighter">৳{total.toFixed(2)}</span>
                 </div>
               </div>
@@ -170,7 +170,7 @@ const Cart: React.FC = () => {
                      />
                      <button 
                         onClick={handleApplyCoupon}
-                        className="bg-[#004d40] text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-md active:scale-95"
+                        className="bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md active:scale-95"
                      >
                         Apply
                      </button>

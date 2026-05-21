@@ -102,7 +102,7 @@ const AboutUs: React.FC = () => {
 
       {/* CTA Section */}
       <section className="container mx-auto px-4 md:px-8 pt-20">
-        <div className="bg-[#004d40] rounded-[3rem] p-10 md:p-20 text-center relative overflow-hidden">
+        <div className="bg-[#3f0b1b] rounded-[3rem] p-10 md:p-20 text-center relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
             <div className="absolute top-0 right-0 w-64 h-64 bg-rose-400 rounded-full blur-[100px]"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-rose-300 rounded-full blur-[100px]"></div>
@@ -110,7 +110,7 @@ const AboutUs: React.FC = () => {
           <h2 className="text-3xl md:text-5xl font-black text-white mb-6 tracking-tight relative z-10">Fresh Groceries are <br /> Just a Click Away</h2>
           <p className="text-rose-100 text-lg mb-10 max-w-xl mx-auto relative z-10 opacity-80">Join thousands of families who trust {storeInfo.name} for their daily nutrition.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
-            <Link to="/products" className="bg-rose-500 hover:bg-rose-400 text-white font-black px-10 py-5 rounded-2xl transition-all shadow-xl shadow-rose-900/20 text-sm uppercase tracking-widest inline-block">
+            <Link to="/products" className="bg-rose-500 hover:bg-rose-600 text-white font-black px-10 py-5 rounded-2xl transition-all shadow-xl shadow-rose-900/20 text-sm uppercase tracking-widest inline-block">
               Browse Products
             </Link>
             <a href={`mailto:${storeInfo.email}`} className="bg-white/10 hover:bg-white/20 text-white font-black px-10 py-5 rounded-2xl transition-all border border-white/20 text-sm uppercase tracking-widest inline-block">

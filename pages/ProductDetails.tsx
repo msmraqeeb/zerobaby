@@ -318,7 +318,7 @@ const ProductDetails: React.FC = () => {
         {/* Reviews Section */}
         <div className="mt-24">
           <div className="flex items-center justify-between mb-12">
-            <h2 className="text-3xl font-black text-[#004d40] uppercase tracking-tight">Customer Reviews</h2>
+            <h2 className="text-3xl font-black text-[#e92c5d] uppercase tracking-tight">Customer Reviews</h2>
             <div className="hidden md:flex items-center gap-2 bg-[#fdf2f5] px-6 py-2 rounded-full">
               <Star size={18} className="text-yellow-400 fill-current" />
               <span className="text-lg font-black text-[#e92c5d]">{ratingStats.average} / 5.0</span>
@@ -329,7 +329,7 @@ const ProductDetails: React.FC = () => {
             {/* Left Column: Stats */}
             <div className="space-y-8">
               <div className="flex items-center gap-6">
-                <span className="text-8xl font-black text-[#004d40] tracking-tighter leading-none">{Math.round(Number(ratingStats.average))}</span>
+                <span className="text-8xl font-black text-[#e92c5d] tracking-tighter leading-none">{Math.round(Number(ratingStats.average))}</span>
                 <div className="space-y-1">
                   <div className="font-bold text-gray-800 uppercase text-xs tracking-[1px]">Store Rating</div>
                   <div className="flex text-gray-200 text-lg">
@@ -393,7 +393,7 @@ const ProductDetails: React.FC = () => {
                   <button
                     onClick={handleSubmitReview}
                     disabled={isSubmittingReview}
-                    className="w-full sm:w-auto bg-[#004d40] hover:bg-[#00382e] text-white font-black py-4 px-10 rounded-xl transition-all text-[10px] uppercase tracking-[2px] shadow-lg disabled:opacity-50 active:scale-95"
+                    className="w-full sm:w-auto bg-[#e92c5d] hover:bg-[#c81d4a] text-white font-black py-4 px-10 rounded-xl transition-all text-[10px] uppercase tracking-[2px] shadow-lg disabled:opacity-50 active:scale-95"
                   >
                     {isSubmittingReview ? "Processing..." : "Submit Review"}
                   </button>
