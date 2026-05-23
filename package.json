@@ -21,6 +21,7 @@
     "imagekit": "^6.0.0",
     "imagekitio-react": "^4.3.0",
     "lucide-react": "^0.454.0",
+    "nodemailer": "^8.0.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.3",

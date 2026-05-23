@@ -486,12 +486,34 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const { data, error } = await supabase.from('orders').insert([orderData]).select().single();
     if (error) throw new Error(error.message);
 
+    const mappedOrder = mapOrder(data);
+
+    // Asynchronously dispatch invoice emails in background
+    try {
+      fetch('/api/send-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ order: mappedOrder })
+      })
+        .then(res => res.json())
+        .then(resData => {
+          console.log("Invoice email status:", resData);
+        })
+        .catch(err => {
+          console.error("Invoice email API error:", err);
+        });
+    } catch (e) {
+      console.warn("Error triggering invoice emails:", e);
+    }
+
     setCart([]);
     setAppliedCoupon(null);
     localStorage.removeItem('cart');
     localStorage.removeItem('appliedCoupon');
     await fetchData(user);
-    return mapOrder(data);
+    return mappedOrder;
   };
 
   const updateHomeSectionsInDB = async (newSections: HomeSection[]) => {
