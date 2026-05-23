@@ -307,13 +307,28 @@ const TripleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
   const banner1 = section.banners?.[0];
   const banner2 = section.banners?.[1];
   const banner3 = section.banners?.[2];
-  if (!banner1?.imageUrl && !banner2?.imageUrl && !banner3?.imageUrl) return null;
+  
+  const activeBanners = useMemo(() => {
+    return [banner1, banner2, banner3].filter((b): b is NonNullable<typeof b> => !!b?.imageUrl);
+  }, [banner1, banner2, banner3]);
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    if (activeBanners.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % activeBanners.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [activeBanners.length]);
+
+  if (activeBanners.length === 0) return null;
 
   return (
     <section className="container mx-auto px-4 md:px-8 mb-16 animate-in fade-in duration-500">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
-        {[banner1, banner2, banner3].map((banner, index) => {
-          if (!banner?.imageUrl) return null;
+      {/* Desktop view (static 3 columns) */}
+      <div className="hidden md:grid md:grid-cols-3 gap-6">
+        {activeBanners.map((banner, index) => {
           const content = (
             <div className="rounded-2xl overflow-hidden shadow-sm group block w-full relative">
               <img
@@ -335,6 +350,50 @@ const TripleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
             </div>
           );
         })}
+      </div>
+
+      {/* Mobile view (auto-sliding carousel) */}
+      <div className="block md:hidden relative rounded-2xl overflow-hidden w-full aspect-[2.1/1] shadow-sm">
+        <div className="relative w-full h-full">
+          {activeBanners.map((banner, index) => {
+            const content = (
+              <div className="w-full h-full relative">
+                <img
+                  src={banner.imageUrl}
+                  className="w-full h-full object-cover pointer-events-none"
+                  alt={`Triple Banner Offer Mobile ${index + 1}`}
+                />
+              </div>
+            );
+            return (
+              <div
+                key={index}
+                className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+              >
+                {banner.link ? (
+                  <Link to={banner.link} className="block w-full h-full">
+                    {content}
+                  </Link>
+                ) : (
+                  content
+                )}
+              </div>
+            );
+          })}
+        </div>
+        
+        {/* Navigation dots */}
+        {activeBanners.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
+            {activeBanners.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-[#e92c5d] w-5' : 'bg-white/50 w-1.5 hover:bg-white'}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
