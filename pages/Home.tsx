@@ -6,6 +6,7 @@ import { useStore } from '../context/StoreContext';
 import { HomeSection, Product, Brand } from '../types';
 
 const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ section, products }) => {
+  const { categories } = useStore();
   const sliderId = `slider-${section.id}`;
 
   // Drag to scroll logic
@@ -37,11 +38,21 @@ const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = (
     scrollRef.current.scrollLeft = scrollLeft - walk;
   };
 
+  const getSectionLink = () => {
+    if (section.filterType === 'category' && section.filterValue) {
+      const categoryObj = categories.find(c => c.name === section.filterValue);
+      if (categoryObj) {
+        return `/category/${categoryObj.slug || encodeURIComponent(categoryObj.name)}`;
+      }
+    }
+    return `/products?filter=${section.filterType}${section.filterValue ? `&value=${section.filterValue}` : ''}`;
+  };
+
   return (
     <section className="container mx-auto px-4 md:px-8 mb-16 relative group/slider">
       <div className="flex justify-between items-end mb-6">
         <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4">{section.title}</h2>
-        <Link to={`/products?filter=${section.filterType}${section.filterValue ? `&value=${section.filterValue}` : ''}`} className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
+        <Link to={getSectionLink()} className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
       </div>
       <div className="relative">
         <button
@@ -83,13 +94,24 @@ const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = (
 };
 
 const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ section, products }) => {
+  const { categories } = useStore();
   const isNoBanner = section.type === 'grid-no-banner';
+
+  const getSectionLink = () => {
+    if (section.filterType === 'category' && section.filterValue) {
+      const categoryObj = categories.find(c => c.name === section.filterValue);
+      if (categoryObj) {
+        return `/category/${categoryObj.slug || encodeURIComponent(categoryObj.name)}`;
+      }
+    }
+    return `/products?filter=${section.filterType}${section.filterValue ? `&value=${section.filterValue}` : ''}`;
+  };
 
   return (
     <section className="container mx-auto px-4 md:px-8 mb-16">
       <div className="flex justify-between items-end mb-6">
         <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4">{section.title}</h2>
-        <Link to={`/products?filter=${section.filterType}${section.filterValue ? `&value=${section.filterValue}` : ''}`} className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
+        <Link to={getSectionLink()} className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
       </div>
 
       <div className={`grid grid-cols-1 ${isNoBanner ? '' : 'lg:grid-cols-5'} gap-6`}>
