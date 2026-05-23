@@ -517,7 +517,7 @@ const Home: React.FC = () => {
       <section className="container mx-auto px-4 md:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Slider (Left 2/3) */}
-          <div className="lg:col-span-2 relative rounded-xl overflow-hidden h-[200px] md:h-[450px]">
+          <div className="lg:col-span-2 relative rounded-xl overflow-hidden h-[280px] md:h-[450px]">
             {sliderBanners.length > 0 ? (
               <>
                 {sliderBanners.map((banner, idx) => {
@@ -545,24 +545,24 @@ const Home: React.FC = () => {
                     <div key={banner.id} className={`absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
                       <img src={banner.image_url} alt={banner.title} className="w-full h-full object-cover" />
                       {(banner.title || banner.subtitle || desc) && (
-                        <div className={`absolute top-1/2 -translate-y-1/2 max-w-md drop-shadow-md p-4 flex flex-col ${isDarkText ? 'text-gray-900' : 'text-white'} ${align === 'right' ? 'right-12 items-end text-right' : 'left-12 items-start text-left'}`}>
+                        <div className={`absolute top-1/2 -translate-y-1/2 max-w-[85%] md:max-w-md drop-shadow-md p-3 md:p-4 flex flex-col ${isDarkText ? 'text-gray-900' : 'text-white'} ${align === 'right' ? 'right-4 md:right-12 items-end text-right' : 'left-4 md:left-12 items-start text-left'}`}>
                           {banner.subtitle && (
-                            <p className={`px-3 py-1 rounded w-fit font-bold uppercase tracking-wider mb-4 text-xs ${isDarkText ? 'bg-rose-500 text-white shadow-sm' : 'text-[#e92c5d] bg-white/90 shadow-sm'}`}>
+                            <p className={`px-2 py-0.5 md:px-3 md:py-1 rounded w-fit font-bold uppercase tracking-wider mb-2 md:mb-4 text-[10px] md:text-xs ${isDarkText ? 'bg-rose-500 text-white shadow-sm' : 'text-[#e92c5d] bg-white/90 shadow-sm'}`}>
                               {banner.subtitle}
                             </p>
                           )}
                           {banner.title && (
-                            <h2 className={`text-3xl md:text-5xl font-black leading-tight mb-3 ${isDarkText ? 'text-gray-900 drop-shadow-none' : 'text-white'}`} style={{ textShadow: isDarkText ? 'none' : '0 2px 8px rgba(0,0,0,0.4)' }}>
+                            <h2 className={`text-xl md:text-5xl font-black leading-tight mb-2 md:mb-3 ${isDarkText ? 'text-gray-900 drop-shadow-none' : 'text-white'}`} style={{ textShadow: isDarkText ? 'none' : '0 2px 8px rgba(0,0,0,0.4)' }}>
                               {banner.title}
                             </h2>
                           )}
                           {desc && (
-                            <p className={`text-xs md:text-sm mb-6 font-semibold max-w-sm ${isDarkText ? 'text-gray-700' : 'text-white/90'}`} style={{ textShadow: isDarkText ? 'none' : '0 1px 4px rgba(0,0,0,0.4)' }}>
+                            <p className={`text-[10px] md:text-sm mb-3 md:mb-6 font-semibold max-w-sm ${isDarkText ? 'text-gray-700' : 'text-white/90'}`} style={{ textShadow: isDarkText ? 'none' : '0 1px 4px rgba(0,0,0,0.4)' }}>
                               {desc}
                             </p>
                           )}
                           {show_btn === 'true' && (
-                            <a href={actualLink || '/products'} className="inline-block bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-8 py-3.5 rounded-full font-bold transition-all shadow-lg hover:shadow-rose-500/50 uppercase tracking-widest text-[10px] md:text-xs">
+                            <a href={actualLink || '/products'} className="inline-block bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-5 py-2 md:px-8 md:py-3.5 rounded-full font-bold transition-all shadow-lg hover:shadow-rose-500/50 uppercase tracking-widest text-[9px] md:text-xs">
                               Shop Now ➝
                             </a>
                           )}
@@ -622,7 +622,7 @@ const Home: React.FC = () => {
               const isRightAlign = align === 'right';
 
               return (
-                <div className={`rounded-xl relative overflow-hidden flex flex-col justify-center group aspect-[2/1] h-auto lg:h-[215px] lg:aspect-auto lg:flex-1 p-3 lg:p-8 ${isRightAlign ? 'items-end' : 'items-start'}`}>
+                <div className={`rounded-xl relative overflow-hidden flex flex-col justify-center group h-[135px] lg:h-[215px] lg:flex-1 p-3 lg:p-8 ${isRightAlign ? 'items-end' : 'items-start'}`}>
                   <img src={rightTopBanner.image_url} alt={rightTopBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   {!isDarkText && <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>}
                   <div className={`relative z-10 w-full flex flex-col ${isRightAlign ? 'items-end text-right' : 'items-start text-left'}`}>
@@ -659,7 +659,7 @@ const Home: React.FC = () => {
                 </div>
               );
             })() : (
-              <div className="rounded-xl bg-[#fdf2f5] relative overflow-hidden border border-rose-50 aspect-[2/1] h-auto lg:h-auto lg:aspect-auto lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group">
+              <div className="rounded-xl bg-[#fdf2f5] relative overflow-hidden border border-rose-50 h-[135px] lg:h-[215px] lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group">
                 <div className="absolute top-0 left-0 bottom-0 z-20 w-[60%] flex flex-col justify-center pl-3 lg:static lg:w-full lg:block lg:pl-0">
                   <span className="text-[#e92c5d] font-bold text-[8px] lg:text-xs mb-0.5 lg:mb-1 block uppercase tracking-wider">Only This Week</span>
                   <h3 className="text-[10px] lg:text-xl font-bold text-gray-800 mb-0.5 lg:mb-1 leading-tight break-words">Quality eggs <br className="lg:hidden" /> at an price</h3>
@@ -696,7 +696,7 @@ const Home: React.FC = () => {
               const isRightAlign = align === 'right';
 
               return (
-                <div className={`rounded-xl relative overflow-hidden flex flex-col justify-center group aspect-[2/1] h-auto lg:h-[215px] lg:aspect-auto lg:flex-1 p-3 lg:p-8 ${isRightAlign ? 'items-end' : 'items-start'}`}>
+                <div className={`rounded-xl relative overflow-hidden flex flex-col justify-center group h-[135px] lg:h-[215px] lg:flex-1 p-3 lg:p-8 ${isRightAlign ? 'items-end' : 'items-start'}`}>
                   <img src={rightBottomBanner.image_url} alt={rightBottomBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   {!isDarkText && <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>}
                   <div className={`relative z-10 w-full flex flex-col ${isRightAlign ? 'items-end text-right' : 'items-start text-left'}`}>
@@ -733,7 +733,7 @@ const Home: React.FC = () => {
                 </div>
               );
             })() : (
-              <div className="rounded-xl bg-[#fff5f5] relative overflow-hidden border border-red-50 aspect-[2/1] h-auto lg:h-auto lg:aspect-auto lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group">
+              <div className="rounded-xl bg-[#fff5f5] relative overflow-hidden border border-red-50 h-[135px] lg:h-[215px] lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group">
                 <div className="absolute top-0 left-0 bottom-0 z-20 w-[60%] flex flex-col justify-center pl-3 lg:static lg:w-full lg:block lg:pl-0">
                   <span className="text-[#e92c5d] font-bold text-[8px] lg:text-xs mb-0.5 lg:mb-1 block uppercase tracking-wider">Fuel Your Day</span>
                   <h3 className="text-[10px] lg:text-xl font-bold text-gray-800 mb-0.5 lg:mb-1 leading-tight break-words">Nutritious bites <br className="lg:hidden" /> for mind</h3>
@@ -769,7 +769,7 @@ const Home: React.FC = () => {
               { icon: Award, title: 'Secure Payment' },
               { icon: Award, title: 'Genuine Product' },
             ].map((feat, idx) => (
-              <div key={idx} className="flex items-center gap-3 min-w-[200px] md:min-w-0 flex-shrink-0 snap-start px-2 md:px-0 select-none">
+              <div key={idx} className="flex items-center gap-2 md:gap-3 min-w-[140px] md:min-w-0 flex-shrink-0 snap-start px-1 md:px-0 select-none">
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-[#e92c5d] text-white rounded-md flex items-center justify-center flex-shrink-0 shadow-sm">
                   <feat.icon size={20} className="md:w-6 md:h-6" strokeWidth={2} />
                 </div>
