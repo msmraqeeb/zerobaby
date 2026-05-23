@@ -258,7 +258,7 @@ const ProductDetails: React.FC = () => {
                         key={val}
                         onClick={() => handleAttrSelect(attr.name, val)}
                         className={`px-2 py-2.5 md:px-8 md:py-4 border-2 rounded-xl md:rounded-[15px] text-xs md:text-sm font-bold transition-all min-w-0 md:min-w-[110px] shadow-sm ${isActive
-                          ? 'bg-[#e92c5d] border-black text-white shadow-xl'
+                          ? 'bg-[#e92c5d] border-[#e92c5d] text-white shadow-xl'
                           : 'bg-white border-gray-100 text-gray-500 hover:border-[#e92c5d]'
                           }`}
                       >
