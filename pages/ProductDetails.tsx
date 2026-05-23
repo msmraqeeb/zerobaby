@@ -214,7 +214,7 @@ const ProductDetails: React.FC = () => {
               <span className="text-[11px] font-black text-[#e92c5d] uppercase tracking-[2px] bg-[#fdf2f5] px-4 py-1.5 rounded-full inline-block">
                 {product.category}
               </span>
-              <h1 className="text-3xl md:text-4xl font-black text-gray-800 tracking-tight leading-tight flex flex-wrap items-center gap-2">
+              <h1 className="text-xl md:text-4xl font-black text-gray-800 tracking-tight leading-tight flex flex-wrap items-center gap-2">
                 {product.name}
                 {currentVariant && (
                   <span className="text-[#e92c5d] font-bold">
@@ -225,12 +225,12 @@ const ProductDetails: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-5 py-2">
-              <span className="text-5xl font-black text-[#e92c5d] flex items-center gap-1.5">
-                <span className="text-3xl font-medium">৳</span>{displayPrice.toFixed(2)}
+              <span className="text-3xl md:text-5xl font-black text-[#e92c5d] flex items-center gap-1.5">
+                <span className="text-xl md:text-3xl font-medium">৳</span>{displayPrice.toFixed(2)}
               </span>
               {displayOriginalPrice && displayOriginalPrice > displayPrice && (
-                <span className="text-3xl text-gray-300 line-through flex items-center gap-1.5 font-medium">
-                  <span className="text-2xl">৳</span>{displayOriginalPrice.toFixed(2)}
+                <span className="text-xl md:text-3xl text-gray-300 line-through flex items-center gap-1.5 font-medium">
+                  <span className="text-lg md:text-2xl">৳</span>{displayOriginalPrice.toFixed(2)}
                 </span>
               )}
             </div>
@@ -240,7 +240,7 @@ const ProductDetails: React.FC = () => {
               <div className="relative pl-8 py-1 my-6">
                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#e92c5d] rounded-full"></div>
                 <div
-                  className="text-[16px] text-gray-600 leading-relaxed italic prose prose-sm max-w-none font-medium"
+                  className="text-sm md:text-[16px] text-gray-600 leading-relaxed italic prose prose-sm max-w-none font-medium"
                   dangerouslySetInnerHTML={{ __html: product.shortDescription }}
                 />
               </div>
@@ -249,15 +249,15 @@ const ProductDetails: React.FC = () => {
             {/* Attribute Selectors Section */}
             {attributeList.map(attr => (
               <div key={attr.name} className="space-y-4 py-2">
-                <span className="text-base font-black text-gray-800 uppercase tracking-widest block">{attr.name}</span>
-                <div className="flex flex-wrap gap-4">
+                <span className="text-xs md:text-base font-black text-gray-800 uppercase tracking-widest block">{attr.name}</span>
+                <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:gap-4">
                   {attr.values.map((val) => {
                     const isActive = selectedAttrValues[attr.name] === val;
                     return (
                       <button
                         key={val}
                         onClick={() => handleAttrSelect(attr.name, val)}
-                        className={`px-8 py-4 border-2 rounded-[15px] text-sm font-bold transition-all min-w-[110px] shadow-sm ${isActive
+                        className={`px-2 py-2.5 md:px-8 md:py-4 border-2 rounded-xl md:rounded-[15px] text-xs md:text-sm font-bold transition-all min-w-0 md:min-w-[110px] shadow-sm ${isActive
                           ? 'bg-[#e92c5d] border-black text-white shadow-xl'
                           : 'bg-white border-gray-100 text-gray-500 hover:border-[#e92c5d]'
                           }`}
@@ -277,20 +277,20 @@ const ProductDetails: React.FC = () => {
               </div>
             )}
 
-            <div className="flex items-center gap-6 pt-6">
-              <div className="flex items-center border-2 border-gray-100 rounded-[20px] overflow-hidden h-16 shadow-sm bg-gray-50/50">
-                <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="px-6 h-full hover:bg-white text-gray-400 hover:text-[#e92c5d] transition-colors"><Minus size={20} /></button>
-                <span className="w-14 text-center font-black text-gray-800 text-xl">{quantity}</span>
-                <button onClick={() => setQuantity(prev => prev + 1)} className="px-6 h-full hover:bg-white text-gray-400 hover:text-[#e92c5d] transition-colors"><Plus size={20} /></button>
+            <div className="flex items-center gap-3 md:gap-6 pt-6">
+              <div className="flex items-center border-2 border-gray-100 rounded-[20px] overflow-hidden h-16 shadow-sm bg-gray-50/50 shrink-0">
+                <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="px-3 md:px-6 h-full hover:bg-white text-gray-400 hover:text-[#e92c5d] transition-colors"><Minus size={16} className="md:w-5 md:h-5" /></button>
+                <span className="w-10 md:w-14 text-center font-black text-gray-800 text-lg md:text-xl">{quantity}</span>
+                <button onClick={() => setQuantity(prev => prev + 1)} className="px-3 md:px-6 h-full hover:bg-white text-gray-400 hover:text-[#e92c5d] transition-colors"><Plus size={16} className="md:w-5 md:h-5" /></button>
               </div>
               <button
                 onClick={handleAddToCart}
-                className={`flex-1 font-black py-5 px-10 rounded-[20px] transition-all flex items-center justify-center gap-4 h-16 shadow-2xl uppercase tracking-widest text-sm ${product.variants && product.variants.length > 0 && !currentVariant
+                className={`flex-1 font-black py-5 px-4 md:px-10 rounded-[20px] transition-all flex items-center justify-center gap-2 md:gap-4 h-16 shadow-2xl uppercase tracking-widest text-xs md:text-sm whitespace-nowrap ${product.variants && product.variants.length > 0 && !currentVariant
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
                   : 'bg-[#e92c5d] hover:bg-[#c81d4a] text-white shadow-rose-100 active:scale-95'
                   }`}
               >
-                <ShoppingCart size={22} />
+                <ShoppingCart size={20} className="md:w-5.5 md:h-5.5" />
                 Add To Cart
               </button>
             </div>
@@ -316,44 +316,44 @@ const ProductDetails: React.FC = () => {
         </div>
 
         {/* Reviews Section */}
-        <div className="mt-24">
-          <div className="flex items-center justify-between mb-12">
-            <h2 className="text-3xl font-black text-[#e92c5d] uppercase tracking-tight">Customer Reviews</h2>
+        <div className="mt-12 md:mt-24">
+          <div className="flex items-center justify-between mb-6 md:mb-12">
+            <h2 className="text-xl md:text-3xl font-black text-[#e92c5d] uppercase tracking-tight">Customer Reviews</h2>
             <div className="hidden md:flex items-center gap-2 bg-[#fdf2f5] px-6 py-2 rounded-full">
               <Star size={18} className="text-yellow-400 fill-current" />
               <span className="text-lg font-black text-[#e92c5d]">{ratingStats.average} / 5.0</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16">
             {/* Left Column: Stats */}
-            <div className="space-y-8">
-              <div className="flex items-center gap-6">
-                <span className="text-8xl font-black text-[#e92c5d] tracking-tighter leading-none">{Math.round(Number(ratingStats.average))}</span>
-                <div className="space-y-1">
-                  <div className="font-bold text-gray-800 uppercase text-xs tracking-[1px]">Store Rating</div>
-                  <div className="flex text-gray-200 text-lg">
+            <div className="space-y-4 md:space-y-8">
+              <div className="flex items-center gap-4 md:gap-6">
+                <span className="text-6xl md:text-8xl font-black text-[#e92c5d] tracking-tighter leading-none">{Math.round(Number(ratingStats.average))}</span>
+                <div className="space-y-0.5 md:space-y-1">
+                  <div className="font-bold text-gray-800 uppercase text-[10px] md:text-xs tracking-[1px]">Store Rating</div>
+                  <div className="flex text-gray-200 text-sm md:text-lg">
                     {/* Show 5 stars, fill based on rating */}
                     {[1, 2, 3, 4, 5].map(i => (
-                      <Star key={i} size={20} className={i <= Math.round(Number(ratingStats.average)) ? "text-yellow-400 fill-current" : "text-gray-200"} strokeWidth={2} />
+                      <Star key={i} size={16} className={i <= Math.round(Number(ratingStats.average)) ? "text-yellow-400 fill-current" : "text-gray-200"} strokeWidth={2} />
                     ))}
                   </div>
-                  <span className="text-gray-400 text-xs font-black uppercase tracking-widest block pt-1">{ratingStats.total} Honest Reviews</span>
+                  <span className="text-gray-400 text-[10px] md:text-xs font-black uppercase tracking-widest block pt-0.5">{ratingStats.total} Honest Reviews</span>
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="text-sm font-bold text-gray-600 mb-4">{ratingStats.recommendedPercent}% Recommended by our shoppers</div>
+              <div className="space-y-2 md:space-y-3">
+                <div className="text-xs md:text-sm font-bold text-gray-600 mb-2 md:mb-4">{ratingStats.recommendedPercent}% Recommended by our shoppers</div>
                 {[5, 4, 3, 2, 1].map((star) => {
                   const percent = star * 20; // Static per requirements or calc real stats
                   return (
-                    <div key={star} className="flex items-center gap-4 group">
-                      <span className="text-sm font-bold text-gray-800 w-3">{star}</span>
-                      <Star size={14} className="text-gray-300" />
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div key={star} className="flex items-center gap-2 md:gap-4 group">
+                      <span className="text-xs md:text-sm font-bold text-gray-800 w-3">{star}</span>
+                      <Star size={12} className="text-gray-300" />
+                      <div className="flex-1 h-1.5 md:h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div className="h-full bg-[#e92c5d] rounded-full" style={{ width: `${percent}%` }}></div>
                       </div>
-                      <span className="text-xs font-bold text-gray-400 w-8 text-right">{percent}%</span>
+                      <span className="text-[10px] md:text-xs font-bold text-gray-400 w-8 text-right">{percent}%</span>
                     </div>
                   );
                 })}
@@ -361,7 +361,7 @@ const ProductDetails: React.FC = () => {
             </div>
 
             {/* Right Column: Form */}
-            <div className="bg-white p-8 md:p-10 rounded-[2rem] border border-gray-100 shadow-sm">
+            <div className="bg-white p-5 md:p-10 rounded-2xl md:rounded-[2rem] border border-gray-100 shadow-sm">
               <div className="mb-6">
                 <h3 className="text-xl font-black text-gray-800 mb-1 uppercase tracking-tight">Share Your Thoughts</h3>
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Your feedback helps others shop better.</p>
@@ -446,7 +446,7 @@ const ProductDetails: React.FC = () => {
         {/* Related Products Section */}
         {relatedProducts.length > 0 && (
           <div className="mt-24">
-            <h2 className="text-3xl font-black text-[#0f172a] uppercase tracking-widest mb-12 text-center">Related Products</h2>
+            <h2 className="text-xl md:text-3xl font-black text-[#0f172a] uppercase tracking-widest mb-6 md:mb-12 text-center">Related Products</h2>
             <div
               ref={relatedScrollRef}
               onMouseDown={handleRelatedMouseDown}
@@ -456,7 +456,7 @@ const ProductDetails: React.FC = () => {
               className="flex overflow-x-auto gap-4 snap-x scrollbar-hide cursor-grab active:cursor-grabbing md:grid md:grid-cols-4 md:gap-6 md:overflow-visible"
             >
               {relatedProducts.map(p => (
-                <div key={p.id} className="min-w-[calc(50%-8px)] snap-center flex-none md:min-w-0 md:w-auto">
+                <div key={p.id} className="w-[47%] min-w-[47%] snap-center flex-none md:min-w-0 md:w-auto">
                   <ProductCard product={p} />
                 </div>
               ))}
