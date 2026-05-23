@@ -1173,35 +1173,145 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     const invoiceWindow = window.open('', '_blank');
     if (!invoiceWindow) return alert("Please allow popups to print invoices");
 
+    // Set the state/URL so the browser prints a clean domain instead of about:blank
+    try {
+      invoiceWindow.history.pushState({}, '', '/');
+    } catch (e) {
+      console.warn("Failed to pushState in print window:", e);
+    }
+
     const html = `
       <html>
         <head>
           <title>Invoice #${order.id}</title>
           <style>
-            body { font-family: 'Helvetica', sans-serif; color: #333; padding: 40px; }
-            .header { display: flex; justify-content: space-between; margin-bottom: 40px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
-            .company h1 { margin: 0; color: #e92c5d; }
-            .company p { margin: 5px 0 0; color: #666; }
-            .invoice-details { text-align: right; }
-            .invoice-details h2 { margin: 0 0 10px; color: #333; }
-            .invoice-details p { margin: 2px 0; color: #666; }
-            .bill-to { margin-bottom: 30px; background: #f9f9f9; padding: 20px; border-radius: 10px; }
-            .bill-to h3 { margin: 0 0 10px; color: #e92c5d; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-            .bill-to p { margin: 2px 0; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-            th { text-align: left; border-bottom: 2px solid #eee; padding: 15px 10px; font-size: 12px; text-transform: uppercase; color: #888; }
-            td { padding: 15px 10px; border-bottom: 1px solid #eee; }
-            .totals { width: 300px; margin-left: auto; }
-            .row { display: flex; justify-content: space-between; padding: 5px 0; }
-            .total-row { font-weight: bold; border-top: 2px solid #eee; padding-top: 15px; margin-top: 10px; font-size: 1.2em; color: #e92c5d; }
-            @media print { body { padding: 0; } .bill-to { background: none; padding: 0; } }
+            body {
+              font-family: 'Helvetica', sans-serif;
+              color: #333;
+              padding: 40px;
+              margin: 0;
+            }
+            .header {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 40px;
+              border-bottom: 2px solid #eee;
+              padding-bottom: 20px;
+            }
+            .company {
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start;
+            }
+            .company img {
+              height: 55px;
+              object-fit: contain;
+              margin-bottom: 5px;
+            }
+            .company p {
+              margin: 5px 0 0;
+              color: #666;
+              font-size: 13px;
+            }
+            .invoice-details {
+              text-align: right;
+            }
+            .invoice-details h2 {
+              margin: 0 0 10px;
+              color: #333;
+            }
+            .invoice-details p {
+              margin: 2px 0;
+              color: #666;
+            }
+            .bill-to {
+              margin-bottom: 30px;
+              background: #f9f9f9;
+              padding: 20px;
+              border-radius: 10px;
+            }
+            .bill-to h3 {
+              margin: 0 0 10px;
+              color: #e92c5d;
+              font-size: 14px;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+            }
+            .bill-to p {
+              margin: 2px 0;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 30px;
+            }
+            th {
+              text-align: left;
+              border-bottom: 2px solid #eee;
+              padding: 15px 10px;
+              font-size: 12px;
+              text-transform: uppercase;
+              color: #888;
+            }
+            td {
+              padding: 15px 10px;
+              border-bottom: 1px solid #eee;
+            }
+            .totals {
+              width: 300px;
+              margin-left: auto;
+            }
+            .row {
+              display: flex;
+              justify-content: space-between;
+              padding: 5px 0;
+            }
+            .total-row {
+              font-weight: bold;
+              border-top: 2px solid #eee;
+              padding-top: 15px;
+              margin-top: 10px;
+              font-size: 1.2em;
+              color: #e92c5d;
+            }
+            
+            /* Custom styled footer positioned cleanly at the bottom */
+            .invoice-footer {
+              border-top: 1px solid #eee;
+              padding-top: 15px;
+              display: flex;
+              justify-content: space-between;
+              font-size: 11px;
+              color: #888;
+              font-weight: bold;
+            }
+
+            @media print {
+              @page {
+                size: auto;
+                margin: 0; /* Hides default browser header and footer (about:blank) */
+              }
+              body {
+                padding: 1.5cm 2cm;
+              }
+              .bill-to {
+                background: none;
+                padding: 0;
+              }
+              .invoice-footer {
+                position: fixed;
+                bottom: 1.5cm;
+                left: 2cm;
+                right: 2cm;
+              }
+            }
           </style>
         </head>
         <body>
           <div class="header">
             <div class="company">
-              <h1>zerobaby</h1>
-              <p>Dhaka, Bangladesh</p>
+              <img src="${currentStoreInfo?.logo_url || 'https://ik.imagekit.io/vrtbi4wsn/store/zerobaby-logo_a9UGaRrto.png'}" alt="Zero Baby Logo" />
+              <p>${currentStoreInfo?.address || 'Pallabi Mirpur 11.5 Bus Stand Mirpur, Dhaka-1216'}</p>
             </div>
             <div class="invoice-details">
               <h2>INVOICE</h2>
@@ -1249,8 +1359,23 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
             <div class="row total-row"><span>Total:</span> <span>৳${order.total.toFixed(2)}</span></div>
           </div>
           
+          <div class="invoice-footer">
+            <span>www.zerobaby.com.bd</span>
+            <span>Thank you for shopping with us!</span>
+          </div>
+          
           <script>
-            window.onload = () => { window.print(); }
+            // Ensure logo image is fully loaded before launching the native print dialog
+            const img = document.querySelector('.company img');
+            const runPrint = () => {
+              setTimeout(() => { window.print(); }, 300);
+            };
+            if (img && !img.complete) {
+              img.onload = runPrint;
+              img.onerror = runPrint;
+            } else {
+              window.onload = runPrint;
+            }
           </script>
         </body>
       </html>
