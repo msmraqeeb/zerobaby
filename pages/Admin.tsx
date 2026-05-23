@@ -1311,7 +1311,9 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
           <div class="header">
             <div class="company">
               <img src="${currentStoreInfo?.logo_url || 'https://ik.imagekit.io/vrtbi4wsn/store/zerobaby-logo_a9UGaRrto.png'}" alt="Zero Baby Logo" />
-              <p>${currentStoreInfo?.address || 'Pallabi Mirpur 11.5 Bus Stand Mirpur, Dhaka-1216'}</p>
+              <p><strong>Address:</strong> ${currentStoreInfo?.address || 'Pallabi Mirpur 11.5 Bus Stand Mirpur, Dhaka-1216'}</p>
+              <p><strong>Mobile:</strong> ${currentStoreInfo?.phone || '01797007260'}</p>
+              <p><strong>Email:</strong> ${currentStoreInfo?.email || 'zerobaby2021@gmail.com'}</p>
             </div>
             <div class="invoice-details">
               <h2>INVOICE</h2>
