@@ -171,82 +171,70 @@ const Checkout: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 md:p-12">
-              <h2 className="text-xl font-black text-gray-800 mb-10 flex items-center gap-4 uppercase tracking-tighter">
+            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-5 md:p-12">
+              <h2 className="text-xl font-black text-gray-800 mb-6 md:mb-10 flex items-center gap-4 uppercase tracking-tighter">
                 <span className="w-10 h-10 rounded-2xl bg-[#fdf2f5] text-[#e92c5d] flex items-center justify-center text-lg font-black border border-rose-100">01</span>
                 Shipping Information
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                 <div className="space-y-2 md:col-span-2">
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
-                  <input required name="fullName" value={formData.fullName} onChange={handleInputChange} placeholder="Recipient Name" className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all text-gray-800 font-bold" />
+                  <input required name="fullName" value={formData.fullName} onChange={handleInputChange} placeholder="Recipient Name" className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-4 md:px-6 py-3 md:py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all text-gray-800 font-bold text-sm md:text-base" />
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
-                  <input required name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="email@example.com" className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all text-gray-800 font-bold" />
+                  <input required name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="email@example.com" className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-4 md:px-6 py-3 md:py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all text-gray-800 font-bold text-sm md:text-base" />
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Street Address</label>
-                  <input required name="address" value={formData.address} onChange={handleInputChange} placeholder="House #, Road #" className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all text-gray-800 font-bold" />
+                  <input required name="address" value={formData.address} onChange={handleInputChange} placeholder="House #, Road #" className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-4 md:px-6 py-3 md:py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all text-gray-800 font-bold text-sm md:text-base" />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">District/Zilla</label>
                   <div className="relative">
-                    <select required name="district" value={formData.district} onChange={handleInputChange} className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all appearance-none text-gray-800 font-bold">
+                    <select required name="district" value={formData.district} onChange={handleInputChange} className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-4 md:px-6 py-3 md:py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all appearance-none text-gray-800 font-bold text-sm md:text-base">
                       <option value="" disabled hidden>Select District</option>
                       {districts.map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
-                    <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" size={18} />
+                    <ChevronDown className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" size={18} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Area</label>
                   <div className="relative">
-                    <select required name="area" value={formData.area} onChange={handleInputChange} disabled={!formData.district} className={`w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all appearance-none text-gray-800 font-bold ${!formData.district ? 'opacity-50' : ''}`}>
+                    <select required name="area" value={formData.area} onChange={handleInputChange} disabled={!formData.district} className={`w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-4 md:px-6 py-3 md:py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all appearance-none text-gray-800 font-bold text-sm md:text-base ${!formData.district ? 'opacity-50' : ''}`}>
                       <option value="" disabled hidden>Select Area</option>
                       {areas.map(a => <option key={a} value={a}>{a}</option>)}
                     </select>
-                    <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" size={18} />
+                    <ChevronDown className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" size={18} />
                   </div>
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
-                  <input required name="phone" type="tel" value={formData.phone} onChange={handleInputChange} placeholder="01XXXXXXXXX" className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-6 py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all text-gray-800 font-bold" />
+                  <input required name="phone" type="tel" value={formData.phone} onChange={handleInputChange} placeholder="01XXXXXXXXX" className="w-full bg-[#f8f9fa] border border-gray-100 rounded-2xl px-4 md:px-6 py-3 md:py-4 outline-none focus:bg-white focus:border-[#e92c5d] transition-all text-gray-800 font-bold text-sm md:text-base" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 md:p-12">
-               <h2 className="text-xl font-black text-gray-800 mb-8 flex items-center gap-4 uppercase tracking-tighter"><span className="w-10 h-10 rounded-2xl bg-[#fdf2f5] text-[#e92c5d] flex items-center justify-center text-lg font-black border border-rose-100">02</span>Payment Method</h2>
+            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-5 md:p-12">
+               <h2 className="text-xl font-black text-gray-800 mb-6 md:mb-8 flex items-center gap-4 uppercase tracking-tighter"><span className="w-10 h-10 rounded-2xl bg-[#fdf2f5] text-[#e92c5d] flex items-center justify-center text-lg font-black border border-rose-100">02</span>Payment Method</h2>
                <div className="space-y-4">
-                <label className={`flex items-center gap-6 p-8 border-2 rounded-[2rem] cursor-pointer transition-all active:scale-[0.99] ${paymentMethod === 'cod' ? 'border-[#e92c5d] bg-rose-50/20 shadow-xl shadow-rose-50/20' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
-                  <input type="radio" name="payment" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="w-6 h-6 accent-[#e92c5d]" />
-                  <div className="flex-1">
-                    <span className="font-black text-gray-800 text-lg block leading-none mb-2">Cash on Delivery</span>
-                    <span className="text-xs text-gray-500 font-bold uppercase tracking-[1px]">Standard delivery in 2-3 business days.</span>
+                <label className={`flex items-center gap-3 md:gap-6 p-4 md:p-8 border-2 rounded-[1.5rem] md:rounded-[2rem] cursor-pointer transition-all active:scale-[0.99] ${paymentMethod === 'cod' ? 'border-[#e92c5d] bg-rose-50/20 shadow-xl shadow-rose-50/20' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                  <input type="radio" name="payment" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="w-5 h-5 md:w-6 md:h-6 accent-[#e92c5d] shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <span className="font-black text-gray-800 text-sm md:text-lg block leading-tight mb-1 md:mb-2">Cash on Delivery</span>
+                    <span className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-[0.5px] md:tracking-[1px] block leading-normal">Standard delivery in 2-3 business days.</span>
                   </div>
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-colors ${paymentMethod === 'cod' ? 'bg-white text-[#e92c5d]' : 'bg-gray-50 text-gray-400'}`}>
-                    <Truck size={28} />
+                  <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm md:shadow-md transition-colors shrink-0 ${paymentMethod === 'cod' ? 'bg-white text-[#e92c5d]' : 'bg-gray-50 text-gray-400'}`}>
+                    <Truck className="w-5 h-5 md:w-7 md:h-7" />
                   </div>
                 </label>
-
-                {/* <label className={`flex items-center gap-6 p-8 border-2 rounded-[2rem] cursor-pointer transition-all active:scale-[0.99] ${paymentMethod === 'online' ? 'border-[#e92c5d] bg-rose-50/20 shadow-xl shadow-rose-50/20' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
-                  <input type="radio" name="payment" checked={paymentMethod === 'online'} onChange={() => setPaymentMethod('online')} className="w-6 h-6 accent-[#e92c5d]" />
-                  <div className="flex-1">
-                    <span className="font-black text-gray-800 text-lg block leading-none mb-2">Online Payment</span>
-                    <span className="text-xs text-gray-500 font-bold uppercase tracking-[1px]">Pay securely with SSLCommerz.</span>
-                  </div>
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-colors ${paymentMethod === 'online' ? 'bg-white text-[#e92c5d]' : 'bg-gray-50 text-gray-400'}`}>
-                    <CreditCard size={28} />
-                  </div>
-                </label> */}
-
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-1">
-             <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-rose-900/5 border border-gray-100 p-8 md:p-10 sticky top-24 overflow-hidden">
+             <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-rose-900/5 border border-gray-100 p-5 md:p-10 sticky top-24 overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-rose-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
               <h2 className="text-2xl font-black text-[#e92c5d] mb-10 uppercase tracking-tighter border-b border-gray-50 pb-6 relative z-10">Summary</h2>
               <div className="space-y-6 mb-10 max-h-[400px] overflow-y-auto pr-3 custom-scrollbar relative z-10">
@@ -289,7 +277,7 @@ const Checkout: React.FC = () => {
               <button 
                 type="submit" 
                 disabled={isSubmitting} 
-                className={`w-full mt-10 text-white font-black py-6 rounded-[20px] shadow-2xl transition-all flex items-center justify-center gap-3 uppercase tracking-[2px] text-[16px] relative z-10 ${isSubmitting ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none' : 'bg-[#e92c5d] hover:bg-[#c81d4a] shadow-rose-100/50 active:scale-95'}`}
+                className={`w-full mt-6 md:mt-10 text-white font-black py-4 md:py-6 rounded-[15px] md:rounded-[20px] shadow-2xl transition-all flex items-center justify-center gap-3 uppercase tracking-[1px] md:tracking-[2px] text-sm md:text-[16px] relative z-10 ${isSubmitting ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none' : 'bg-[#e92c5d] hover:bg-[#c81d4a] shadow-rose-100/50 active:scale-95'}`}
               >
                 {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Confirm Order'}
               </button>
