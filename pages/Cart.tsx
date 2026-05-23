@@ -124,7 +124,7 @@ const Cart: React.FC = () => {
 
           {/* Cart Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 sticky top-24">
+            <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-5 md:p-8 sticky top-24">
               <h2 className="text-xl font-black text-[#e92c5d] mb-8 uppercase tracking-widest text-center border-b border-gray-50 pb-4">Cart Total</h2>
               
               <div className="space-y-4 mb-10">
@@ -166,11 +166,11 @@ const Cart: React.FC = () => {
                        value={couponInput}
                        onChange={e => setCouponInput(e.target.value.toUpperCase())}
                        onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
-                       className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-rose-500 focus:ring-4 focus:ring-rose-50 transition-all placeholder:text-gray-300" 
+                       className="flex-1 border border-gray-200 rounded-xl px-3 md:px-4 py-3 text-sm font-bold outline-none focus:border-rose-500 focus:ring-4 focus:ring-rose-50 transition-all placeholder:text-gray-300 min-w-0" 
                      />
                      <button 
                         onClick={handleApplyCoupon}
-                        className="bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md active:scale-95"
+                        className="bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-4 md:px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md active:scale-95 shrink-0"
                      >
                         Apply
                      </button>
