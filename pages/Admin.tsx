@@ -2348,7 +2348,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                           for (const file of files) {
                             const formData = new FormData();
                             formData.append('file', file);
-                            formData.append('publicKey', import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY as string);
+                            formData.append('publicKey', authData.publicKey || import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY as string);
                             formData.append('signature', authData.signature);
                             formData.append('expire', authData.expire.toString());
                             formData.append('token', authData.token);

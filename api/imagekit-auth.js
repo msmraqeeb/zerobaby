@@ -10,7 +10,11 @@ export default function handler(req, res) {
 
     const authenticationParameters = imagekit.getAuthenticationParameters();
     
-    res.status(200).json(authenticationParameters);
+    res.status(200).json({
+      ...authenticationParameters,
+      publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+      urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT
+    });
   } catch (error) {
     res.status(500).json({ error: "ImageKit Auth Failed", details: error.message });
   }
