@@ -1,4 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 import { Link } from 'react-router-dom';
 import { ArrowRight, Truck, Headphones, ShieldCheck, Award } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
@@ -544,6 +548,7 @@ const BrandScroller: React.FC<{ brands: Brand[] }> = ({ brands }) => {
 const Home: React.FC = () => {
   const { products, banners, homeSections, categories, brands } = useStore();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   // Randomize products for "Best Items for you" section
   const randomProducts = useMemo(() => {
@@ -561,6 +566,70 @@ const Home: React.FC = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, [sliderBanners.length]);
+
+  // GSAP Entrance Animations for the Hero Banner
+  useEffect(() => {
+    if (sliderBanners.length === 0) return;
+
+    // Target elements inside the active slide container
+    const activeSlideEl = sliderRef.current?.querySelector(`.slide-${currentSlide}`);
+    if (!activeSlideEl) return;
+
+    const textEls = activeSlideEl.querySelectorAll('.hero-text');
+    const imageEl = activeSlideEl.querySelector('.hero-image');
+
+    if (textEls.length > 0 || imageEl) {
+      // Cancel any ongoing animations on these elements
+      gsap.killTweensOf(textEls);
+      gsap.killTweensOf(imageEl);
+
+      // Instantly set properties to starting state
+      gsap.set(textEls, { y: 50, opacity: 0 });
+      gsap.set(imageEl, { scale: 1.1, opacity: 0 });
+
+      // Run GSAP entrance animations with power2.out easing
+      gsap.to(textEls, {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        stagger: 0.2,
+        ease: "power2.out"
+      });
+
+      gsap.to(imageEl, {
+        scale: 1,
+        opacity: 1,
+        duration: 1.5,
+        ease: "power2.out"
+      });
+    }
+  }, [currentSlide, sliderBanners.length]);
+
+  // GSAP ScrollTrigger Animations for Features Bar
+  useEffect(() => {
+    // Instantly hide the badges on mount so they don't flash
+    gsap.set(".features-container .feature-badge", { y: -30, scale: 0.9, opacity: 0 });
+
+    const triggerInstance = ScrollTrigger.create({
+      trigger: ".features-container",
+      start: "top 90%",
+      onEnter: () => {
+        gsap.to(".features-container .feature-badge", {
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: "back.out(1.5)",
+          overwrite: "auto"
+        });
+      }
+    });
+
+    return () => {
+      triggerInstance.kill();
+    };
+  }, []);
 
   // Drag to scroll logic
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -598,7 +667,7 @@ const Home: React.FC = () => {
       <section className="container mx-auto px-4 md:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Slider (Left 2/3) */}
-          <div className="lg:col-span-2 relative rounded-xl overflow-hidden h-[280px] md:h-[450px]">
+          <div ref={sliderRef} className="lg:col-span-2 relative rounded-xl overflow-hidden h-[280px] md:h-[450px]">
             {sliderBanners.length > 0 ? (
               <>
                 {sliderBanners.map((banner, idx) => {
@@ -623,27 +692,27 @@ const Home: React.FC = () => {
                   const isDarkText = color === 'dark';
 
                   return (
-                    <div key={banner.id} className={`absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
-                      <img src={banner.image_url} alt={banner.title} className="w-full h-full object-cover" />
+                    <div key={banner.id} className={`slide-${idx} absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}>
+                      <img src={banner.image_url} alt={banner.title} className="w-full h-full object-cover hero-image" />
                       {(banner.title || banner.subtitle || desc) && (
                         <div className={`absolute top-1/2 -translate-y-1/2 max-w-[85%] md:max-w-md drop-shadow-md p-3 md:p-4 flex flex-col ${isDarkText ? 'text-gray-900' : 'text-white'} ${align === 'right' ? 'right-4 md:right-12 items-end text-right' : 'left-4 md:left-12 items-start text-left'}`}>
                           {banner.subtitle && (
-                            <p className={`px-2 py-0.5 md:px-3 md:py-1 rounded w-fit font-bold uppercase tracking-wider mb-2 md:mb-4 text-[10px] md:text-xs ${isDarkText ? 'bg-rose-500 text-white shadow-sm' : 'text-[#e92c5d] bg-white/90 shadow-sm'}`}>
+                            <p className={`hero-text px-2 py-0.5 md:px-3 md:py-1 rounded w-fit font-bold uppercase tracking-wider mb-2 md:mb-4 text-[10px] md:text-xs ${isDarkText ? 'bg-rose-500 text-white shadow-sm' : 'text-[#e92c5d] bg-white/90 shadow-sm'}`}>
                               {banner.subtitle}
                             </p>
                           )}
                           {banner.title && (
-                            <h2 className={`text-xl md:text-5xl font-black leading-tight mb-2 md:mb-3 ${isDarkText ? 'text-gray-900 drop-shadow-none' : 'text-white'}`} style={{ textShadow: isDarkText ? 'none' : '0 2px 8px rgba(0,0,0,0.4)' }}>
+                            <h2 className={`hero-text text-xl md:text-5xl font-black leading-tight mb-2 md:mb-3 ${isDarkText ? 'text-gray-900 drop-shadow-none' : 'text-white'}`} style={{ textShadow: isDarkText ? 'none' : '0 2px 8px rgba(0,0,0,0.4)' }}>
                               {banner.title}
                             </h2>
                           )}
                           {desc && (
-                            <p className={`text-[10px] md:text-sm mb-3 md:mb-6 font-semibold max-w-sm ${isDarkText ? 'text-gray-700' : 'text-white/90'}`} style={{ textShadow: isDarkText ? 'none' : '0 1px 4px rgba(0,0,0,0.4)' }}>
+                            <p className={`hero-text text-[10px] md:text-sm mb-3 md:mb-6 font-semibold max-w-sm ${isDarkText ? 'text-gray-700' : 'text-white/90'}`} style={{ textShadow: isDarkText ? 'none' : '0 1px 4px rgba(0,0,0,0.4)' }}>
                               {desc}
                             </p>
                           )}
                           {show_btn === 'true' && (
-                            <a href={actualLink || '/products'} className="inline-block bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-5 py-2 md:px-8 md:py-3.5 rounded-full font-bold transition-all shadow-lg hover:shadow-rose-500/50 uppercase tracking-widest text-[9px] md:text-xs">
+                            <a href={actualLink || '/products'} className="hero-text inline-block bg-[#e92c5d] hover:bg-[#c81d4a] text-white px-5 py-2 md:px-8 md:py-3.5 rounded-full font-bold transition-all shadow-lg hover:shadow-rose-500/50 uppercase tracking-widest text-[9px] md:text-xs">
                               Shop Now ➝
                             </a>
                           )}
@@ -833,7 +902,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Features Bar */}
-      <section className="container mx-auto px-4 md:px-8 mb-12">
+      <section className="features-container container mx-auto px-4 md:px-8 mb-12">
         <div className="bg-[#f7f8f3] rounded-2xl p-6 md:p-8">
           <div
             ref={scrollRef}
@@ -850,7 +919,7 @@ const Home: React.FC = () => {
               { icon: Award, title: 'Secure Payment' },
               { icon: Award, title: 'Genuine Product' },
             ].map((feat, idx) => (
-              <div key={idx} className="flex items-center gap-2 md:gap-3 min-w-[140px] md:min-w-0 flex-shrink-0 snap-start px-1 md:px-0 select-none">
+              <div key={idx} className="feature-badge flex items-center gap-2 md:gap-3 min-w-[140px] md:min-w-0 flex-shrink-0 snap-start px-1 md:px-0 select-none">
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-[#e92c5d] text-white rounded-md flex items-center justify-center flex-shrink-0 shadow-sm">
                   <feat.icon size={20} className="md:w-6 md:h-6" strokeWidth={2} />
                 </div>

@@ -1,6 +1,7 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import Lenis from 'lenis';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import FloatingContact from './components/FloatingContact';
@@ -24,9 +25,36 @@ import { StoreProvider, useStore } from './context/StoreContext';
 const AppContent: React.FC = () => {
   const { isAdmin, loading } = useStore();
   const { pathname } = useLocation();
+  const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Setup smooth scrolling with Lenis on mount
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth ease-out
+      smoothWheel: true
+    });
+    lenisRef.current = lenis;
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+      lenisRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, [pathname]);
 
   if (loading) {
