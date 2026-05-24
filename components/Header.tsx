@@ -196,7 +196,7 @@ const Header: React.FC = () => {
               <div className="flex md:hidden items-center gap-3 text-white">
                 <button
                   onClick={openCart}
-                  className="relative p-1"
+                  className="relative p-1 header-cart-icon"
                 >
                   <ShoppingCart size={24} />
                   {cartCount > 0 && (
@@ -252,6 +252,13 @@ const Header: React.FC = () => {
                         onClick={(e) => {
                           e.stopPropagation();
                           addToCart(product);
+                          const imgElement = e.currentTarget.closest('.group')?.querySelector('img');
+                          if (imgElement) {
+                            const startRect = imgElement.getBoundingClientRect();
+                            window.dispatchEvent(new CustomEvent('fly-to-cart', { 
+                              detail: { startRect, imageUrl: product.images[0] } 
+                            }));
+                          }
                         }}
                         className="bg-gray-100 text-gray-600 hover:bg-[#e92c5d] hover:text-white p-2 rounded-full transition-all opacity-80 hover:opacity-100 hover:scale-105 active:scale-95"
                         title="Add to Cart"
@@ -280,7 +287,7 @@ const Header: React.FC = () => {
               <div className="flex items-center gap-4">
                 <button
                   onClick={openCart}
-                  className="relative p-2 hover:bg-white/10 rounded-full transition-colors group"
+                  className="relative p-2 hover:bg-white/10 rounded-full transition-colors group header-cart-icon"
                 >
                   <ShoppingCart size={24} />
                   {cartCount > 0 && (
@@ -393,6 +400,13 @@ const Header: React.FC = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         addToCart(product);
+                        const imgElement = e.currentTarget.closest('.group')?.querySelector('img');
+                        if (imgElement) {
+                          const startRect = imgElement.getBoundingClientRect();
+                          window.dispatchEvent(new CustomEvent('fly-to-cart', { 
+                            detail: { startRect, imageUrl: product.images[0] } 
+                          }));
+                        }
                       }}
                       className="bg-gray-100 text-gray-600 hover:bg-[#e92c5d] hover:text-white p-1.5 rounded-full transition-all opacity-80 hover:opacity-100"
                       title="Add to Cart"

@@ -78,6 +78,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
             onClick={(e) => {
               e.preventDefault();
               addToCart(product);
+              const imgElement = e.currentTarget.closest('.group')?.querySelector('img');
+              if (imgElement) {
+                const startRect = imgElement.getBoundingClientRect();
+                window.dispatchEvent(new CustomEvent('fly-to-cart', { 
+                  detail: { startRect, imageUrl: primaryImage } 
+                }));
+              }
             }}
             className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-[#e92c5d] hover:bg-[#e92c5d] hover:text-white hover:border-[#e92c5d] transition-all"
           >

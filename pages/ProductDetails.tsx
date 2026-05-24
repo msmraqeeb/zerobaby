@@ -86,13 +86,23 @@ const ProductDetails: React.FC = () => {
     );
   }
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (product.variants && product.variants.length > 0 && !currentVariant) {
       setSelectionError("Please select a variant first.");
       return;
     }
     setSelectionError(null);
     addToCart(product, currentVariant || undefined, quantity);
+
+    const imgElement = document.querySelector('.product-gallery-main-image') as HTMLImageElement;
+    if (imgElement) {
+      const startRect = imgElement.getBoundingClientRect();
+      const imageUrl = imgElement.src;
+      window.dispatchEvent(new CustomEvent('fly-to-cart', {
+        detail: { startRect, imageUrl }
+      }));
+    }
   };
 
   const handleAttrSelect = (name: string, value: string) => {
@@ -177,7 +187,7 @@ const ProductDetails: React.FC = () => {
               <img
                 src={variantImage || displayImages[activeImageIdx] || ''}
                 alt={product.name}
-                className="max-h-full max-w-full object-contain transition-all duration-500"
+                className="product-gallery-main-image max-h-full max-w-full object-contain transition-all duration-500"
               />
               {displayImages.length > 1 && !variantImage && (
                 <>
