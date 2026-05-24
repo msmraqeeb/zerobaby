@@ -87,9 +87,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
                 }));
               }
             }}
-            className="relative z-20 w-8 h-8 md:w-9 md:h-9 shrink-0 rounded-full border border-gray-200 flex items-center justify-center text-[#e92c5d] hover:bg-[#e92c5d] hover:text-white hover:border-[#e92c5d] transition-all before:absolute before:-inset-3 before:content-['']"
+            className="relative z-20 w-8 h-8 md:w-9 md:h-9 shrink-0 rounded-full border border-gray-200 flex items-center justify-center text-[#e92c5d] hover:bg-[#e92c5d] hover:text-white hover:border-[#e92c5d] transition-all before:absolute before:-inset-3 before:content-[''] touch-manipulation"
           >
-            <ShoppingCart size={16} />
+            <ShoppingCart size={16} className="pointer-events-none" />
           </button>
         </div>
 

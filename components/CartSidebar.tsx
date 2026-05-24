@@ -31,7 +31,7 @@ const CartSidebar: React.FC = () => {
       />
       
       {/* Sidebar */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-[70] transform transition-transform duration-300 flex flex-col font-sans">
+      <div className={`fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-[70] transform transition-transform duration-300 flex flex-col font-sans ${isCartOpen ? 'translate-x-0 pointer-events-auto' : 'translate-x-full pointer-events-none'}`}>
         {/* Header */}
         <div className="p-5 flex items-center justify-between bg-rose-50/50 border-b border-gray-100">
           <div className="flex items-center gap-2">

@@ -20,10 +20,10 @@ const FloatingContact = () => {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 font-sans">
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 font-sans pointer-events-none">
 
             {/* Expanded Menu */}
-            <div className={`flex flex-col gap-3 transition-all duration-300 origin-bottom ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-10 pointer-events-none'}`}>
+            <div className={`flex flex-col gap-3 transition-all duration-300 origin-bottom ${isOpen ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-95 translate-y-10 pointer-events-none'}`}>
 
                 {/* Instagram */}
                 {instagram && (
@@ -88,7 +88,7 @@ const FloatingContact = () => {
             {/* Main Toggle Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 relative overflow-hidden ring-4 ring-white ${isOpen ? 'bg-[#007bff] rotate-180' : 'bg-transparent hover:scale-105'}`}
+                className={`w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 relative overflow-hidden ring-4 ring-white pointer-events-auto ${isOpen ? 'bg-[#007bff] rotate-180' : 'bg-transparent hover:scale-105'}`}
             >
                 {isOpen ? (
                     <X size={32} className="text-white" />
