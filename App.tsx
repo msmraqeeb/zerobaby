@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import FloatingContact from './components/FloatingContact';
 import CartSidebar from './components/CartSidebar';
+import CustomCursor from './components/CustomCursor';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import MyAccount from './pages/MyAccount';
@@ -67,6 +68,7 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
+      <CustomCursor />
       <Header />
       <CartSidebar />
       <main className="flex-grow">

@@ -1,0 +1,6 @@
+
+@media (pointer: fine) {
+  html.hide-native-cursor, html.hide-native-cursor * {
+    cursor: none !important;
+  }
+}
