@@ -12,6 +12,7 @@ import { HomeSection, Product, Brand } from '../types';
 const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ section, products }) => {
   const { categories } = useStore();
   const sliderId = `slider-${section.id}`;
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   // Drag to scroll logic
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -52,8 +53,36 @@ const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = (
     return `/products?filter=${section.filterType}${section.filterValue ? `&value=${section.filterValue}` : ''}`;
   };
 
+  useEffect(() => {
+    if (!products.length) return;
+
+    const cards = containerRef.current?.querySelectorAll('.product-card-anim');
+    if (!cards || !cards.length) return;
+
+    gsap.set(cards, { y: 30, opacity: 0 });
+
+    const triggerInstance = ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top 90%",
+      onEnter: () => {
+        gsap.to(cards, {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power2.out",
+          overwrite: "auto"
+        });
+      }
+    });
+
+    return () => {
+      triggerInstance.kill();
+    };
+  }, [products.length]);
+
   return (
-    <section className="container mx-auto px-4 md:px-8 mb-16 relative group/slider">
+    <section ref={containerRef} className="container mx-auto px-4 md:px-8 mb-16 relative group/slider">
       <div className="flex justify-between items-end mb-6">
         <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4">{section.title}</h2>
         <Link to={getSectionLink()} className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
@@ -78,7 +107,7 @@ const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = (
           className="flex gap-4 md:gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory cursor-grab active:cursor-grabbing"
         >
           {products.map(product => (
-            <div key={product.id} className="w-[150px] md:w-[240px] lg:w-[260px] snap-center flex-shrink-0 select-none">
+            <div key={product.id} className="product-card-anim w-[150px] md:w-[240px] lg:w-[260px] snap-center flex-shrink-0 select-none">
               <ProductCard product={product} className="w-full" />
             </div>
           ))}
@@ -100,6 +129,72 @@ const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = (
 const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ section, products }) => {
   const { categories } = useStore();
   const isNoBanner = section.type === 'grid-no-banner';
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const bannerRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!products.length) return;
+
+    const cards = containerRef.current?.querySelectorAll('.product-card-anim');
+    if (!cards || !cards.length) return;
+
+    gsap.set(cards, { y: 30, opacity: 0 });
+
+    const triggerInstance = ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top 90%",
+      onEnter: () => {
+        gsap.to(cards, {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.08,
+          ease: "power2.out",
+          overwrite: "auto"
+        });
+      }
+    });
+
+    // Pinned Banner ScrollTrigger (Desktop Only)
+    let pinTrigger: ScrollTrigger | null = null;
+    if (section.banner && bannerRef.current) {
+      const mediaQuery = window.matchMedia("(min-width: 1024px)");
+
+      const setupPin = () => {
+        if (mediaQuery.matches) {
+          if (pinTrigger) {
+            pinTrigger.kill();
+          }
+          pinTrigger = ScrollTrigger.create({
+            trigger: containerRef.current,
+            pin: bannerRef.current,
+            start: "top 120px",
+            end: () => `bottom ${120 + (bannerRef.current?.offsetHeight || 500)}px`,
+            pinSpacing: false,
+            invalidateOnRefresh: true
+          });
+        } else {
+          if (pinTrigger) {
+            pinTrigger.kill();
+            pinTrigger = null;
+          }
+        }
+      };
+
+      setupPin();
+      mediaQuery.addEventListener("change", setupPin);
+
+      return () => {
+        if (pinTrigger) pinTrigger.kill();
+        mediaQuery.removeEventListener("change", setupPin);
+        triggerInstance.kill();
+      };
+    }
+
+    return () => {
+      triggerInstance.kill();
+    };
+  }, [products.length, section.banner]);
 
   const getSectionLink = () => {
     if (section.filterType === 'category' && section.filterValue) {
@@ -112,7 +207,7 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
   };
 
   return (
-    <section className="container mx-auto px-4 md:px-8 mb-16">
+    <section ref={containerRef} className="container mx-auto px-4 md:px-8 mb-16">
       <div className="flex justify-between items-end mb-6">
         <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4">{section.title}</h2>
         <Link to={getSectionLink()} className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
@@ -121,7 +216,7 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
       <div className={`grid grid-cols-1 ${isNoBanner ? '' : 'lg:grid-cols-5'} gap-6`}>
         {section.banner && !isNoBanner && (
           section.banner.imageUrl ? (
-            <div className="hidden lg:block rounded-xl overflow-hidden shadow-sm group h-full relative">
+            <div ref={bannerRef} className="hidden lg:block rounded-xl overflow-hidden shadow-sm group h-[500px] self-start relative">
               {section.banner.link ? (
                 <Link to={section.banner.link} className="block w-full h-full">
                   <img
@@ -139,7 +234,7 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
               )}
             </div>
           ) : (
-            <div className="hidden lg:block bg-gradient-to-b from-[#e92c5d] to-[#c81d4a] rounded-xl p-8 relative overflow-hidden text-white h-full">
+            <div ref={bannerRef} className="hidden lg:block bg-gradient-to-b from-[#e92c5d] to-[#c81d4a] rounded-xl p-8 relative overflow-hidden text-white h-[500px] self-start">
               <h3 className="text-3xl font-bold mb-4 font-serif italic">{section.banner.title}</h3>
               <p className="mb-8 text-rose-100 opacity-90">{section.banner.description}</p>
               <Link to={section.banner.link || '#'} className="bg-yellow-400 text-gray-900 px-6 py-2 rounded-full font-bold hover:bg-yellow-300 transition-colors w-fit flex items-center gap-2">
@@ -154,7 +249,7 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
           grid grid-cols-2 lg:grid-cols-${isNoBanner ? '5' : (section.banner ? '4' : '5')} gap-3 md:gap-6
         `}>
           {products.slice(0, isNoBanner ? 10 : (section.banner ? 8 : 10)).map(product => (
-            <ProductCard key={`${section.id}-${product.id}`} product={product} className="max-w-[260px] mx-auto w-full" />
+            <ProductCard key={`${section.id}-${product.id}`} product={product} className="product-card-anim max-w-[260px] mx-auto w-full" />
           ))}
         </div>
       </div>
@@ -205,11 +300,11 @@ const PromoBannersSection = () => {
         {/* Banner 1 */}
         <Link
           to="/category/toys-&-stationery"
-          className="w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
+          className="parallax-container w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
         >
           <img
             src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.1.png"
-            className="w-full h-auto object-contain md:object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
+            className="parallax-img w-full h-auto object-contain md:object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
             alt="Promo Banner 1"
           />
         </Link>
@@ -217,11 +312,11 @@ const PromoBannersSection = () => {
         {/* Banner 2 */}
         <Link
           to="/category/apparels"
-          className="w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
+          className="parallax-container w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
         >
           <img
             src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.2.png"
-            className="w-full h-auto object-contain md:object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
+            className="parallax-img w-full h-auto object-contain md:object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
             alt="Promo Banner 2"
           />
         </Link>
@@ -229,11 +324,11 @@ const PromoBannersSection = () => {
         {/* Banner 3 */}
         <Link
           to="/category/childcare"
-          className="w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
+          className="parallax-container w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
         >
           <img
             src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.3.png"
-            className="w-full h-auto object-contain md:object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
+            className="parallax-img w-full h-auto object-contain md:object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
             alt="Promo Banner 3"
           />
         </Link>
@@ -247,15 +342,15 @@ const DualBannerSection = () => (
     <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
       <Link
         to="/category/toiletries"
-        className="rounded-2xl overflow-hidden shadow-sm group aspect-[2/1] h-auto md:aspect-auto md:h-[280px] block"
+        className="parallax-container rounded-2xl overflow-hidden shadow-sm group aspect-[2/1] h-auto md:aspect-auto md:h-[280px] block"
       >
-        <img src="https://ik.imagekit.io/vrtbi4wsn/banners/banner1.4.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Special Offer 1" />
+        <img src="https://ik.imagekit.io/vrtbi4wsn/banners/banner1.4.jpg" className="parallax-img w-full h-full object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15]" alt="Special Offer 1" />
       </Link>
       <Link
         to="/category/baby-foods"
-        className="rounded-2xl overflow-hidden shadow-sm group aspect-[2/1] h-auto md:aspect-auto md:h-[280px] block"
+        className="parallax-container rounded-2xl overflow-hidden shadow-sm group aspect-[2/1] h-auto md:aspect-auto md:h-[280px] block"
       >
-        <img src="https://ik.imagekit.io/vrtbi4wsn/banners/banner1.5.jpg" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Special Offer 2" />
+        <img src="https://ik.imagekit.io/vrtbi4wsn/banners/banner1.5.jpg" className="parallax-img w-full h-full object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15]" alt="Special Offer 2" />
       </Link>
     </div>
   </section>
@@ -266,10 +361,10 @@ const FullWidthBannerSection: React.FC<{ section: HomeSection }> = ({ section })
   if (!banner?.imageUrl) return null;
 
   const content = (
-    <div className="w-full rounded-2xl overflow-hidden shadow-sm group relative block aspect-[3/1] md:aspect-[4/1] lg:aspect-[5/1]">
+    <div className="parallax-container w-full rounded-2xl overflow-hidden shadow-sm group relative block aspect-[3/1] md:aspect-[4/1] lg:aspect-[5/1]">
       <img
         src={banner.imageUrl}
-        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02] pointer-events-none"
+        className="parallax-img w-full h-full object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none"
         alt={section.title || "Full Width Promo Banner"}
       />
     </div>
@@ -300,13 +395,13 @@ const DoubleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
           banner1.link ? (
             <Link
               to={banner1.link}
-              className="rounded-2xl overflow-hidden shadow-sm group block w-full"
+              className="parallax-container rounded-2xl overflow-hidden shadow-sm group block w-full"
             >
-              <img src={banner1.imageUrl} className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none" alt="Offer 1" />
+              <img src={banner1.imageUrl} className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 1" />
             </Link>
           ) : (
-            <div className="rounded-2xl overflow-hidden shadow-sm group block w-full">
-              <img src={banner1.imageUrl} className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none" alt="Offer 1" />
+            <div className="parallax-container rounded-2xl overflow-hidden shadow-sm group block w-full">
+              <img src={banner1.imageUrl} className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 1" />
             </div>
           )
         )}
@@ -314,13 +409,13 @@ const DoubleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
           banner2.link ? (
             <Link
               to={banner2.link}
-              className="rounded-2xl overflow-hidden shadow-sm group block w-full"
+              className="parallax-container rounded-2xl overflow-hidden shadow-sm group block w-full"
             >
-              <img src={banner2.imageUrl} className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none" alt="Offer 2" />
+              <img src={banner2.imageUrl} className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 2" />
             </Link>
           ) : (
-            <div className="rounded-2xl overflow-hidden shadow-sm group block w-full">
-              <img src={banner2.imageUrl} className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none" alt="Offer 2" />
+            <div className="parallax-container rounded-2xl overflow-hidden shadow-sm group block w-full">
+              <img src={banner2.imageUrl} className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 2" />
             </div>
           )
         )}
@@ -356,10 +451,10 @@ const TripleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
       <div className="hidden md:grid md:grid-cols-3 gap-6">
         {activeBanners.map((banner, index) => {
           const content = (
-            <div className="rounded-2xl overflow-hidden shadow-sm group block w-full relative">
+            <div className="parallax-container rounded-2xl overflow-hidden shadow-sm group block w-full relative">
               <img
                 src={banner.imageUrl}
-                className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 pointer-events-none"
+                className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none"
                 alt={`Triple Banner Offer ${index + 1}`}
               />
             </div>
@@ -630,6 +725,63 @@ const Home: React.FC = () => {
       triggerInstance.kill();
     };
   }, []);
+
+  // GSAP ScrollTrigger Animations for Best Items Section
+  useEffect(() => {
+    if (randomProducts.length === 0) return;
+
+    // Instantly hide the product cards on mount so they don't flash
+    gsap.set(".best-items-container .product-card-anim", { y: 30, opacity: 0 });
+
+    const triggerInstance = ScrollTrigger.create({
+      trigger: ".best-items-container",
+      start: "top 90%",
+      onEnter: () => {
+        gsap.to(".best-items-container .product-card-anim", {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.08,
+          ease: "power2.out",
+          overwrite: "auto"
+        });
+      }
+    });
+
+    return () => {
+      triggerInstance.kill();
+    };
+  }, [randomProducts.length]);
+
+  // GSAP ScrollTrigger Animations for Banner Parallax
+  useEffect(() => {
+    const containers = document.querySelectorAll('.parallax-container');
+    const triggers: ScrollTrigger[] = [];
+
+    containers.forEach(container => {
+      const img = container.querySelector('.parallax-img');
+      if (!img) return;
+
+      const trigger = ScrollTrigger.create({
+        trigger: container,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: true,
+        onUpdate: (self) => {
+          gsap.to(img, {
+            yPercent: -15 * self.progress,
+            ease: "none",
+            overwrite: "auto"
+          });
+        }
+      });
+      triggers.push(trigger);
+    });
+
+    return () => {
+      triggers.forEach(t => t.kill());
+    };
+  }, [banners.length]);
 
   // Drag to scroll logic
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -1006,14 +1158,14 @@ const Home: React.FC = () => {
         })}
 
       {/* Best Items for you Section */}
-      <section className="container mx-auto px-4 md:px-8 mb-16">
+      <section className="best-items-container container mx-auto px-4 md:px-8 mb-16">
         <div className="flex justify-between items-end mb-6">
           <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4">Best Items for you</h2>
           <Link to="/products" className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6">
           {randomProducts.map(product => (
-            <ProductCard key={`best-${product.id}`} product={product} className="max-w-[260px] mx-auto w-full" />
+            <ProductCard key={`best-${product.id}`} product={product} className="product-card-anim max-w-[260px] mx-auto w-full" />
           ))}
         </div>
       </section>

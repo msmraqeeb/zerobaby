@@ -1,10 +1,14 @@
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import ProductCard from '../components/ProductCard';
 import { Filter, SlidersHorizontal, ChevronRight, ChevronDown, Search, RotateCcw, Check, Star, Coins, X } from 'lucide-react';
 import { Category } from '../types';
+import gsap from 'gsap';
+import { Flip } from 'gsap/Flip';
+
+gsap.registerPlugin(Flip);
 
 interface CategoryNode extends Category {
   children: CategoryNode[];
@@ -91,6 +95,13 @@ const Products: React.FC = () => {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedMinRating, setSelectedMinRating] = useState<number | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const flipStateRef = useRef<any>(null);
+
+  // Capture current DOM state during render (before React commits changes)
+  if (typeof window !== 'undefined') {
+    flipStateRef.current = Flip.getState(".product-card-container");
+  }
 
   const categoryTree = useMemo(() => buildCategoryTree(categories), [categories]);
 
@@ -267,6 +278,24 @@ const Products: React.FC = () => {
     });
   }, [categoryProducts, searchQuery, selectedBrands, selectedMinRating, reviews, location.search, selectedAttributes, priceRange]);
 
+  // Trigger Flip animation once React has committed DOM updates
+  useLayoutEffect(() => {
+    if (flipStateRef.current) {
+      Flip.from(flipStateRef.current, {
+        duration: 0.6,
+        ease: "power2.out",
+        absolute: true,
+        scale: true,
+        simple: true,
+        onEnter: (elements) => gsap.fromTo(elements, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4 }),
+        onLeave: (elements) => gsap.to(elements, { opacity: 0, scale: 0.8, duration: 0.3 }),
+        onComplete: () => {
+          flipStateRef.current = null;
+        }
+      });
+    }
+  }, [filteredProducts]);
+
   const toggleBrand = (brandName: string) => {
     setSelectedBrands(prev =>
       prev.includes(brandName) ? prev.filter(b => b !== brandName) : [...prev, brandName]
@@ -291,168 +320,173 @@ const Products: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-8">
 
           {/* Sidebar Filters */}
-          <aside className="hidden lg:block lg:w-72 space-y-8 shrink-0">
-            {/* Category Filter */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Filter size={18} className="text-rose-500" />
-                Categories
-              </h3>
-              <div className="space-y-1">
-                <button
-                  onClick={() => setSelectedCategory('All')}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === 'All' ? 'bg-rose-50 text-rose-600' : 'text-gray-600 hover:bg-gray-50'}`}
-                >
-                  All Categories
-                </button>
-                {categoryTree.map(cat => (
-                  <CategorySidebarItem
-                    key={cat.id}
-                    category={cat}
-                    selectedCategory={selectedCategory}
-                    onSelect={setSelectedCategory}
-                    selectedCategoryFamily={selectedCategoryFamily}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Price Range Filter */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <h3 className="font-bold text-gray-800 mb-6 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Coins size={18} className="text-rose-500" />
-                  Price Range
-                </div>
-                <span className="text-xs font-black text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">
-                  ৳{priceRange[0]} - ৳{priceRange[1]}
-                </span>
-              </h3>
-
-              <div className="relative h-2 w-full bg-gray-100 rounded-full mb-6">
-                {/* Track Fill */}
-                <div
-                  className="absolute h-full bg-rose-500 rounded-full"
-                  style={{
-                    left: `${((priceRange[0] - minMax[0]) / (minMax[1] - minMax[0])) * 100}%`,
-                    right: `${100 - ((priceRange[1] - minMax[0]) / (minMax[1] - minMax[0])) * 100}%`
-                  }}
-                ></div>
-
-                {/* Range Inputs */}
-                <input
-                  type="range"
-                  min={minMax[0]}
-                  max={minMax[1]}
-                  value={priceRange[0]}
-                  onChange={(e) => {
-                    const val = Math.min(Number(e.target.value), priceRange[1] - 1);
-                    setPriceRange([val, priceRange[1]]);
-                  }}
-                  className="absolute w-full h-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-rose-500 [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-rose-500 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:cursor-pointer outline-none z-30"
-                />
-                <input
-                  type="range"
-                  min={minMax[0]}
-                  max={minMax[1]}
-                  value={priceRange[1]}
-                  onChange={(e) => {
-                    const val = Math.max(Number(e.target.value), priceRange[0] + 1);
-                    setPriceRange([priceRange[0], val]);
-                  }}
-                  className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-rose-500 [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-rose-500 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:cursor-pointer outline-none z-40"
-                />
-              </div>
-
-              <div className="flex justify-between text-xs font-bold text-gray-400">
-                <span>৳{minMax[0]}</span>
-                <span>৳{minMax[1]}</span>
-              </div>
-            </div>
-
-            {/* Brand Filter */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <SlidersHorizontal size={18} className="text-rose-500" />
-                Brands
-              </h3>
-              <div className="space-y-2">
-                {availableBrands.length === 0 ? (
-                  <p className="text-xs text-gray-400 italic">No brands found</p>
-                ) : (
-                  availableBrands.map(brand => (
-                    <label key={brand.id} className="flex items-center gap-3 cursor-pointer group">
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          checked={selectedBrands.includes(brand.name)}
-                          onChange={() => toggleBrand(brand.name)}
-                          className="peer h-5 w-5 appearance-none rounded border-2 border-gray-200 checked:bg-rose-500 checked:border-rose-500 transition-all"
-                        />
-                        <Check size={14} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
-                      </div>
-                      <span className="text-sm font-medium text-gray-600 group-hover:text-rose-500 transition-colors">{brand.name}</span>
-                    </label>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Dynamic Attribute Filter */}
-            {Object.entries(availableAttributes).map(([attrName, values]) => (
-              <div key={attrName} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm animate-in fade-in duration-500">
+          <aside className="hidden lg:block lg:w-72 shrink-0 sticky top-[120px] self-start">
+            <div 
+              data-lenis-prevent
+              className="max-h-[calc(100vh-160px)] overflow-y-auto pr-2 space-y-8"
+            >
+              {/* Category Filter */}
+              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                 <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                  {attrName}
+                  <Filter size={18} className="text-rose-500" />
+                  Categories
                 </h3>
-                <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
-                  {values.map(val => (
-                    <label key={val} className="flex items-center gap-3 cursor-pointer group">
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          checked={selectedAttributes[attrName]?.includes(val) || false}
-                          onChange={() => toggleAttribute(attrName, val)}
-                          className="peer h-5 w-5 appearance-none rounded border-2 border-gray-200 checked:bg-rose-500 checked:border-rose-500 transition-all"
-                        />
-                        <Check size={14} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
-                      </div>
-                      <span className="text-sm font-medium text-gray-600 group-hover:text-rose-500 transition-colors">{val}</span>
-                    </label>
+                <div className="space-y-1">
+                  <button
+                    onClick={() => setSelectedCategory('All')}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === 'All' ? 'bg-rose-50 text-rose-600' : 'text-gray-600 hover:bg-gray-50'}`}
+                  >
+                    All Categories
+                  </button>
+                  {categoryTree.map(cat => (
+                    <CategorySidebarItem
+                      key={cat.id}
+                      category={cat}
+                      selectedCategory={selectedCategory}
+                      onSelect={setSelectedCategory}
+                      selectedCategoryFamily={selectedCategoryFamily}
+                    />
                   ))}
                 </div>
               </div>
-            ))}
 
-            {/* Rating Filter */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <h3 className="font-bold text-gray-800 mb-4">Customer Rating</h3>
-              <div className="space-y-2">
-                {[4, 3, 2, 1].map(stars => (
-                  <button
-                    key={stars}
-                    onClick={() => setSelectedMinRating(stars)}
-                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${selectedMinRating === stars ? 'bg-amber-50 text-amber-700' : 'hover:bg-gray-50 text-gray-600'}`}
-                  >
-                    <div className="flex text-amber-400">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={14} fill={i < stars ? "currentColor" : "none"} className={i < stars ? "" : "text-gray-200"} />
-                      ))}
-                    </div>
-                    <span className="font-medium">& Up</span>
-                  </button>
-                ))}
+              {/* Price Range Filter */}
+              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <h3 className="font-bold text-gray-800 mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Coins size={18} className="text-rose-500" />
+                    Price Range
+                  </div>
+                  <span className="text-xs font-black text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">
+                    ৳{priceRange[0]} - ৳{priceRange[1]}
+                  </span>
+                </h3>
+
+                <div className="relative h-2 w-full bg-gray-100 rounded-full mb-6">
+                  {/* Track Fill */}
+                  <div
+                    className="absolute h-full bg-rose-500 rounded-full"
+                    style={{
+                      left: `${((priceRange[0] - minMax[0]) / (minMax[1] - minMax[0])) * 100}%`,
+                      right: `${100 - ((priceRange[1] - minMax[0]) / (minMax[1] - minMax[0])) * 100}%`
+                    }}
+                  ></div>
+
+                  {/* Range Inputs */}
+                  <input
+                    type="range"
+                    min={minMax[0]}
+                    max={minMax[1]}
+                    value={priceRange[0]}
+                    onChange={(e) => {
+                      const val = Math.min(Number(e.target.value), priceRange[1] - 1);
+                      setPriceRange([val, priceRange[1]]);
+                    }}
+                    className="absolute w-full h-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-rose-500 [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-rose-500 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:cursor-pointer outline-none z-30"
+                  />
+                  <input
+                    type="range"
+                    min={minMax[0]}
+                    max={minMax[1]}
+                    value={priceRange[1]}
+                    onChange={(e) => {
+                      const val = Math.max(Number(e.target.value), priceRange[0] + 1);
+                      setPriceRange([priceRange[0], val]);
+                    }}
+                    className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-rose-500 [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-rose-500 [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:cursor-pointer outline-none z-40"
+                  />
+                </div>
+
+                <div className="flex justify-between text-xs font-bold text-gray-400">
+                  <span>৳{minMax[0]}</span>
+                  <span>৳{minMax[1]}</span>
+                </div>
               </div>
-            </div>
 
-            {/* Reset Action */}
-            <button
-              onClick={resetFilters}
-              className="w-full flex items-center justify-center gap-2 py-4 text-sm font-bold text-gray-400 hover:text-rose-500 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all"
-            >
-              <RotateCcw size={16} />
-              Reset All Filters
-            </button>
+              {/* Brand Filter */}
+              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <SlidersHorizontal size={18} className="text-rose-500" />
+                  Brands
+                </h3>
+                <div className="space-y-2">
+                  {availableBrands.length === 0 ? (
+                    <p className="text-xs text-gray-400 italic">No brands found</p>
+                  ) : (
+                    availableBrands.map(brand => (
+                      <label key={brand.id} className="flex items-center gap-3 cursor-pointer group">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={selectedBrands.includes(brand.name)}
+                            onChange={() => toggleBrand(brand.name)}
+                            className="peer h-5 w-5 appearance-none rounded border-2 border-gray-200 checked:bg-rose-500 checked:border-rose-500 transition-all"
+                          />
+                          <Check size={14} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+                        </div>
+                        <span className="text-sm font-medium text-gray-600 group-hover:text-rose-500 transition-colors">{brand.name}</span>
+                      </label>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Dynamic Attribute Filter */}
+              {Object.entries(availableAttributes).map(([attrName, values]) => (
+                <div key={attrName} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm animate-in fade-in duration-500">
+                  <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                    {attrName}
+                  </h3>
+                  <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+                    {values.map(val => (
+                      <label key={val} className="flex items-center gap-3 cursor-pointer group">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={selectedAttributes[attrName]?.includes(val) || false}
+                            onChange={() => toggleAttribute(attrName, val)}
+                            className="peer h-5 w-5 appearance-none rounded border-2 border-gray-200 checked:bg-rose-500 checked:border-rose-500 transition-all"
+                          />
+                          <Check size={14} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+                        </div>
+                        <span className="text-sm font-medium text-gray-600 group-hover:text-rose-500 transition-colors">{val}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              {/* Rating Filter */}
+              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                <h3 className="font-bold text-gray-800 mb-4">Customer Rating</h3>
+                <div className="space-y-2">
+                  {[4, 3, 2, 1].map(stars => (
+                    <button
+                      key={stars}
+                      onClick={() => setSelectedMinRating(stars)}
+                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${selectedMinRating === stars ? 'bg-amber-50 text-amber-700' : 'hover:bg-gray-50 text-gray-600'}`}
+                    >
+                      <div className="flex text-amber-400">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={14} fill={i < stars ? "currentColor" : "none"} className={i < stars ? "" : "text-gray-200"} />
+                        ))}
+                      </div>
+                      <span className="font-medium">& Up</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Reset Action */}
+              <button
+                onClick={resetFilters}
+                className="w-full flex items-center justify-center gap-2 py-4 text-sm font-bold text-gray-400 hover:text-rose-500 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all"
+              >
+                <RotateCcw size={16} />
+                Reset All Filters
+              </button>
+            </div>
           </aside>
 
           {/* Product Listing Main Area */}
@@ -517,9 +551,18 @@ const Products: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-                {filteredProducts.map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
+                {products.map(product => {
+                  const isVisible = filteredProducts.some(p => p.id === product.id);
+                  return (
+                    <div
+                      key={product.id}
+                      className={`product-card-container h-full ${isVisible ? 'block' : 'hidden'}`}
+                      data-flip-id={product.id}
+                    >
+                      <ProductCard product={product} className="h-full" />
+                    </div>
+                  );
+                })}
               </div>
             )}
           </main>
