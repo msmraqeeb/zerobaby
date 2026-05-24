@@ -2342,6 +2342,10 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                         setIsUploadingImage(true);
                         try {
                           const authRes = await fetch('/api/imagekit-auth');
+                          if (!authRes.ok) {
+                            const errData = await authRes.json().catch(() => ({}));
+                            throw new Error(errData.details || errData.error || 'Failed to authenticate with ImageKit');
+                          }
                           const authData = await authRes.json();
                           
                           const newUrls: string[] = [];
@@ -2363,13 +2367,16 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                             if (uploadRes.ok) {
                               const data = await uploadRes.json();
                               newUrls.push(data.url);
+                            } else {
+                              const errData = await uploadRes.json().catch(() => ({}));
+                              console.error('ImageKit direct upload failed:', errData);
                             }
                           }
                           
                           setProdForm(prev => ({ ...prev, images: [...prev.images, ...newUrls] }));
-                        } catch (error) {
+                        } catch (error: any) {
                           console.error('Image upload failed', error);
-                          alert('Failed to upload images. Please try again.');
+                          alert(`Failed to upload images: ${error.message}`);
                         } finally {
                           setIsUploadingImage(false);
                           if (fileInputRef.current) fileInputRef.current.value = '';

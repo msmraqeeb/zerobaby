@@ -2,7 +2,8 @@ export const uploadToImageKit = async (file: File, folder: string = '/general'):
   try {
     const authRes = await fetch('/api/imagekit-auth');
     if (!authRes.ok) {
-      throw new Error('Failed to authenticate with ImageKit');
+      const errData = await authRes.json().catch(() => ({}));
+      throw new Error(errData.details || errData.error || 'Failed to authenticate with ImageKit');
     }
     const authData = await authRes.json();
     
