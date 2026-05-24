@@ -5,6 +5,7 @@ import { useStore } from '../context/StoreContext';
 import { ShoppingCart, MessageCircle, PhoneCall, Star, Plus, Minus, ChevronRight, X, Info, Send, ChevronLeft } from 'lucide-react';
 import { Variant, Review } from '../types';
 import ProductCard from '../components/ProductCard';
+import { InlineImageZoom, ImageZoomModal } from '../components/ImageZoom';
 
 const ProductDetails: React.FC = () => {
   const { slug } = useParams() as { slug: string };
@@ -13,6 +14,7 @@ const ProductDetails: React.FC = () => {
   const [selectedAttrValues, setSelectedAttrValues] = useState<Record<string, string>>({});
   const [selectionError, setSelectionError] = useState<string | null>(null);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
 
   // Review state
   const [reviewComment, setReviewComment] = useState('');
@@ -183,23 +185,30 @@ const ProductDetails: React.FC = () => {
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Gallery Section */}
           <div className="lg:w-1/2 space-y-4">
-            <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm aspect-square flex items-center justify-center p-8 relative group">
-              <img
-                src={variantImage || displayImages[activeImageIdx] || ''}
-                alt={product.name}
-                className="product-gallery-main-image max-h-full max-w-full object-contain transition-all duration-500"
+            <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm aspect-square flex items-center justify-center relative group">
+              <InlineImageZoom
+                imageUrl={variantImage || displayImages[activeImageIdx] || ''}
+                altText={product.name}
+                onOpenModal={() => setIsZoomOpen(true)}
               />
               {displayImages.length > 1 && !variantImage && (
                 <>
-                  <button onClick={() => setActiveImageIdx(prev => (prev === 0 ? displayImages.length - 1 : prev - 1))} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-rose-500">
+                  <button onClick={() => setActiveImageIdx(prev => (prev === 0 ? displayImages.length - 1 : prev - 1))} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-rose-500 z-20">
                     <ChevronLeft size={24} />
                   </button>
-                  <button onClick={() => setActiveImageIdx(prev => (prev === displayImages.length - 1 ? 0 : prev + 1))} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-rose-500">
+                  <button onClick={() => setActiveImageIdx(prev => (prev === displayImages.length - 1 ? 0 : prev + 1))} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-rose-500 z-20">
                     <ChevronRight size={24} />
                   </button>
                 </>
               )}
             </div>
+            {/* Fullscreen Zoom Modal */}
+            <ImageZoomModal
+              imageUrl={variantImage || displayImages[activeImageIdx] || ''}
+              altText={product.name}
+              isOpen={isZoomOpen}
+              onClose={() => setIsZoomOpen(false)}
+            />
             {/* Thumbnails */}
             {!variantImage && displayImages.length > 1 && (
               <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">

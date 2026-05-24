@@ -1,9 +1,10 @@
 
-import React from 'react';
-import { ShoppingCart, Heart } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShoppingCart, Heart, ZoomIn } from 'lucide-react';
 import { Product } from '../types';
 import { useStore } from '../context/StoreContext';
 import { Link } from 'react-router-dom';
+import { ImageZoomModal } from './ImageZoom';
 
 interface ProductCardProps {
   product: Product;
@@ -13,6 +14,7 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) => {
   const { addToCart, wishlist, toggleWishlist, user } = useStore();
   const isInWishlist = wishlist.includes(product.id);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,13 +52,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
       )}
 
       {/* Image Area */}
-      <Link to={`/product/${product.slug}`} className="aspect-square w-full p-4 flex items-center justify-center bg-transparent group-hover:bg-gray-50/50 transition-colors block relative">
+      <div className="aspect-square w-full p-4 flex items-center justify-center bg-transparent group-hover:bg-gray-50/50 transition-colors relative cursor-pointer" onClick={() => setIsZoomOpen(true)}>
         <img 
           src={primaryImage} 
           alt={product.name} 
           className="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" 
         />
-      </Link>
+        {/* Zoom indicator on hover */}
+        <div className="absolute bottom-2 right-2 w-7 h-7 bg-black/30 backdrop-blur-sm rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          <ZoomIn size={14} />
+        </div>
+      </div>
+      {/* Zoom Modal */}
+      <ImageZoomModal
+        imageUrl={primaryImage}
+        altText={product.name}
+        isOpen={isZoomOpen}
+        onClose={() => setIsZoomOpen(false)}
+      />
 
       {/* Content Area */}
       <div className="p-4 pt-0">
