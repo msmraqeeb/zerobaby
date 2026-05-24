@@ -61,14 +61,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
       {/* Content Area */}
       <div className="p-4 pt-0">
         {/* Price & Cart Row */}
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-[#e92c5d] text-base flex items-baseline gap-0.5">
-              <span className="text-sm font-medium">৳</span>{product.price.toFixed(2)}
+        <div className="flex items-start justify-between gap-1 mb-1">
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0">
+            <span className="font-bold text-[#e92c5d] text-sm md:text-base flex items-baseline gap-0.5 leading-tight">
+              <span className="text-xs md:text-sm font-medium">৳</span>{product.price.toFixed(2)}
             </span>
             {/* PERMANENT FIX: Strikethrough price only renders if it is strictly greater than the current selling price */}
             {isDiscounted && (
-              <span className="text-xs text-gray-400 line-through">
+              <span className="text-[10px] md:text-xs text-gray-400 line-through leading-tight">
                 ৳{product.originalPrice!.toFixed(2)}
               </span>
             )}
@@ -86,7 +86,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
                 }));
               }
             }}
-            className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-[#e92c5d] hover:bg-[#e92c5d] hover:text-white hover:border-[#e92c5d] transition-all"
+            className="w-8 h-8 md:w-9 md:h-9 shrink-0 rounded-full border border-gray-200 flex items-center justify-center text-[#e92c5d] hover:bg-[#e92c5d] hover:text-white hover:border-[#e92c5d] transition-all"
           >
             <ShoppingCart size={16} />
           </button>
