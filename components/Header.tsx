@@ -281,13 +281,17 @@ const Header: React.FC = () => {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-6 text-white">
-              <div className="hidden lg:flex items-center gap-3">
+              <a 
+                href={`tel:${storeInfo.phone && storeInfo.phone.trim().startsWith('0') ? '+88' + storeInfo.phone.trim() : storeInfo.phone}`}
+                className="hidden lg:flex items-center gap-3 hover:text-[#e92c5d] transition-colors"
+                title="Call Order Inquiry"
+              >
                 <Phone size={28} />
                 <div className="flex flex-col">
                   <span className="text-[10px] opacity-90 leading-tight">Order inquiry</span>
                   <span className="font-bold text-sm">{storeInfo.phone}</span>
                 </div>
-              </div>
+              </a>
 
               <div className="flex items-center gap-4">
                 <button

@@ -36,11 +36,29 @@ const Footer: React.FC = () => {
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="text-rose-500 shrink-0" size={18} />
-                <span>{storeInfo.phone}</span>
+                {storeInfo.phone ? (
+                  <a 
+                    href={`tel:${storeInfo.phone.trim().startsWith('0') ? '+88' + storeInfo.phone.trim() : storeInfo.phone}`}
+                    className="hover:text-rose-500 transition-colors duration-300"
+                  >
+                    {storeInfo.phone}
+                  </a>
+                ) : (
+                  <span>{storeInfo.phone}</span>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="text-rose-500 shrink-0" size={18} />
-                <span>{storeInfo.email}</span>
+                {storeInfo.email ? (
+                  <a 
+                    href={`mailto:${storeInfo.email.trim()}`}
+                    className="hover:text-rose-500 transition-colors duration-300"
+                  >
+                    {storeInfo.email}
+                  </a>
+                ) : (
+                  <span>{storeInfo.email}</span>
+                )}
               </div>
             </div>
           </div>
