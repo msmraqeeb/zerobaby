@@ -251,6 +251,11 @@ const Header: React.FC = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
+                          if (product.variants && product.variants.length > 0) {
+                            setShowResults(false);
+                            navigate(`/product/${product.slug}`);
+                            return;
+                          }
                           addToCart(product);
                           const imgElement = e.currentTarget.closest('.group')?.querySelector('img');
                           if (imgElement) {
@@ -399,6 +404,11 @@ const Header: React.FC = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (product.variants && product.variants.length > 0) {
+                          setShowResults(false);
+                          navigate(`/product/${product.slug}`);
+                          return;
+                        }
                         addToCart(product);
                         const imgElement = e.currentTarget.closest('.group')?.querySelector('img');
                         if (imgElement) {

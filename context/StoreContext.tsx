@@ -182,7 +182,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     shortDescription: p.short_description, description: String(p.description || ''),
     sku: p.sku, slug: p.slug, brand: p.brand,
     isFeatured: Boolean(p.is_featured),
-    variants: Array.isArray(p.variants) ? p.variants : []
+    variants: Array.isArray(p.variants) ? p.variants : [],
+    filterAttributes: Array.isArray(p.filter_attributes) ? p.filter_attributes : []
   });
 
   const mapProductToDB = (p: Partial<Product>) => {
@@ -201,6 +202,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (p.brand !== undefined) db.brand = p.brand;
     if (p.isFeatured !== undefined) db.is_featured = p.isFeatured;
     if (p.variants !== undefined) db.variants = p.variants;
+    if (p.filterAttributes !== undefined) db.filter_attributes = p.filterAttributes;
     return db;
   };
 

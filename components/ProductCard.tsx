@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { ShoppingCart, Heart, ZoomIn } from 'lucide-react';
 import { Product } from '../types';
 import { useStore } from '../context/StoreContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ImageZoomModal } from './ImageZoom';
 
 interface ProductCardProps {
@@ -12,6 +12,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) => {
+  const navigate = useNavigate();
   const { addToCart, wishlist, toggleWishlist, user } = useStore();
   const isInWishlist = wishlist.includes(product.id);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
@@ -91,6 +92,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              if (product.variants && product.variants.length > 0) {
+                navigate(`/product/${product.slug}`);
+                return;
+              }
               addToCart(product);
               const imgElement = e.currentTarget.closest('.group')?.querySelector('img');
               if (imgElement) {

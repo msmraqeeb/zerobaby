@@ -15,6 +15,7 @@ export interface Product {
   brand?: string;
   isFeatured?: boolean;
   variants?: Variant[];
+  filterAttributes?: { name: string; options: string[] }[];
 }
 
 export interface Brand {

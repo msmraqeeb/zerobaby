@@ -245,6 +245,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   badge TEXT,
   is_featured BOOLEAN DEFAULT false,
   variants JSONB DEFAULT '[]'::jsonb,
+  filter_attributes JSONB DEFAULT '[]'::jsonb,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -684,30 +685,6 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
 
     let finalVariants = prodForm.variants;
 
-    // Auto-generate variants on submit if the variants table was not generated manually,
-    // but the product has attribute options specified.
-    const selectedAttrs = prodForm.tempAttributes.filter(a => a.options.length > 0);
-    if ((!finalVariants || finalVariants.length === 0) && selectedAttrs.length > 0) {
-      const cartesian = (...args: any[][]) => args.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
-      const combinations = selectedAttrs.length === 1
-        ? selectedAttrs[0].options.map(opt => [opt])
-        : cartesian(...selectedAttrs.map(a => a.options));
-
-      finalVariants = combinations.map((combo: string[], idx: number) => {
-        const attrValues: Record<string, string> = {};
-        selectedAttrs.forEach((attr, i) => { attrValues[attr.name] = combo[i]; });
-        return {
-          id: Math.random().toString(36).substr(2, 9),
-          attributeValues: attrValues,
-          price: finalPrice,
-          originalPrice: finalOriginal,
-          sku: `${prodForm.sku || 'PROD'}-${idx}`,
-          stock: 100,
-          image: prodForm.images[0] || ''
-        };
-      });
-    }
-
     const data: Omit<Product, 'id'> = {
       name: prodForm.name,
       price: finalPrice,
@@ -721,6 +698,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
       brand: prodForm.brand,
       isFeatured: prodForm.isFeatured,
       variants: finalVariants,
+      filterAttributes: prodForm.tempAttributes.filter(a => a.options.length > 0),
       slug: prodForm.name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '')
     };
 
@@ -749,8 +727,12 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
 
   const startEditProduct = (p: Product) => {
     const hasSale = p.originalPrice !== undefined && p.originalPrice > p.price;
-    const reconstructedAttrs: { name: string, options: string[] }[] = [];
-    if (p.variants && p.variants.length > 0) {
+    
+    // Use filterAttributes if available (new system), otherwise reconstruct from variants (backward compat)
+    let reconstructedAttrs: { name: string, options: string[] }[] = [];
+    if (p.filterAttributes && p.filterAttributes.length > 0) {
+      reconstructedAttrs = p.filterAttributes.map(a => ({ name: a.name, options: [...a.options] }));
+    } else if (p.variants && p.variants.length > 0) {
       const attrMap: Record<string, Set<string>> = {};
       p.variants.forEach(v => {
         Object.entries(v.attributeValues).forEach(([name, val]) => {
@@ -1419,7 +1401,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
         </nav>
       </aside>
 
-      <main className="flex-1 p-10 overflow-x-hidden">
+      <main className="flex-1 p-10">
         {adminTab === 'layout' && (
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className="flex justify-between items-center">
@@ -2327,9 +2309,9 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
               </>
             ) : (
               <div className="max-w-5xl mx-auto space-y-8 pb-20">
-                <div className="flex items-center justify-between">
+                <div className="sticky top-0 md:top-[60px] z-40 bg-[#fcfdfd]/90 backdrop-blur-md py-4 flex items-center justify-between border-b border-gray-100/80 px-2 transition-all">
                   <button onClick={closeForms} className="flex items-center gap-2 text-slate-400 hover:text-slate-800 font-bold text-sm uppercase tracking-widest transition-colors"><ChevronRight size={20} className="rotate-180" /> Back</button>
-                  <button onClick={handleProductSubmit} className="bg-[#e92c5d] text-white px-10 py-3.5 rounded-xl font-black uppercase text-xs shadow-lg hover:bg-[#c81d4a] flex items-center gap-2"><Save size={18} /> Save Product</button>
+                  <button onClick={handleProductSubmit} className="bg-[#e92c5d] text-white px-10 py-3.5 rounded-xl font-black uppercase text-xs shadow-lg hover:bg-[#c81d4a] flex items-center gap-2 transition-all active:scale-95 hover:shadow-xl"><Save size={18} /> Save Product</button>
                 </div>
                 <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-10 space-y-8">
                   <div className="space-y-4">
@@ -2563,7 +2545,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                                 {showOptionsDropdown && (
                                   <>
                                     <div className="fixed inset-0 z-10" onClick={() => setShowOptionsDropdown(false)}></div>
-                                    <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl p-3 max-h-60 overflow-y-auto z-20 animate-in slide-in-from-top-2 duration-200">
+                                    <div data-lenis-prevent className="absolute left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl p-3 max-h-60 overflow-y-auto z-20 animate-in slide-in-from-top-2 duration-200">
                                       {(() => {
                                         const selected = attributes.find(a => a.id === draftAttr.globalAttrId);
                                         if (!selected) return null;
@@ -2665,11 +2647,24 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                     {prodForm.variants.length > 0 && (
                       <div className="space-y-3">
                         {prodForm.variants.map((v, vIdx) => (
-                          <div key={v.id} className="grid grid-cols-12 gap-4 p-4 bg-gray-50 rounded-2xl items-center">
-                            <div className="col-span-3 font-black text-xs text-[#e92c5d]">{Object.values(v.attributeValues).join(' / ')}</div>
-                            <div className="col-span-3"><input type="number" className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-bold" value={v.originalPrice || v.price} onChange={e => { const vs = [...prodForm.variants]; vs[vIdx].originalPrice = parseFloat(e.target.value); setProdForm({ ...prodForm, variants: vs }); }} placeholder="MRP" /></div>
-                            <div className="col-span-3"><input type="number" className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-bold text-rose-600" value={v.price} onChange={e => { const vs = [...prodForm.variants]; vs[vIdx].price = parseFloat(e.target.value); setProdForm({ ...prodForm, variants: vs }); }} placeholder="Selling Price" /></div>
-                            <div className="col-span-3"><input className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-bold" value={v.stock} onChange={e => { const vs = [...prodForm.variants]; vs[vIdx].stock = parseInt(e.target.value); setProdForm({ ...prodForm, variants: vs }); }} placeholder="Stock" /></div>
+                          <div key={v.id || vIdx} className="grid grid-cols-12 gap-4 p-4 bg-gray-50 rounded-2xl items-center">
+                            <div className="col-span-3 font-black text-xs text-[#e92c5d] break-all">{Object.values(v.attributeValues).join(' / ')}</div>
+                            <div className="col-span-2"><input type="number" className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-bold" value={v.originalPrice || v.price} onChange={e => { const vs = [...prodForm.variants]; vs[vIdx].originalPrice = parseFloat(e.target.value) || 0; setProdForm({ ...prodForm, variants: vs }); }} placeholder="MRP" /></div>
+                            <div className="col-span-2"><input type="number" className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-bold text-rose-600" value={v.price} onChange={e => { const vs = [...prodForm.variants]; vs[vIdx].price = parseFloat(e.target.value) || 0; setProdForm({ ...prodForm, variants: vs }); }} placeholder="Selling Price" /></div>
+                            <div className="col-span-3"><input type="number" className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-bold" value={v.stock} onChange={e => { const vs = [...prodForm.variants]; vs[vIdx].stock = parseInt(e.target.value) || 0; setProdForm({ ...prodForm, variants: vs }); }} placeholder="Stock" /></div>
+                            <div className="col-span-2 flex justify-end">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const vs = prodForm.variants.filter((_, idx) => idx !== vIdx);
+                                  setProdForm({ ...prodForm, variants: vs });
+                                }}
+                                className="p-2 text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors flex items-center justify-center shadow-sm"
+                                title="Delete Variant"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -2886,7 +2881,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
               </div>
               {viewingOrder && (
                 <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
-                  <div className="bg-white rounded-[2rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto p-10 shadow-2xl space-y-10 animate-in zoom-in-95 relative">
+                  <div data-lenis-prevent className="bg-white rounded-[2rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto p-10 shadow-2xl space-y-10 animate-in zoom-in-95 relative">
                     <div className="flex justify-between items-center border-b pb-6">
                       <div className="flex items-center gap-4">
                         <h3 className="text-2xl font-black text-gray-800">Order Details <span className="text-rose-500">#{viewingOrder.id}</span></h3>

@@ -158,12 +158,20 @@ const CategoryPage: React.FC = () => {
   const availableAttributes = useMemo(() => {
     const attrs: Record<string, Set<string>> = {};
     categoryProducts.forEach(p => {
+      // Collect from variants
       if (p.variants) {
         p.variants.forEach(v => {
           Object.entries(v.attributeValues).forEach(([key, val]) => {
             if (!attrs[key]) attrs[key] = new Set();
             attrs[key].add(val);
           });
+        });
+      }
+      // Also collect from filterAttributes (attributes without variants)
+      if (p.filterAttributes) {
+        p.filterAttributes.forEach(fa => {
+          if (!attrs[fa.name]) attrs[fa.name] = new Set();
+          fa.options.forEach(opt => attrs[fa.name].add(opt));
         });
       }
     });
@@ -214,12 +222,18 @@ const CategoryPage: React.FC = () => {
       // Price filter
       const priceMatch = p.price >= priceRange[0] && p.price <= priceRange[1];
 
-      // Attributes filter
+      // Attributes filter - checks both variants and filterAttributes
       const attributeMatch = Object.entries(selectedAttributes).every(([attrName, selectedValues]) => {
-        if (!p.variants) return false;
-        return p.variants.some(v =>
+        // Check in variants first
+        if (p.variants && p.variants.some(v =>
           v.attributeValues[attrName] && selectedValues.includes(v.attributeValues[attrName])
-        );
+        )) return true;
+        // Check in filterAttributes (attributes without variants)
+        if (p.filterAttributes) {
+          const fa = p.filterAttributes.find(a => a.name === attrName);
+          if (fa && fa.options.some(opt => selectedValues.includes(opt))) return true;
+        }
+        return false;
       });
 
       return brandMatch && ratingMatch && priceMatch && attributeMatch;
