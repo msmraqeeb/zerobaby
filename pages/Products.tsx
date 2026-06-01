@@ -320,7 +320,7 @@ const Products: React.FC = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
       const clientHeight = window.innerHeight;
       
-      if (scrollHeight - scrollTop - clientHeight < 400) {
+      if (scrollHeight - scrollTop - clientHeight < 1000) {
         setIsLoadingMore(true);
         setTimeout(() => {
           setVisibleCount(prev => prev + 12);
