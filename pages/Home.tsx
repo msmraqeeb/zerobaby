@@ -597,8 +597,9 @@ const BrandScroller: React.FC<{ brands: Brand[] }> = ({ brands }) => {
               const hasLogo = brand.logo_url && brand.logo_url.trim() !== '';
 
               return (
-                <div 
+                <Link 
                   key={`${brand.id}-${idx}`}
+                  to={`/products?brand=${encodeURIComponent(brand.name)}`}
                   className="flex flex-col items-center gap-2 group cursor-pointer flex-shrink-0 select-none"
                 >
                   {/* Logo wrapper frame with exactly 50x50 px child image */}
@@ -607,7 +608,7 @@ const BrandScroller: React.FC<{ brands: Brand[] }> = ({ brands }) => {
                       <img 
                         src={brand.logo_url} 
                         alt={brand.name} 
-                        className="w-[50px] h-[50px] object-contain transition-all duration-300 filter grayscale group-hover:grayscale-0"
+                        className="w-[50px] h-[50px] object-contain transition-all duration-300 filter grayscale-0 group-hover:grayscale"
                         onError={(e) => {
                           // Safe fallback on image load error
                           (e.currentTarget as HTMLImageElement).style.display = 'none';
@@ -630,7 +631,7 @@ const BrandScroller: React.FC<{ brands: Brand[] }> = ({ brands }) => {
                   <span className="text-[10px] md:text-xs font-semibold text-gray-500 group-hover:text-gray-900 transition-colors">
                     {brand.name}
                   </span>
-                </div>
+                </Link>
               );
             })}
           </div>

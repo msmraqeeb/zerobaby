@@ -89,19 +89,29 @@ const CategorySidebarItem: React.FC<{
   );
 };
 
+const ProductCardSkeleton: React.FC = () => {
+  return (
+    <div className="bg-white rounded-3xl border border-gray-100 p-4 space-y-4 animate-pulse shadow-sm">
+      <div className="w-full aspect-square bg-gray-200 rounded-2xl"></div>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div className="w-8 h-8 bg-gray-200 rounded-full shrink-0"></div>
+        </div>
+        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+      </div>
+    </div>
+  );
+};
+
 const Products: React.FC = () => {
   const { products, categories, searchQuery, brands, reviews } = useStore();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedMinRating, setSelectedMinRating] = useState<number | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  const flipStateRef = useRef<any>(null);
-
-  // Capture current DOM state during render (before React commits changes)
-  if (typeof window !== 'undefined') {
-    flipStateRef.current = Flip.getState(".product-card-container");
-  }
+  const [visibleCount, setVisibleCount] = useState(12);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const categoryTree = useMemo(() => buildCategoryTree(categories), [categories]);
 
@@ -143,12 +153,18 @@ const Products: React.FC = () => {
 
   const location = useLocation();
 
-  // Sync URL category param with state
+  // Sync URL category and brand params with state
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const catParam = searchParams.get('category');
     if (catParam) {
       setSelectedCategory(decodeURIComponent(catParam));
+    }
+    const brandParam = searchParams.get('brand');
+    if (brandParam) {
+      setSelectedBrands([decodeURIComponent(brandParam)]);
+    } else {
+      setSelectedBrands([]);
     }
   }, [location.search]);
 
@@ -292,23 +308,34 @@ const Products: React.FC = () => {
     });
   }, [categoryProducts, searchQuery, selectedBrands, selectedMinRating, reviews, location.search, selectedAttributes, priceRange]);
 
-  // Trigger Flip animation once React has committed DOM updates
-  useLayoutEffect(() => {
-    if (flipStateRef.current) {
-      Flip.from(flipStateRef.current, {
-        duration: 0.6,
-        ease: "power2.out",
-        absolute: true,
-        scale: true,
-        simple: true,
-        onEnter: (elements) => gsap.fromTo(elements, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4 }),
-        onLeave: (elements) => gsap.to(elements, { opacity: 0, scale: 0.8, duration: 0.3 }),
-        onComplete: () => {
-          flipStateRef.current = null;
-        }
-      });
-    }
+  useEffect(() => {
+    setVisibleCount(12);
   }, [filteredProducts]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isLoadingMore || visibleCount >= filteredProducts.length) return;
+      
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const clientHeight = window.innerHeight;
+      
+      if (scrollHeight - scrollTop - clientHeight < 400) {
+        setIsLoadingMore(true);
+        setTimeout(() => {
+          setVisibleCount(prev => prev + 12);
+          setIsLoadingMore(false);
+        }, 800);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [visibleCount, filteredProducts.length, isLoadingMore]);
+
+  const productsToShow = useMemo(() => {
+    return filteredProducts.slice(0, visibleCount);
+  }, [filteredProducts, visibleCount]);
 
   const toggleBrand = (brandName: string) => {
     setSelectedBrands(prev =>
@@ -565,18 +592,18 @@ const Products: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-                {products.map(product => {
-                  const isVisible = filteredProducts.some(p => p.id === product.id);
-                  return (
-                    <div
-                      key={product.id}
-                      className={`product-card-container h-full ${isVisible ? 'block' : 'hidden'}`}
-                      data-flip-id={product.id}
-                    >
-                      <ProductCard product={product} className="h-full" />
-                    </div>
-                  );
-                })}
+                {productsToShow.map(product => (
+                  <div
+                    key={product.id}
+                    className="product-card-container h-full animate-in fade-in zoom-in-95 duration-500 slide-in-from-bottom-6"
+                  >
+                    <ProductCard product={product} className="h-full" />
+                  </div>
+                ))}
+                
+                {isLoadingMore && Array.from({ length: 6 }).map((_, idx) => (
+                  <ProductCardSkeleton key={`skeleton-${idx}`} />
+                ))}
               </div>
             )}
           </main>
