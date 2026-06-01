@@ -45,6 +45,7 @@ const Admin: React.FC = () => {
   const [editingItem, setEditingItem] = useState<{ type: string; data: any } | null>(null);
   const [isAdding, setIsAdding] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [activeImagePickerIdx, setActiveImagePickerIdx] = useState<number | null>(null);
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
   const [isEditingOrder, setIsEditingOrder] = useState(false);
   const [editingOrderData, setEditingOrderData] = useState<Order | null>(null);
@@ -762,6 +763,31 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     });
     setEditingItem({ type: 'product', data: p });
     setIsAdding(null);
+  };
+
+  const getNextSku = () => {
+    if (!products || products.length === 0) return 'ZB-011';
+    
+    const skuRegex = /^ZB-(\d+)$/i;
+    let maxNum = 0;
+    
+    products.forEach(p => {
+      if (p.sku) {
+        const match = p.sku.match(skuRegex);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (num > maxNum) {
+            maxNum = num;
+          }
+        }
+      }
+    });
+    
+    if (maxNum === 0) return 'ZB-011';
+    
+    const nextNum = maxNum + 1;
+    const paddedNum = String(nextNum).padStart(3, '0');
+    return `ZB-${paddedNum}`;
   };
 
   const handlePageSubmit = async (e: React.FormEvent) => {
@@ -2271,7 +2297,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
               <>
                 <div className="flex justify-between items-center">
                   <div><h2 className="text-2xl font-black text-slate-800 tracking-tight">Products</h2><p className="text-slate-400 text-sm">Manage your product catalog.</p></div>
-                  <button onClick={() => setIsAdding('product')} className="bg-[#e92c5d] text-white px-8 py-3.5 rounded-xl font-black uppercase text-[11px] flex items-center gap-2 shadow-xl hover:bg-[#c81d4a] transition-all"><Plus size={18} /> Add Product</button>
+                  <button onClick={() => { setIsAdding('product'); setProdForm(prev => ({ ...prev, sku: getNextSku() })); }} className="bg-[#e92c5d] text-white px-8 py-3.5 rounded-xl font-black uppercase text-[11px] flex items-center gap-2 shadow-xl hover:bg-[#c81d4a] transition-all"><Plus size={18} /> Add Product</button>
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
                   <table className="w-full text-left">
@@ -2648,7 +2674,71 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                       <div className="space-y-3">
                         {prodForm.variants.map((v, vIdx) => (
                           <div key={v.id || vIdx} className="grid grid-cols-12 gap-4 p-4 bg-gray-50 rounded-2xl items-center">
-                            <div className="col-span-3 font-black text-xs text-[#e92c5d] break-all">{Object.values(v.attributeValues).join(' / ')}</div>
+                            {/* Variant Image Cell */}
+                            <div className="col-span-1 relative flex justify-center">
+                              <button
+                                type="button"
+                                onClick={() => setActiveImagePickerIdx(activeImagePickerIdx === vIdx ? null : vIdx)}
+                                className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all bg-white overflow-hidden group shadow-sm ${
+                                  v.image ? 'border-[#e92c5d] hover:border-[#c81d4a]' : 'border-dashed border-gray-300 hover:border-gray-400'
+                                }`}
+                                title="Select Variant Image"
+                              >
+                                {v.image ? (
+                                  <img src={v.image} className="w-full h-full object-cover" alt="Variant thumbnail" />
+                                ) : (
+                                  <ImageIcon size={16} className="text-gray-400 group-hover:text-gray-600" />
+                                )}
+                              </button>
+
+                              {activeImagePickerIdx === vIdx && (
+                                <>
+                                  <div className="fixed inset-0 z-30" onClick={() => setActiveImagePickerIdx(null)}></div>
+                                  <div data-lenis-prevent className="absolute left-0 mt-12 bg-white border border-gray-200 rounded-xl shadow-xl p-3 z-40 flex gap-2 max-w-[240px] overflow-x-auto shadow-2xl animate-in slide-in-from-top-2 duration-150">
+                                    {prodForm.images.length === 0 ? (
+                                      <span className="text-[10px] text-gray-400 italic p-1 whitespace-nowrap">Upload product images first</span>
+                                    ) : (
+                                      <>
+                                        {prodForm.images.map((imgUrl, imgIdx) => (
+                                          <button
+                                            key={imgIdx}
+                                            type="button"
+                                            onClick={() => {
+                                              const vs = [...prodForm.variants];
+                                              vs[vIdx].image = imgUrl;
+                                              setProdForm({ ...prodForm, variants: vs });
+                                              setActiveImagePickerIdx(null);
+                                            }}
+                                            className={`w-10 h-10 rounded-lg border-2 overflow-hidden shrink-0 transition-all ${
+                                              v.image === imgUrl ? 'border-[#e92c5d] scale-105 shadow-md' : 'border-gray-100 hover:border-gray-300'
+                                            }`}
+                                          >
+                                            <img src={imgUrl} className="w-full h-full object-cover" alt="Product thumbnail" />
+                                          </button>
+                                        ))}
+                                        {v.image && (
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const vs = [...prodForm.variants];
+                                              vs[vIdx].image = undefined;
+                                              setProdForm({ ...prodForm, variants: vs });
+                                              setActiveImagePickerIdx(null);
+                                            }}
+                                            className="w-10 h-10 rounded-lg border-2 border-dashed border-red-200 text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0 text-[10px] font-bold"
+                                          >
+                                            Clear
+                                          </button>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
+                                </>
+                              )}
+                            </div>
+
+                            {/* Rest of the fields */}
+                            <div className="col-span-2 font-black text-xs text-[#e92c5d] break-all">{Object.values(v.attributeValues).join(' / ')}</div>
                             <div className="col-span-2"><input type="number" className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-bold" value={v.originalPrice || v.price} onChange={e => { const vs = [...prodForm.variants]; vs[vIdx].originalPrice = parseFloat(e.target.value) || 0; setProdForm({ ...prodForm, variants: vs }); }} placeholder="MRP" /></div>
                             <div className="col-span-2"><input type="number" className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-bold text-rose-600" value={v.price} onChange={e => { const vs = [...prodForm.variants]; vs[vIdx].price = parseFloat(e.target.value) || 0; setProdForm({ ...prodForm, variants: vs }); }} placeholder="Selling Price" /></div>
                             <div className="col-span-3"><input type="number" className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-bold" value={v.stock} onChange={e => { const vs = [...prodForm.variants]; vs[vIdx].stock = parseInt(e.target.value) || 0; setProdForm({ ...prodForm, variants: vs }); }} placeholder="Stock" /></div>
