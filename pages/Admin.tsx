@@ -3137,8 +3137,10 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
         {/* System Settings Tab */}
         {
           adminTab === 'settings' && (
-            <div className="max-w-3xl space-y-8 animate-in fade-in duration-500">
+            <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
               <div><h2 className="text-2xl font-black text-slate-800 tracking-tight">System Settings</h2><p className="text-slate-400 text-sm">Configure store-wide parameters and shipping fees.</p></div>
+              
+              {/* Delivery Fees Configuration */}
               <div className="bg-white rounded-[2rem] border border-gray-100 p-10 space-y-10 shadow-sm">
                 <div className="space-y-8">
                   <h3 className="text-lg font-black text-gray-800 uppercase tracking-widest flex items-center gap-3"><Truck className="text-rose-500" /> Delivery Fees Configuration</h3>
@@ -3150,6 +3152,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                 <div className="pt-6 border-t flex justify-end"><button onClick={() => updateShippingSettings(shipForm)} className="bg-rose-600 text-white font-black px-12 py-4 rounded-2xl uppercase tracking-widest text-[11px] shadow-lg shadow-rose-50 hover:bg-rose-700 transition-all">Save Changes</button></div>
               </div>
 
+              {/* Store Identity */}
               <div className="bg-white rounded-[2rem] border border-gray-100 p-10 space-y-10 shadow-sm">
                 <div className="space-y-8">
                   <h3 className="text-lg font-black text-gray-800 uppercase tracking-widest flex items-center gap-3"><Globe className="text-blue-500" /> Store Identity</h3>
@@ -3243,12 +3246,11 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                 <div className="pt-6 border-t flex justify-end"><button onClick={() => updateStoreInfo(storeForm)} className="bg-blue-600 text-white font-black px-12 py-4 rounded-2xl uppercase tracking-widest text-[11px] shadow-lg shadow-blue-50 hover:bg-blue-700 transition-all">Update Identity</button></div>
               </div>
 
+              {/* Technical Warning */}
               <div className="bg-amber-50 rounded-[2rem] border border-amber-100 p-10 flex items-start gap-6"><div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-amber-500 shadow-sm shrink-0"><AlertTriangle /></div><div><h4 className="font-black text-amber-800 uppercase text-sm tracking-widest mb-2">Technical Warning</h4><p className="text-sm text-amber-700/80 leading-relaxed font-medium">Changing shipping settings affects all active checkouts instantly.</p></div></div>
             </div>
           )
         }
-
-
       </main >
       
     </div >
