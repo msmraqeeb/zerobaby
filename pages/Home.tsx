@@ -155,42 +155,6 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
       }
     });
 
-    // Pinned Banner ScrollTrigger (Desktop Only)
-    let pinTrigger: ScrollTrigger | null = null;
-    if (section.banner && bannerRef.current) {
-      const mediaQuery = window.matchMedia("(min-width: 1024px)");
-
-      const setupPin = () => {
-        if (mediaQuery.matches) {
-          if (pinTrigger) {
-            pinTrigger.kill();
-          }
-          pinTrigger = ScrollTrigger.create({
-            trigger: containerRef.current,
-            pin: bannerRef.current,
-            start: "top 120px",
-            end: () => `bottom ${120 + (bannerRef.current?.offsetHeight || 500)}px`,
-            pinSpacing: false,
-            invalidateOnRefresh: true
-          });
-        } else {
-          if (pinTrigger) {
-            pinTrigger.kill();
-            pinTrigger = null;
-          }
-        }
-      };
-
-      setupPin();
-      mediaQuery.addEventListener("change", setupPin);
-
-      return () => {
-        if (pinTrigger) pinTrigger.kill();
-        mediaQuery.removeEventListener("change", setupPin);
-        triggerInstance.kill();
-      };
-    }
-
     return () => {
       triggerInstance.kill();
     };
