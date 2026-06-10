@@ -9,4 +9,12 @@
             "destination": "/index.html"
         }
     ]
-}
+}
+{
+  "rewrites": [
+    {
+      "source": "/((?!.well-known).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
