@@ -19,6 +19,7 @@ export default defineConfig({
     start_url: '/',
     scope: '/',
     orientation: 'portrait',
+    categories: ['shopping', 'lifestyle'],
     id: 'https://zerobaby.com.bd/',
     icons: [
       {
