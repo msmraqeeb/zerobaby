@@ -97,6 +97,10 @@ const Admin: React.FC = () => {
     setStoreForm(currentStoreInfo);
   }, [currentStoreInfo]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [adminTab]);
+
   // Report States
   const [reportStartDate, setReportStartDate] = useState(() => {
     const d = new Date();

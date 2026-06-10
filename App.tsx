@@ -52,10 +52,9 @@ const AppContent: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (lenisRef.current) {
       lenisRef.current.scrollTo(0, { immediate: true });
-    } else {
-      window.scrollTo(0, 0);
     }
   }, [pathname]);
 

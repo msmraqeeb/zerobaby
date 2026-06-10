@@ -180,7 +180,7 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
       <div className={`grid grid-cols-1 ${isNoBanner ? '' : 'lg:grid-cols-5'} gap-6`}>
         {section.banner && !isNoBanner && (
           section.banner.imageUrl ? (
-            <div ref={bannerRef} className="hidden lg:block rounded-xl overflow-hidden shadow-sm group h-[500px] self-start relative">
+            <div ref={bannerRef} className="hidden lg:block rounded-xl overflow-hidden shadow-sm group h-full relative">
               {section.banner.link ? (
                 <Link to={section.banner.link} className="block w-full h-full">
                   <img
@@ -198,10 +198,10 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
               )}
             </div>
           ) : (
-            <div ref={bannerRef} className="hidden lg:block bg-gradient-to-b from-[#e92c5d] to-[#c81d4a] rounded-xl p-8 relative overflow-hidden text-white h-[500px] self-start">
+            <div ref={bannerRef} className="hidden lg:block bg-gradient-to-b from-[#e92c5d] to-[#c81d4a] rounded-xl p-8 relative overflow-hidden text-white h-full flex flex-col justify-center">
               <h3 className="text-3xl font-bold mb-4 font-serif italic">{section.banner.title}</h3>
               <p className="mb-8 text-rose-100 opacity-90">{section.banner.description}</p>
-              <Link to={section.banner.link || '#'} className="bg-yellow-400 text-gray-900 px-6 py-2 rounded-full font-bold hover:bg-yellow-300 transition-colors w-fit flex items-center gap-2">
+              <Link to={section.banner.link || '#'} className="bg-yellow-400 text-gray-900 px-6 py-2 rounded-full font-bold hover:bg-yellow-300 transition-colors w-fit flex items-center gap-2 mt-auto">
                 {section.banner.buttonText || 'Shop Now'} ➝
               </Link>
             </div>
