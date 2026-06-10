@@ -36,14 +36,14 @@ export default defineConfig({
 ],
     screenshots: [
       {
-        src: 'https://ik.imagekit.io/vrtbi4wsn/store/screenshot-wide.png',
+        src: 'https://ik.imagekit.io/vrtbi4wsn/store/screenshot-wide-1280.png',
         sizes: '1280x720',
         type: 'image/png',
         // @ts-ignore
         form_factor: 'wide'
       },
       {
-        src: 'https://ik.imagekit.io/vrtbi4wsn/store/screenshot-narrow.png',
+        src: 'https://ik.imagekit.io/vrtbi4wsn/store/screenshot-narrow-390.png',
         sizes: '390x844',
         type: 'image/png',
         // @ts-ignore
