@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "bd.com.zerobaby.twa",
+        "sha256_cert_fingerprints": ["15:8E:35:70:49:7B:AE:1E:AF:01:1D:68:B5:61:23:E5:58:5C:54:C1:24:92:3E:03:6D:C0:AD:61:23:9A:AE:E1"]
+      }
+    }]
