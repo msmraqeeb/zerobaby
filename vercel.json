@@ -1,19 +1,15 @@
 {
-    "rewrites": [
-        {
-            "source": "/api/(.*)",
-            "destination": "/api/$1"
-        },
-        {
-            "source": "/((?!api/).*)",
-            "destination": "/index.html"
-        },
-        {
-            "source": "/((?!\\.well-known).*)",
-            "destination": "/index.html"
-        }
-    ],
-    "headers": [
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/((?!api|.well-known).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
     {
       "source": "/.well-known/assetlinks.json",
       "headers": [
