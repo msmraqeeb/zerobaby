@@ -22,6 +22,7 @@ import BlogPost from './pages/BlogPost';
 
 import DynamicPage from './pages/DynamicPage';
 import CategoryPage from './pages/CategoryPage';
+import LoadingScreen from './components/LoadingScreen';
 import { StoreProvider, useStore } from './context/StoreContext';
 
 const AppContent: React.FC = () => {
@@ -61,11 +62,13 @@ const AppContent: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen flex flex-col font-sans">
-      <CustomCursor />
-      <FlyToCart />
-      <Header />
-      <CartSidebar />
+    <>
+      {loading && <LoadingScreen />}
+      <div className="min-h-screen flex flex-col font-sans">
+        <CustomCursor />
+        <FlyToCart />
+        <Header />
+        <CartSidebar />
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -86,8 +89,9 @@ const AppContent: React.FC = () => {
         </Routes>
       </main>
       <Footer />
-      <FloatingContact />
-    </div>
+        <FloatingContact />
+      </div>
+    </>
   );
 };
 
