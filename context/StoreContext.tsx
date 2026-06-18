@@ -224,8 +224,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     coupon_code: o.coupon_code || undefined
   });
 
-  const fetchData = async (activeUser?: any) => {
+  const fetchData = async (activeUser?: any, skipPublicData = false) => {
     try {
+      if (!skipPublicData) {
       const [pd, cat, br, coup, rev, set, attr, storeSettings, pagesRes, homeSectionsRes] = await Promise.all([
         supabase.from('products').select('*').order('created_at', { ascending: false }),
         supabase.from('categories').select('*').order('name', { ascending: true }),
@@ -309,8 +310,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         sort_order: b.sort_order,
         is_active: b.is_active
       })));
-
-
+      } // end if (!skipPublicData)
 
       if (activeUser) {
         const [ord, usersList] = await Promise.all([
@@ -351,9 +351,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         if (wishData) setWishlist(wishData.map(w => String(w.product_id)));
         if (addrData) setAddresses(addrData.map(a => ({ id: String(a.id), fullName: a.full_name, phone: a.phone, addressLine: a.address_line, district: a.district, area: a.area })));
 
-        await fetchData(sessionUser);
+        await fetchData(sessionUser, true); // skip public data since we already fetched it
       } else {
-        await fetchData(null);
+        // Public data already fetched in useEffect, so nothing to do here
       }
     } catch (err) {
       console.error("Auth init error:", err);
@@ -363,6 +363,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   useEffect(() => {
+    // Fetch public data instantly on load to remove the white loading screen delay
+    fetchData(null, false).then(() => setLoading(false));
+
     supabase.auth.getSession().then(({ data: { session } }) => initializeAuth(session?.user || null));
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
@@ -371,7 +374,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         setAddresses([]);
         setUsers([]);
         setWishlist([]);
-        fetchData(null);
+        // Don't need to refetch public data on logout
       } else if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
         initializeAuth(session?.user || null);
       }
