@@ -7,7 +7,7 @@ import {
   Package, ShoppingBag, Plus, Trash2, X, ShieldCheck, Pencil,
   Ticket, Eye, Truck, RefreshCw, Layers, Zap, Users as UsersIcon,
   Globe, PlusCircle, Image as ImageIcon, Save, AlertTriangle,
-  ChevronDown, MessageSquare, Star, ChevronRight, Minus,
+  ChevronDown, MessageSquare, Star, ChevronRight, ChevronLeft, ArrowUpDown, ArrowUp, ArrowDown, Minus,
   Settings as SettingsIcon, Search, Edit3, Check, Database, Copy, Printer, Calendar, BarChart3, FileText, LayoutTemplate, Upload, BookOpen
 } from 'lucide-react';
 import { Product, Category, Order, Variant, ShippingSettings, Brand, Coupon, CartItem, StoreInfo, Page, HomeSection, BlogPost } from '../types';
@@ -37,6 +37,17 @@ const Admin: React.FC = () => {
 
   const [adminTab, setAdminTabState] = useState<string>('products');
   const [isSyncing, setIsSyncing] = useState(false);
+
+  // Products Table Search, Filters, Sort & Pagination States
+  const [prodSearch, setProdSearch] = useState('');
+  const [prodFilterCat, setProdFilterCat] = useState('');
+  const [prodFilterSubCat, setProdFilterSubCat] = useState('');
+  const [prodFilterStatus, setProdFilterStatus] = useState('all');
+  const [prodFilterBrand, setProdFilterBrand] = useState('');
+  const [prodSortColumn, setProdSortColumn] = useState<'product' | 'price' | null>(null);
+  const [prodSortDirection, setProdSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [prodPage, setProdPage] = useState(1);
+  const itemsPerPage = 30;
   const [copySuccess, setCopySuccess] = useState(false);
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
   const handleImageError = (id: string) => setBrokenImages(prev => ({ ...prev, [id]: true }));
@@ -540,6 +551,129 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     return buildHierarchy(null);
   }, [categories]);
 
+  // Helper to determine product stock status
+  const isProductInStock = (p: Product) => {
+    if (p.variants && p.variants.length > 0) {
+      return p.variants.some(v => (v.stock ?? 0) > 0);
+    }
+    if ('stock' in p) {
+      return ((p as any).stock ?? 0) > 0;
+    }
+    return true; // Simple products default to In Stock
+  };
+
+  // Helper to get category and all its descendant names
+  const getCategoryDescendantNames = (categoryName: string): string[] => {
+    const rootCat = categories.find(c => c.name === categoryName);
+    if (!rootCat) return [categoryName];
+    
+    const getDescendants = (catId: string): string[] => {
+      let names: string[] = [];
+      const children = categories.filter(c => String(c.parentId) === String(catId));
+      children.forEach(child => {
+        names.push(child.name);
+        names = [...names, ...getDescendants(child.id)];
+      });
+      return names;
+    };
+    
+    return [rootCat.name, ...getDescendants(rootCat.id)];
+  };
+
+  const parentCategories = useMemo(() => {
+    return categories.filter(c => !c.parentId);
+  }, [categories]);
+
+  const subCategories = useMemo(() => {
+    if (prodFilterCat) {
+      const parent = categories.find(c => c.name === prodFilterCat);
+      if (parent) {
+        return categories.filter(c => String(c.parentId) === String(parent.id));
+      }
+      return [];
+    }
+    return categories.filter(c => c.parentId);
+  }, [categories, prodFilterCat]);
+
+  const handleParentCatChange = (catName: string) => {
+    setProdFilterCat(catName);
+    setProdFilterSubCat('');
+  };
+
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+
+    // Search
+    if (prodSearch.trim()) {
+      const searchLower = prodSearch.toLowerCase().trim();
+      result = result.filter(p => 
+        p.name.toLowerCase().includes(searchLower) ||
+        (p.sku && p.sku.toLowerCase().includes(searchLower)) ||
+        (p.brand && p.brand.toLowerCase().includes(searchLower)) ||
+        (p.category && p.category.toLowerCase().includes(searchLower))
+      );
+    }
+
+    // Category (Parent Category)
+    if (prodFilterCat && !prodFilterSubCat) {
+      const allowedCategories = getCategoryDescendantNames(prodFilterCat);
+      result = result.filter(p => allowedCategories.includes(p.category));
+    }
+
+    // Subcategory
+    if (prodFilterSubCat) {
+      result = result.filter(p => p.category === prodFilterSubCat);
+    }
+
+    // Stock Status
+    if (prodFilterStatus !== 'all') {
+      const wantInStock = prodFilterStatus === 'in-stock';
+      result = result.filter(p => {
+        const inStock = isProductInStock(p);
+        return wantInStock ? inStock : !inStock;
+      });
+    }
+
+    // Brand
+    if (prodFilterBrand) {
+      result = result.filter(p => p.brand === prodFilterBrand);
+    }
+
+    // Sorting
+    if (prodSortColumn) {
+      result.sort((a, b) => {
+        let valA: any = '';
+        let valB: any = '';
+
+        if (prodSortColumn === 'product') {
+          valA = a.name.toLowerCase();
+          valB = b.name.toLowerCase();
+        } else if (prodSortColumn === 'price') {
+          valA = a.price;
+          valB = b.price;
+        }
+
+        if (valA < valB) return prodSortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return prodSortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return result;
+  }, [products, prodSearch, prodFilterCat, prodFilterSubCat, prodFilterStatus, prodFilterBrand, prodSortColumn, prodSortDirection, categories]);
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const activePage = Math.max(1, Math.min(prodPage, totalPages || 1));
+
+  const paginatedProducts = useMemo(() => {
+    const startIdx = (activePage - 1) * itemsPerPage;
+    return filteredProducts.slice(startIdx, startIdx + itemsPerPage);
+  }, [filteredProducts, activePage, itemsPerPage]);
+
+  useEffect(() => {
+    setProdPage(1);
+  }, [prodSearch, prodFilterCat, prodFilterSubCat, prodFilterStatus, prodFilterBrand, prodSortColumn, prodSortDirection]);
+
   // Pricing Logic Helper
   const getProductDisplayPrice = (p: Product) => {
     const hasSale = p.originalPrice !== undefined && p.originalPrice > p.price;
@@ -767,6 +901,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     });
     setEditingItem({ type: 'product', data: p });
     setIsAdding(null);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const getNextSku = () => {
@@ -808,6 +943,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     setPageForm({ title: p.title, slug: p.slug, content: p.content, isPublished: p.isPublished });
     setEditingItem({ type: 'page', data: p });
     setIsAdding(null);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const startEditBanner = (b: any) => {
@@ -843,6 +979,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     });
     setEditingItem({ type: 'banner', data: b });
     setIsAdding(null);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const handleBannerSubmit = async (e: React.FormEvent) => {
@@ -928,6 +1065,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     });
     setEditingItem({ type: 'section', data: s });
     setIsAdding(null);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const handleBlogSubmit = async (e: React.FormEvent) => {
@@ -960,6 +1098,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     });
     setEditingItem({ type: 'blog', data: p });
     setIsAdding(null);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const closeForms = () => {
@@ -984,6 +1123,7 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
     setShowOptionsDropdown(false);
     setShowInlineBrandForm(false);
     setNewBrandName('');
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const handleCategorySubmit = async (e: React.FormEvent) => {
@@ -2299,25 +2439,175 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
           <div className="space-y-6 animate-in fade-in duration-500">
             {!(isAdding === 'product' || editingItem?.type === 'product') ? (
               <>
-                <div className="flex justify-between items-center">
+                 <div className="flex justify-between items-center">
                   <div><h2 className="text-2xl font-black text-slate-800 tracking-tight">Products</h2><p className="text-slate-400 text-sm">Manage your product catalog.</p></div>
-                  <button onClick={() => { setIsAdding('product'); setProdForm(prev => ({ ...prev, sku: getNextSku() })); }} className="bg-[#e92c5d] text-white px-8 py-3.5 rounded-xl font-black uppercase text-[11px] flex items-center gap-2 shadow-xl hover:bg-[#c81d4a] transition-all"><Plus size={18} /> Add Product</button>
+                  <button onClick={() => { setIsAdding('product'); setProdForm(prev => ({ ...prev, sku: getNextSku() })); window.scrollTo({ top: 0, behavior: 'instant' }); }} className="bg-[#e92c5d] text-white px-8 py-3.5 rounded-xl font-black uppercase text-[11px] flex items-center gap-2 shadow-xl hover:bg-[#c81d4a] transition-all"><Plus size={18} /> Add Product</button>
                 </div>
+
+                {/* Search & Filters Panel */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    {/* Search Input */}
+                    <div className="md:col-span-4 relative">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                      <input
+                        type="text"
+                        placeholder="Search product name, SKU, brand..."
+                        value={prodSearch}
+                        onChange={(e) => setProdSearch(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-rose-300 focus:ring-4 focus:ring-rose-50 transition-all text-slate-700"
+                      />
+                    </div>
+
+                    {/* Category Filter */}
+                    <div className="md:col-span-2 relative">
+                      <select
+                        value={prodFilterCat}
+                        onChange={(e) => handleParentCatChange(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-4 pr-10 py-3 text-sm font-bold text-slate-600 outline-none appearance-none cursor-pointer focus:bg-white focus:border-rose-300 focus:ring-4 focus:ring-rose-50 transition-all"
+                      >
+                        <option value="">All Categories</option>
+                        {parentCategories.map(c => (
+                          <option key={c.id} value={c.name}>{c.name}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                    </div>
+
+                    {/* Sub-category Filter */}
+                    <div className="md:col-span-2 relative">
+                      <select
+                        value={prodFilterSubCat}
+                        onChange={(e) => setProdFilterSubCat(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-4 pr-10 py-3 text-sm font-bold text-slate-600 outline-none appearance-none cursor-pointer focus:bg-white focus:border-rose-300 focus:ring-4 focus:ring-rose-50 transition-all"
+                      >
+                        <option value="">All Sub-categories</option>
+                        {subCategories.map(c => (
+                          <option key={c.id} value={c.name}>{c.name}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                    </div>
+
+                    {/* Status Filter */}
+                    <div className="md:col-span-2 relative">
+                      <select
+                        value={prodFilterStatus}
+                        onChange={(e) => setProdFilterStatus(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-4 pr-10 py-3 text-sm font-bold text-slate-600 outline-none appearance-none cursor-pointer focus:bg-white focus:border-rose-300 focus:ring-4 focus:ring-rose-50 transition-all"
+                      >
+                        <option value="all">All Statuses</option>
+                        <option value="in-stock">In Stock</option>
+                        <option value="out-of-stock">Out of Stock</option>
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                    </div>
+
+                    {/* Brand Filter */}
+                    <div className="md:col-span-2 relative">
+                      <select
+                        value={prodFilterBrand}
+                        onChange={(e) => setProdFilterBrand(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-4 pr-10 py-3 text-sm font-bold text-slate-600 outline-none appearance-none cursor-pointer focus:bg-white focus:border-rose-300 focus:ring-4 focus:ring-rose-50 transition-all"
+                      >
+                        <option value="">All Brands</option>
+                        {brands.map(b => (
+                          <option key={b.id} value={b.name}>{b.name}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                    </div>
+                  </div>
+
+                  {/* Summary & Clear Filters */}
+                  {(prodSearch || prodFilterCat || prodFilterSubCat || prodFilterStatus !== 'all' || prodFilterBrand) && (
+                    <div className="flex justify-between items-center text-xs font-bold text-slate-400 pt-2 px-1">
+                      <div>
+                        Found <span className="text-[#e92c5d]">{filteredProducts.length}</span> matching products
+                      </div>
+                      <button
+                        onClick={() => {
+                          setProdSearch('');
+                          setProdFilterCat('');
+                          setProdFilterSubCat('');
+                          setProdFilterStatus('all');
+                          setProdFilterBrand('');
+                        }}
+                        className="text-rose-600 hover:text-rose-800 transition-colors uppercase tracking-wider text-[10px] flex items-center gap-1 font-black"
+                      >
+                        Clear All Filters
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
                   <table className="w-full text-left">
                     <thead className="bg-slate-50 border-b text-[10px] uppercase font-black text-slate-400 tracking-widest">
-                      <tr><th className="px-8 py-6">Product</th><th className="px-6 py-6">Category</th><th className="px-6 py-6">Price Details (৳)</th><th className="px-8 py-6 text-right">Actions</th></tr>
+                      <tr>
+                        <th 
+                          onClick={() => {
+                            if (prodSortColumn === 'product') {
+                              setProdSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                            } else {
+                              setProdSortColumn('product');
+                              setProdSortDirection('asc');
+                            }
+                          }}
+                          className="px-8 py-6 cursor-pointer hover:bg-slate-100/50 transition-colors select-none"
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <span>Product</span>
+                            {prodSortColumn === 'product' ? (
+                              prodSortDirection === 'asc' ? <ArrowUp size={12} className="text-[#e92c5d]" /> : <ArrowDown size={12} className="text-[#e92c5d]" />
+                            ) : (
+                              <ArrowUpDown size={12} className="opacity-40" />
+                            )}
+                          </div>
+                        </th>
+                        <th className="px-6 py-6">Category</th>
+                        <th 
+                          onClick={() => {
+                            if (prodSortColumn === 'price') {
+                              setProdSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                            } else {
+                              setProdSortColumn('price');
+                              setProdSortDirection('asc');
+                            }
+                          }}
+                          className="px-6 py-6 cursor-pointer hover:bg-slate-100/50 transition-colors select-none"
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <span>Price Details (৳)</span>
+                            {prodSortColumn === 'price' ? (
+                              prodSortDirection === 'asc' ? <ArrowUp size={12} className="text-[#e92c5d]" /> : <ArrowDown size={12} className="text-[#e92c5d]" />
+                            ) : (
+                              <ArrowUpDown size={12} className="opacity-40" />
+                            )}
+                          </div>
+                        </th>
+                        <th className="px-8 py-6 text-right">Actions</th>
+                      </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
-                      {products.map(p => {
+                      {paginatedProducts.map(p => {
                         const { mrp, sale } = getProductDisplayPrice(p);
+                        const inStock = isProductInStock(p);
                         return (
                           <tr key={p.id} className="hover:bg-slate-50/50 group transition-colors">
                             <td className="px-8 py-5 flex items-center gap-4">
                               <div className="w-12 h-12 bg-slate-50 rounded-xl p-1 border border-slate-100 flex items-center justify-center shrink-0">
                                 {(!p.images?.[0] || brokenImages[p.id]) ? <ImageIcon className="text-slate-200" size={20} /> : <img src={p.images[0]} className="max-h-full max-w-full object-contain" onError={() => handleImageError(p.id)} />}
                               </div>
-                              <div className="min-w-0"><span className="font-bold text-slate-700 block truncate max-w-xs">{p.name}</span><span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">SKU: {p.sku || 'N/A'}</span></div>
+                              <div className="min-w-0">
+                                <span className="font-bold text-slate-700 block truncate max-w-xs">{p.name}</span>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">SKU: {p.sku || 'N/A'}</span>
+                                  <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${inStock ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+                                    {inStock ? 'In Stock' : 'Out of Stock'}
+                                  </span>
+                                </div>
+                              </div>
                             </td>
                             <td className="px-6 py-5 text-slate-400 font-medium text-sm">{p.category}</td>
                             <td className="px-6 py-5">
@@ -2336,6 +2626,69 @@ CREATE POLICY "Public read blog" ON public.blog_posts FOR SELECT USING (true);`;
                     </tbody>
                   </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex justify-between items-center bg-white rounded-2xl border border-gray-100 px-8 py-4 shadow-sm">
+                    <div className="text-xs font-bold text-slate-400">
+                      Showing <span className="text-slate-600">{(activePage - 1) * itemsPerPage + 1}</span> to{' '}
+                      <span className="text-slate-600">
+                        {Math.min(activePage * itemsPerPage, filteredProducts.length)}
+                      </span>{' '}
+                      of <span className="text-[#e92c5d]">{filteredProducts.length}</span> products
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        disabled={activePage === 1}
+                        onClick={() => { setProdPage(prev => Math.max(prev - 1, 1)); window.scrollTo({ top: 0, behavior: 'instant' }); }}
+                        className="p-2.5 rounded-xl border border-slate-100 text-slate-400 shadow-sm transition-all hover:bg-slate-50 active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
+                      >
+                        <ChevronLeft size={18} />
+                      </button>
+                      
+                      {/* Page numbers */}
+                      <div className="flex items-center gap-1.5">
+                        {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((pNum) => {
+                          if (
+                            pNum === 1 ||
+                            pNum === totalPages ||
+                            Math.abs(pNum - activePage) <= 1
+                          ) {
+                            return (
+                              <button
+                                key={pNum}
+                                onClick={() => { setProdPage(pNum); window.scrollTo({ top: 0, behavior: 'instant' }); }}
+                                className={`w-9 h-9 rounded-xl font-bold text-xs flex items-center justify-center transition-all ${
+                                  activePage === pNum
+                                    ? 'bg-[#e92c5d] text-white shadow-md shadow-rose-100 scale-105'
+                                    : 'bg-white text-slate-500 border border-slate-100 hover:bg-slate-50'
+                                }`}
+                              >
+                                {pNum}
+                              </button>
+                            );
+                          }
+                          if (pNum === 2 || pNum === totalPages - 1) {
+                            return (
+                              <span key={`ellipsis-${pNum}`} className="text-slate-300 font-bold px-1 text-xs select-none">
+                                ...
+                              </span>
+                            );
+                          }
+                          return null;
+                        })}
+                      </div>
+
+                      <button
+                        disabled={activePage === totalPages}
+                        onClick={() => { setProdPage(prev => Math.min(prev + 1, totalPages)); window.scrollTo({ top: 0, behavior: 'instant' }); }}
+                        className="p-2.5 rounded-xl border border-slate-100 text-slate-400 shadow-sm transition-all hover:bg-slate-50 active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
+                      >
+                        <ChevronRight size={18} />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <div className="max-w-5xl mx-auto space-y-8 pb-20">
