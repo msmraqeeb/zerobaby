@@ -357,14 +357,12 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
     } catch (err) {
       console.error("Auth init error:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     // Fetch public data instantly on load to remove the white loading screen delay
-    fetchData(null, false).then(() => setLoading(false));
+    fetchData(null, false).finally(() => setLoading(false));
 
     supabase.auth.getSession().then(({ data: { session } }) => initializeAuth(session?.user || null));
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {

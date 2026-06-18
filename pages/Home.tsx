@@ -851,20 +851,8 @@ const Home: React.FC = () => {
                 )}
               </>
             ) : (
-              <div className="absolute inset-0 flex">
-                <div className="w-1/2 bg-[#fdf2f5] relative">
-                  <img src="https://images.unsplash.com/photo-1580915411954-282cb1b0d780?auto=format&fit=crop&q=80&w=800" className="w-full h-full object-cover opacity-80" alt="delivery" />
-                  <div className="absolute inset-0 bg-rose-500/10"></div>
-                </div>
-                <div className="w-1/2 relative">
-                  <img src="https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&q=80&w=800" className="w-full h-full object-cover" alt="farmer" />
-                </div>
-                <button className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md text-gray-400 hover:text-[#e92c5d] z-20">
-                  <ArrowRight size={20} className="rotate-180" />
-                </button>
-                <button className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md text-gray-400 hover:text-[#e92c5d] z-20">
-                  <ArrowRight size={20} />
-                </button>
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-50 text-gray-400">
+                <span>No Banners Available</span>
               </div>
             )}
           </div>
@@ -934,18 +922,8 @@ const Home: React.FC = () => {
                 </div>
               );
             })() : (
-              <div className="rounded-xl bg-[#fdf2f5] relative overflow-hidden border border-rose-50 h-[135px] lg:h-[215px] lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group">
-                <div className="absolute top-0 left-0 bottom-0 z-20 w-[60%] flex flex-col justify-center pl-3 lg:static lg:w-full lg:block lg:pl-0">
-                  <span className="text-[#e92c5d] font-bold text-[8px] lg:text-xs mb-0.5 lg:mb-1 block uppercase tracking-wider">Only This Week</span>
-                  <h3 className="text-[10px] lg:text-xl font-bold text-gray-800 mb-0.5 lg:mb-1 leading-tight break-words">Quality eggs <br className="lg:hidden" /> at an price</h3>
-                  <p className="text-gray-500 text-[8px] lg:text-xs mb-1.5 lg:mb-4">Eat one every day</p>
-                  <button className="bg-[#e92c5d] text-white text-[8px] lg:text-xs px-2 lg:px-5 py-1 lg:py-2.5 rounded-full font-bold hover:bg-[#c81d4a] transition-colors flex items-center gap-1 lg:gap-2 group w-fit">
-                    Shop Now <ArrowRight size={8} className="lg:w-3.5 lg:h-3.5 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </div>
-                <div className="absolute right-0 bottom-0 top-0 w-[65%] lg:w-40 lg:h-40 lg:top-auto lg:bottom-[-8px] lg:right-[-16px] z-10">
-                  <img src="https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-contain object-right-bottom mix-blend-multiply lg:opacity-100" alt="eggs" />
-                </div>
+              <div className="rounded-xl bg-gray-50 relative overflow-hidden border border-gray-100 h-[135px] lg:h-[215px] lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group flex items-center justify-center text-gray-400 text-sm">
+                No Banner
               </div>
             )}
 
@@ -1012,18 +990,8 @@ const Home: React.FC = () => {
                 </div>
               );
             })() : (
-              <div className="rounded-xl bg-[#fff5f5] relative overflow-hidden border border-red-50 h-[135px] lg:h-[215px] lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group">
-                <div className="absolute top-0 left-0 bottom-0 z-20 w-[60%] flex flex-col justify-center pl-3 lg:static lg:w-full lg:block lg:pl-0">
-                  <span className="text-[#e92c5d] font-bold text-[8px] lg:text-xs mb-0.5 lg:mb-1 block uppercase tracking-wider">Fuel Your Day</span>
-                  <h3 className="text-[10px] lg:text-xl font-bold text-gray-800 mb-0.5 lg:mb-1 leading-tight break-words">Nutritious bites <br className="lg:hidden" /> for mind</h3>
-                  <p className="text-gray-500 text-[8px] lg:text-xs mb-1.5 lg:mb-4">Start fresh...</p>
-                  <button className="bg-[#e92c5d] text-white text-[8px] lg:text-xs px-2 lg:px-5 py-1 lg:py-2.5 rounded-full font-bold hover:bg-[#c81d4a] transition-colors flex items-center gap-1 lg:gap-2 group w-fit">
-                    Shop Now <ArrowRight size={8} className="lg:w-3.5 lg:h-3.5 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </div>
-                <div className="absolute right-0 bottom-0 top-0 w-[65%] lg:w-40 lg:h-40 lg:top-auto lg:bottom-[-8px] lg:right-[-16px] z-10">
-                  <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-contain object-right-bottom mix-blend-multiply lg:opacity-100" alt="fruits" />
-                </div>
+              <div className="rounded-xl bg-gray-50 relative overflow-hidden border border-gray-100 h-[135px] lg:h-[215px] lg:flex-1 lg:flex lg:flex-col lg:justify-center lg:p-6 group flex items-center justify-center text-gray-400 text-sm">
+                No Banner
               </div>
             )}
           </div>
