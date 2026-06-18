@@ -606,7 +606,7 @@ const BrandScroller: React.FC<{ brands: Brand[] }> = ({ brands }) => {
 };
 
 const Home: React.FC = () => {
-  const { products, banners, homeSections, categories, brands } = useStore();
+  const { products, banners, homeSections, categories, brands, loading } = useStore();
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderRef = useRef<HTMLDivElement>(null);
 
@@ -785,7 +785,11 @@ const Home: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Slider (Left 2/3) */}
           <div ref={sliderRef} className="lg:col-span-2 relative rounded-xl overflow-hidden h-[280px] md:h-[450px]">
-            {sliderBanners.length > 0 ? (
+            {loading ? (
+              <div className="absolute inset-0 bg-slate-100 animate-pulse flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-100 via-slate-200/80 to-slate-100 animate-shimmer" style={{ backgroundSize: '200% 100%' }}></div>
+              </div>
+            ) : sliderBanners.length > 0 ? (
               <>
                 {sliderBanners.map((banner, idx) => {
                   const linkStr = banner.link || '';
@@ -868,7 +872,11 @@ const Home: React.FC = () => {
           {/* Right Banners (Right 1/3) */}
           <div className="grid grid-cols-2 lg:flex lg:flex-col gap-3 lg:gap-6 h-full pb-2 lg:pb-0">
             {/* Top Banner */}
-            {rightTopBanner ? (() => {
+            {loading ? (
+              <div className="rounded-xl bg-slate-100 animate-pulse h-[135px] lg:h-[215px] lg:flex-1 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-100 via-slate-200/80 to-slate-100 animate-shimmer" style={{ backgroundSize: '200% 100%' }}></div>
+              </div>
+            ) : rightTopBanner ? (() => {
               const linkStr = rightTopBanner.link || '';
               const parts = linkStr.split('|');
               const actualLink = parts[0] || '';
@@ -942,7 +950,11 @@ const Home: React.FC = () => {
             )}
 
             {/* Bottom Banner */}
-            {rightBottomBanner ? (() => {
+            {loading ? (
+              <div className="rounded-xl bg-slate-100 animate-pulse h-[135px] lg:h-[215px] lg:flex-1 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-100 via-slate-200/80 to-slate-100 animate-shimmer" style={{ backgroundSize: '200% 100%' }}></div>
+              </div>
+            ) : rightBottomBanner ? (() => {
               const linkStr = rightBottomBanner.link || '';
               const parts = linkStr.split('|');
               const actualLink = parts[0] || '';
@@ -1093,6 +1105,21 @@ const Home: React.FC = () => {
             sectionContent = <DoubleBannerSection key={section.id} section={section} />;
           } else if (section.type === 'banner-triple') {
             sectionContent = <TripleBannerSection key={section.id} section={section} />;
+          } else if (loading) {
+            sectionContent = (
+              <section key={section.id} className="container mx-auto px-4 md:px-8 mb-16">
+                <h2 className="text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4 mb-6">{section.title}</h2>
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="border border-gray-100 rounded-xl bg-white overflow-hidden p-4 space-y-4 animate-pulse">
+                      <div className="aspect-square w-full bg-slate-100 rounded-lg"></div>
+                      <div className="h-4 bg-slate-100 rounded w-2/3"></div>
+                      <div className="h-6 bg-slate-100 rounded w-1/3"></div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            );
           } else if (items.length === 0) {
             sectionContent = (
               <section key={section.id} className="container mx-auto px-4 md:px-8 mb-16 opacity-50">
@@ -1129,9 +1156,19 @@ const Home: React.FC = () => {
           <Link to="/products" className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6">
-          {randomProducts.map(product => (
-            <ProductCard key={`best-${product.id}`} product={product} className="product-card-anim max-w-[260px] mx-auto w-full" />
-          ))}
+          {loading ? (
+            Array.from({ length: 10 }).map((_, i) => (
+              <div key={`best-skeleton-${i}`} className="border border-gray-100 rounded-xl bg-white overflow-hidden p-4 space-y-4 animate-pulse max-w-[260px] mx-auto w-full">
+                <div className="aspect-square w-full bg-slate-100 rounded-lg"></div>
+                <div className="h-4 bg-slate-100 rounded w-2/3"></div>
+                <div className="h-6 bg-slate-100 rounded w-1/3"></div>
+              </div>
+            ))
+          ) : (
+            randomProducts.map(product => (
+              <ProductCard key={`best-${product.id}`} product={product} className="product-card-anim max-w-[260px] mx-auto w-full" />
+            ))
+          )}
         </div>
       </section>
 
