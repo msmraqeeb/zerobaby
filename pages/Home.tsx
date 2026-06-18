@@ -82,7 +82,7 @@ const SliderSection: React.FC<{ section: HomeSection; products: Product[] }> = (
   }, [products.length]);
 
   return (
-    <section ref={containerRef} className="container mx-auto px-4 md:px-8 mb-16 relative group/slider">
+    <section ref={containerRef} className="container mx-auto px-4 md:px-8 mb-6 md:mb-16 relative group/slider">
       <div className="flex justify-between items-end mb-6">
         <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4">{section.title}</h2>
         <Link to={getSectionLink()} className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
@@ -171,7 +171,7 @@ const GridSection: React.FC<{ section: HomeSection; products: Product[] }> = ({ 
   };
 
   return (
-    <section ref={containerRef} className="container mx-auto px-4 md:px-8 mb-16">
+    <section ref={containerRef} className="container mx-auto px-4 md:px-8 mb-6 md:mb-16">
       <div className="flex justify-between items-end mb-6">
         <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4">{section.title}</h2>
         <Link to={getSectionLink()} className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
@@ -252,7 +252,7 @@ const PromoBannersSection = () => {
   };
 
   return (
-    <section className="container mx-auto px-4 md:px-8 mb-16">
+    <section className="container mx-auto px-4 md:px-8 mb-6 md:mb-16">
       <div
         ref={scrollRef}
         onMouseDown={handleMouseDown}
@@ -302,7 +302,7 @@ const PromoBannersSection = () => {
 };
 
 const DualBannerSection = () => (
-  <section className="container mx-auto px-4 md:px-8 mb-16">
+  <section className="container mx-auto px-4 md:px-8 mb-6 md:mb-16">
     <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6">
       <Link
         to="/category/toiletries"
@@ -335,7 +335,7 @@ const FullWidthBannerSection: React.FC<{ section: HomeSection }> = ({ section })
   );
 
   return (
-    <section className="container mx-auto px-4 md:px-8 mb-16 animate-in fade-in duration-500">
+    <section className="container mx-auto px-4 md:px-8 mb-6 md:mb-16 animate-in fade-in duration-500">
       {banner.link ? (
         <Link to={banner.link} className="block">
           {content}
@@ -353,7 +353,7 @@ const DoubleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
   if (!banner1?.imageUrl && !banner2?.imageUrl) return null;
 
   return (
-    <section className="container mx-auto px-4 md:px-8 mb-16 animate-in fade-in duration-500">
+    <section className="container mx-auto px-4 md:px-8 mb-6 md:mb-16 animate-in fade-in duration-500">
       <div className="grid grid-cols-2 gap-3 md:gap-6">
         {banner1?.imageUrl && (
           banner1.link ? (
@@ -410,7 +410,7 @@ const TripleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
   if (activeBanners.length === 0) return null;
 
   return (
-    <section className="container mx-auto px-4 md:px-8 mb-16 animate-in fade-in duration-500">
+    <section className="container mx-auto px-4 md:px-8 mb-6 md:mb-16 animate-in fade-in duration-500">
       {/* Desktop view (static 3 columns) */}
       <div className="hidden md:grid md:grid-cols-3 gap-6">
         {activeBanners.map((banner, index) => {
@@ -518,7 +518,7 @@ const BrandScroller: React.FC<{ brands: Brand[] }> = ({ brands }) => {
   if (marqueeItems.length === 0) return null;
 
   return (
-    <section className="container mx-auto px-4 md:px-8 mb-16">
+    <section className="container mx-auto px-4 md:px-8 mb-6 md:mb-16">
       <div className="w-full py-8 bg-gray-50/70 rounded-2xl border border-gray-100/80 overflow-hidden relative">
         <style dangerouslySetInnerHTML={{ __html: `
           @keyframes marquee-brands-scroll {
@@ -1031,7 +1031,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Features Bar */}
-      <section className="features-container container mx-auto px-4 md:px-8 mb-12">
+      <section className="features-container container mx-auto px-4 md:px-8 mb-6 md:mb-12">
         <div className="bg-[#f7f8f3] rounded-2xl p-6 md:p-8">
           <div
             ref={scrollRef}
@@ -1107,7 +1107,7 @@ const Home: React.FC = () => {
             sectionContent = <TripleBannerSection key={section.id} section={section} />;
           } else if (loading) {
             sectionContent = (
-              <section key={section.id} className="container mx-auto px-4 md:px-8 mb-16">
+              <section key={section.id} className="container mx-auto px-4 md:px-8 mb-6 md:mb-16">
                 <h2 className="text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4 mb-6">{section.title}</h2>
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6">
                   {Array.from({ length: 5 }).map((_, i) => (
@@ -1122,7 +1122,7 @@ const Home: React.FC = () => {
             );
           } else if (items.length === 0) {
             sectionContent = (
-              <section key={section.id} className="container mx-auto px-4 md:px-8 mb-16 opacity-50">
+              <section key={section.id} className="container mx-auto px-4 md:px-8 mb-6 md:mb-16 opacity-50">
                 <h2 className="text-2xl font-bold text-gray-800 border-l-4 border-gray-300 pl-4 mb-6">{section.title}</h2>
                 <div className="bg-gray-50 border border-gray-100 rounded-xl p-8 text-center">
                   <p className="text-gray-400 font-bold mb-2">No items found for this section.</p>
@@ -1150,7 +1150,7 @@ const Home: React.FC = () => {
         })}
 
       {/* Best Items for you Section */}
-      <section className="best-items-container container mx-auto px-4 md:px-8 mb-16">
+      <section className="best-items-container container mx-auto px-4 md:px-8 mb-6 md:mb-16">
         <div className="flex justify-between items-end mb-6">
           <h2 className="text-lg md:text-2xl font-bold text-gray-800 border-l-4 border-[#e92c5d] pl-4">Best Items for you</h2>
           <Link to="/products" className="text-[10px] md:text-sm font-bold text-[#e92c5d] flex items-center gap-1 hover:gap-2 transition-all uppercase tracking-tighter">View All Items <ArrowRight size={14} /></Link>
