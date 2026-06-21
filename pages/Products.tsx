@@ -136,15 +136,17 @@ const Products: React.FC = () => {
 
   // Helper to update URL params cleanly
   const updateUrlParams = (updates: Record<string, string | null>) => {
-    const newParams = new URLSearchParams(searchParams.toString());
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value === null) {
-        newParams.delete(key);
-      } else {
-        newParams.set(key, value);
-      }
-    });
-    setSearchParams(newParams, { replace: true });
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev.toString());
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === null) {
+          newParams.delete(key);
+        } else {
+          newParams.set(key, value);
+        }
+      });
+      return newParams;
+    }, { replace: true });
   };
 
   const categoryTree = useMemo(() => buildCategoryTree(categories), [categories]);
@@ -310,6 +312,7 @@ const Products: React.FC = () => {
       : [...currentValues, value];
     
     updateUrlParams({ [`attr_${attrName}`]: newValues.length > 0 ? newValues.join(',') : null });
+    setIsFilterOpen(false);
   };
 
   const filteredProducts = useMemo(() => {
@@ -412,6 +415,7 @@ const Products: React.FC = () => {
       ? selectedBrands.filter((b: string) => b !== brandName) 
       : [...selectedBrands, brandName];
     updateUrlParams({ brands: newBrands.length > 0 ? newBrands.join(',') : null });
+    setIsFilterOpen(false);
   };
 
   const resetFilters = () => {
