@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import ProductCard from '../components/ProductCard';
 import { Filter, SlidersHorizontal, ChevronRight, ChevronDown, Search, RotateCcw, Check, Star, Coins, X } from 'lucide-react';
@@ -107,15 +107,43 @@ const ProductCardSkeleton: React.FC = () => {
 const Products: React.FC = () => {
   const navigate = useNavigate();
   const { products, categories, searchQuery, brands, reviews, loading } = useStore();
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedMinRating, setSelectedMinRating] = useState<number | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
+  
   const currentOrderBy = searchParams.get('orderby') || 'default';
+  const selectedCategory = searchParams.get('category') || 'All';
+
+  // Derived state from URL
+  const selectedBrands = useMemo(() => {
+    const brandsParam = searchParams.get('brands');
+    return brandsParam ? brandsParam.split(',').filter(Boolean) as string[] : [];
+  }, [searchParams]);
+  const selectedMinRating = searchParams.get('rating') ? Number(searchParams.get('rating')) : null;
+  const selectedAttributes = useMemo(() => {
+    const attrs: Record<string, string[]> = {};
+    searchParams.forEach((val: string, key: string) => {
+      if (key.startsWith('attr_')) {
+        attrs[key.substring(5)] = val.split(',').filter(Boolean);
+      }
+    });
+    return attrs;
+  }, [searchParams]);
+
+  // Helper to update URL params cleanly
+  const updateUrlParams = (updates: Record<string, string | null>) => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null) {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, value);
+      }
+    });
+    setSearchParams(newParams, { replace: true });
+  };
 
   const categoryTree = useMemo(() => buildCategoryTree(categories), [categories]);
 
@@ -155,20 +183,7 @@ const Products: React.FC = () => {
     return family;
   }, [selectedCategory, categories]);
 
-  // Sync URL category and brand params with state
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const catParam = params.get('category');
-    if (catParam) {
-      setSelectedCategory(decodeURIComponent(catParam));
-    }
-    const brandParam = searchParams.get('brand');
-    if (brandParam) {
-      setSelectedBrands([decodeURIComponent(brandParam)]);
-    } else {
-      setSelectedBrands([]);
-    }
-  }, [location.search]);
+  // Sync URL category param with state (Now derived directly, so no need for useEffect)
 
   // Get all descendant categories for filtering products
   const categoryProducts = useMemo(() => {
@@ -194,27 +209,58 @@ const Products: React.FC = () => {
   const [minMax, setMinMax] = useState<[number, number]>([0, 10000]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
 
-  // Initialize price range based on current category products
+  // Initialize price range based on current category products and URL
   useEffect(() => {
     if (categoryProducts.length > 0) {
       const prices = categoryProducts.map(p => p.price);
       const min = Math.floor(Math.min(...prices));
       const max = Math.ceil(Math.max(...prices));
       setMinMax([min, max]);
-      setPriceRange([min, max]); // Initialize selection to active category range
+      
+      const minParam = searchParams.get('minPrice');
+      const maxParam = searchParams.get('maxPrice');
+      if (!minParam && !maxParam) {
+        setPriceRange([min, max]); // Initialize selection to active category range only if no URL params
+      }
     } else {
       setMinMax([0, 10000]);
-      setPriceRange([0, 10000]);
+      if (!searchParams.get('minPrice') && !searchParams.get('maxPrice')) {
+        setPriceRange([0, 10000]);
+      }
     }
   }, [categoryProducts]);
 
-  // Dynamic Attribute Logic
-  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string[]>>({});
+  // Sync priceRange from URL if it changes (e.g. back navigation)
+  useEffect(() => {
+    const minParam = searchParams.get('minPrice');
+    const maxParam = searchParams.get('maxPrice');
+    if (minParam || maxParam) {
+      setPriceRange([
+        minParam ? Number(minParam) : minMax[0],
+        maxParam ? Number(maxParam) : minMax[1]
+      ]);
+    }
+  }, [searchParams, minMax]);
+
+  // Debounced URL update for priceRange
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      // Only update URL if price range differs from minMax default
+      if (priceRange[0] !== minMax[0] || priceRange[1] !== minMax[1]) {
+        updateUrlParams({ minPrice: priceRange[0].toString(), maxPrice: priceRange[1].toString() });
+      } else {
+        updateUrlParams({ minPrice: null, maxPrice: null });
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [priceRange, minMax]);
 
   // Reset attributes and brands when category changes to avoid stale filters
   useEffect(() => {
-    setSelectedAttributes({});
-    setSelectedBrands([]);
+    // Only reset if category ACTUALLY changed to a new value in URL, but wait,
+    // since we're using URL state, let's reset them by clearing the params.
+    // However, if we're on load and URL already has brands + category, we shouldn't wipe them.
+    // Instead of auto-wiping on category change here, we will wipe them when the user CLICKS a category!
   }, [selectedCategory]);
 
   // Available attributes for filter sidebar inside selected category
@@ -256,20 +302,15 @@ const Products: React.FC = () => {
   }, [brands, categoryProducts]);
 
   const toggleAttribute = (attrName: string, value: string) => {
-    setSelectedAttributes(prev => {
-      const currentValues = prev[attrName] || [];
-      const newValues = currentValues.includes(value)
-        ? currentValues.filter(v => v !== value)
-        : [...currentValues, value];
-
-      const newState = { ...prev, [attrName]: newValues };
-      if (newValues.length === 0) delete newState[attrName];
-      return newState;
-    });
+    const currentValues = selectedAttributes[attrName] || [];
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter(v => v !== value)
+      : [...currentValues, value];
+    
+    updateUrlParams({ [`attr_${attrName}`]: newValues.length > 0 ? newValues.join(',') : null });
   };
 
   const filteredProducts = useMemo(() => {
-    const searchParams = new URLSearchParams(location.search);
     const showSaleOnly = searchParams.get('filter') === 'sale';
 
     return categoryProducts.filter(p => {
@@ -369,16 +410,22 @@ const Products: React.FC = () => {
 
 
   const toggleBrand = (brandName: string) => {
-    setSelectedBrands(prev =>
-      prev.includes(brandName) ? prev.filter(b => b !== brandName) : [...prev, brandName]
-    );
+    const newBrands = selectedBrands.includes(brandName) 
+      ? selectedBrands.filter((b: string) => b !== brandName) 
+      : [...selectedBrands, brandName];
+    updateUrlParams({ brands: newBrands.length > 0 ? newBrands.join(',') : null });
   };
 
   const resetFilters = () => {
-    setSelectedCategory('All');
-    setSelectedBrands([]);
-    setSelectedMinRating(null);
-    setSelectedAttributes({});
+    const newParams = new URLSearchParams();
+    if (selectedCategory !== 'All') {
+      newParams.set('category', selectedCategory);
+    }
+    if (currentOrderBy && currentOrderBy !== 'default') {
+       newParams.set('orderby', currentOrderBy);
+    }
+    setSearchParams(newParams, { replace: true });
+    
     if (products.length > 0) {
       setPriceRange(minMax);
     } else {
@@ -541,7 +588,7 @@ const Products: React.FC = () => {
                   {[4, 3, 2, 1].map(stars => (
                     <button
                       key={stars}
-                      onClick={() => setSelectedMinRating(stars)}
+                      onClick={() => updateUrlParams({ rating: selectedMinRating === stars ? null : stars.toString() })}
                       className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${selectedMinRating === stars ? 'bg-amber-50 text-amber-700' : 'hover:bg-gray-50 text-gray-600'}`}
                     >
                       <div className="flex text-amber-400">
@@ -836,7 +883,7 @@ const Products: React.FC = () => {
                   {[4, 3, 2, 1].map(stars => (
                     <button
                       key={stars}
-                      onClick={() => { setSelectedMinRating(stars); setIsFilterOpen(false); }}
+                      onClick={() => { updateUrlParams({ rating: selectedMinRating === stars ? null : stars.toString() }); setIsFilterOpen(false); }}
                       className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-colors ${selectedMinRating === stars ? 'bg-amber-50 text-amber-700' : 'hover:bg-gray-50 text-gray-600'}`}
                     >
                       <div className="flex text-amber-400">

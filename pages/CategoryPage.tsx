@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import ProductCard from '../components/ProductCard';
 import { Filter, SlidersHorizontal, ChevronRight, Search, RotateCcw, Check, Star, Coins, Home, Grid, X } from 'lucide-react';
@@ -41,8 +41,21 @@ const CategoryPage: React.FC = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
+  const [searchParams, setSearchParams] = useSearchParams();
   const currentOrderBy = searchParams.get('orderby') || 'default';
+
+  // Helper to update URL params cleanly
+  const updateUrlParams = (updates: Record<string, string | null>) => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null) {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, value);
+      }
+    });
+    setSearchParams(newParams, { replace: true });
+  };
   
   // Find current category
   const currentCategory = useMemo(() => {
@@ -95,19 +108,32 @@ const CategoryPage: React.FC = () => {
     };
   }, [currentCategory]);
 
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedMinRating, setSelectedMinRating] = useState<number | null>(null);
+  // Derived state from URL
+  const selectedBrands = useMemo(() => {
+    const brandsParam = searchParams.get('brands');
+    return brandsParam ? brandsParam.split(',').filter(Boolean) as string[] : [];
+  }, [searchParams]);
+  const selectedMinRating = searchParams.get('rating') ? Number(searchParams.get('rating')) : null;
+  const selectedAttributes = useMemo(() => {
+    const attrs: Record<string, string[]> = {};
+    searchParams.forEach((val: string, key: string) => {
+      if (key.startsWith('attr_')) {
+        attrs[key.substring(5)] = val.split(',').filter(Boolean);
+      }
+    });
+    return attrs;
+  }, [searchParams]);
+
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [visibleCount, setVisibleCount] = useState(12);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [minMax, setMinMax] = useState<[number, number]>([0, 10000]);
-  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string[]>>({});
 
-  // Reset local filters on category change
+  // Reset attributes and brands when category changes to avoid stale filters
+  // Actually, we should just let the URL parameters handle it. If user switches category via router links,
+  // those links usually don't carry over the `?brands=` so they will naturally reset!
   useEffect(() => {
-    setSelectedBrands([]);
-    setSelectedMinRating(null);
-    setSelectedAttributes({});
+    // Left empty. 
   }, [categorySlug]);
 
   // Helper to find all descendants of the current category (to include child category products)
@@ -137,19 +163,51 @@ const CategoryPage: React.FC = () => {
     return products.filter(p => descendantNames.includes(p.category));
   }, [products, descendantNames, currentCategory]);
 
-  // Initialize price range based on current category products
+  // Initialize price range based on current category products and URL
   useEffect(() => {
     if (categoryProducts.length > 0) {
       const prices = categoryProducts.map(p => p.price);
       const min = Math.floor(Math.min(...prices));
       const max = Math.ceil(Math.max(...prices));
       setMinMax([min, max]);
-      setPriceRange([min, max]);
+      
+      const minParam = searchParams.get('minPrice');
+      const maxParam = searchParams.get('maxPrice');
+      if (!minParam && !maxParam) {
+        setPriceRange([min, max]); // Initialize selection to active category range only if no URL params
+      }
     } else {
       setMinMax([0, 10000]);
-      setPriceRange([0, 10000]);
+      if (!searchParams.get('minPrice') && !searchParams.get('maxPrice')) {
+        setPriceRange([0, 10000]);
+      }
     }
   }, [categoryProducts]);
+
+  // Sync priceRange from URL if it changes (e.g. back navigation)
+  useEffect(() => {
+    const minParam = searchParams.get('minPrice');
+    const maxParam = searchParams.get('maxPrice');
+    if (minParam || maxParam) {
+      setPriceRange([
+        minParam ? Number(minParam) : minMax[0],
+        maxParam ? Number(maxParam) : minMax[1]
+      ]);
+    }
+  }, [searchParams, minMax]);
+
+  // Debounced URL update for priceRange
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      // Only update URL if price range differs from minMax default
+      if (priceRange[0] !== minMax[0] || priceRange[1] !== minMax[1]) {
+        updateUrlParams({ minPrice: priceRange[0].toString(), maxPrice: priceRange[1].toString() });
+      } else {
+        updateUrlParams({ minPrice: null, maxPrice: null });
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [priceRange, minMax]);
 
   // Build category tree inside the active category to display subcategory navigation
   const subcategoryTree = useMemo(() => {
@@ -214,20 +272,17 @@ const CategoryPage: React.FC = () => {
   }, [brands, categoryProducts]);
 
   const toggleAttribute = (attrName: string, value: string) => {
-    setSelectedAttributes(prev => {
-      const currentValues = prev[attrName] || [];
-      const newValues = currentValues.includes(value)
-        ? currentValues.filter(v => v !== value)
-        : [...currentValues, value];
+    const currentValues = selectedAttributes[attrName] || [];
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter(v => v !== value)
+      : [...currentValues, value];
 
-      const newState = { ...prev, [attrName]: newValues };
-      if (newValues.length === 0) delete newState[attrName];
-      return newState;
-    });
+    updateUrlParams({ [`attr_${attrName}`]: newValues.length > 0 ? newValues.join(',') : null });
   };
 
   // Main Filtered Products list
   const filteredProducts = useMemo(() => {
+    const showSaleOnly = searchParams.get('filter') === 'sale';
     return categoryProducts.filter(p => {
       // Brand filter
       const brandMatch = selectedBrands.length === 0 || (p.brand && selectedBrands.includes(p.brand));
@@ -257,9 +312,11 @@ const CategoryPage: React.FC = () => {
         return false;
       });
 
-      return brandMatch && ratingMatch && priceMatch && attributeMatch;
+      const saleMatch = !showSaleOnly || (p.originalPrice !== undefined && p.originalPrice > p.price);
+
+      return brandMatch && ratingMatch && priceMatch && attributeMatch && saleMatch;
     });
-  }, [categoryProducts, selectedBrands, selectedMinRating, reviews, priceRange, selectedAttributes]);
+  }, [categoryProducts, selectedBrands, selectedMinRating, reviews, priceRange, selectedAttributes, searchParams]);
 
   const sortedProducts = useMemo(() => {
     const sorted = [...filteredProducts].sort((a, b) => {
@@ -320,16 +377,24 @@ const CategoryPage: React.FC = () => {
   }, [sortedProducts, visibleCount]);
 
   const toggleBrand = (brandName: string) => {
-    setSelectedBrands(prev =>
-      prev.includes(brandName) ? prev.filter(b => b !== brandName) : [...prev, brandName]
-    );
+    const newBrands = selectedBrands.includes(brandName) 
+      ? selectedBrands.filter((b: string) => b !== brandName) 
+      : [...selectedBrands, brandName];
+    updateUrlParams({ brands: newBrands.length > 0 ? newBrands.join(',') : null });
   };
 
   const resetFilters = () => {
-    setSelectedBrands([]);
-    setSelectedMinRating(null);
-    setSelectedAttributes({});
-    setPriceRange(minMax);
+    const newParams = new URLSearchParams();
+    if (currentOrderBy && currentOrderBy !== 'default') {
+       newParams.set('orderby', currentOrderBy);
+    }
+    setSearchParams(newParams, { replace: true });
+    
+    if (categoryProducts.length > 0) {
+      setPriceRange(minMax);
+    } else {
+      setPriceRange([0, 10000]);
+    }
   };
 
   if (!currentCategory) {
@@ -574,7 +639,7 @@ const CategoryPage: React.FC = () => {
                 {[4, 3, 2, 1].map(stars => (
                   <button
                     key={stars}
-                    onClick={() => setSelectedMinRating(stars)}
+                    onClick={() => updateUrlParams({ rating: selectedMinRating === stars ? null : stars.toString() })}
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${selectedMinRating === stars ? 'bg-amber-50 text-amber-700' : 'hover:bg-gray-50 text-gray-600'}`}
                   >
                     <div className="flex text-amber-400">
@@ -861,7 +926,7 @@ const CategoryPage: React.FC = () => {
                   {[4, 3, 2, 1].map(stars => (
                     <button
                       key={stars}
-                      onClick={() => { setSelectedMinRating(stars); setIsFilterOpen(false); }}
+                      onClick={() => { updateUrlParams({ rating: selectedMinRating === stars ? null : stars.toString() }); setIsFilterOpen(false); }}
                       className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-colors ${selectedMinRating === stars ? 'bg-amber-50 text-amber-700' : 'hover:bg-gray-50 text-gray-600'}`}
                     >
                       <div className="flex text-amber-400">
