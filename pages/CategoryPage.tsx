@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import ProductCard from '../components/ProductCard';
@@ -130,7 +130,6 @@ const CategoryPage: React.FC = () => {
   const [minMax, setMinMax] = useState<[number, number]>([0, 10000]);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // Reset attributes and brands when category changes to avoid stale filters
   // Actually, we should just let the URL parameters handle it. If user switches category via router links,
@@ -354,34 +353,22 @@ const CategoryPage: React.FC = () => {
     setVisibleCount(12);
   }, [filteredProducts, currentOrderBy]);
 
-  useEffect(() => {
-    if (isLoadingMore || visibleCount >= sortedProducts.length) return;
+  const lastElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (isLoadingMore) return;
+    if (observerRef.current) observerRef.current.disconnect();
 
-    const handleObserver = (entries: IntersectionObserverEntry[]) => {
-      const target = entries[0];
-      if (target.isIntersecting) {
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && visibleCount < sortedProducts.length) {
         setIsLoadingMore(true);
         setTimeout(() => {
           setVisibleCount(prev => prev + 12);
           setIsLoadingMore(false);
         }, 500);
       }
-    };
+    }, { rootMargin: "400px" });
 
-    observerRef.current = new IntersectionObserver(handleObserver, {
-      root: null,
-      rootMargin: "400px", // Increased margin so it loads before reaching the very end
-      threshold: 0
-    });
-
-    if (loadMoreRef.current) {
-      observerRef.current.observe(loadMoreRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) observerRef.current.disconnect();
-    };
-  }, [visibleCount, sortedProducts.length, isLoadingMore]);
+    if (node) observerRef.current.observe(node);
+  }, [isLoadingMore, visibleCount, sortedProducts.length]);
 
   const productsToShow = useMemo(() => {
     return sortedProducts.slice(0, visibleCount);
@@ -761,19 +748,19 @@ const CategoryPage: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 animate-fade-in">
-                {productsToShow.map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
+                {productsToShow.map((product, index) => {
+                  const isLastElement = index === productsToShow.length - 1;
+                  return (
+                    <div ref={isLastElement ? lastElementRef : null} key={product.id}>
+                      <ProductCard product={product} />
+                    </div>
+                  );
+                })}
                 
                 {isLoadingMore && Array.from({ length: 4 }).map((_, idx) => (
                   <ProductCardSkeleton key={`skeleton-${idx}`} />
                 ))}
               </div>
-            )}
-            
-            {/* Intersection Observer Sentinel */}
-            {visibleCount < sortedProducts.length && (
-              <div ref={loadMoreRef} className="h-10 w-full mt-4"></div>
             )}
           </main>
         </div>

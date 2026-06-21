@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import ProductCard from '../components/ProductCard';
@@ -114,7 +114,6 @@ const Products: React.FC = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
   
   const currentOrderBy = searchParams.get('orderby') || 'default';
   const selectedCategory = searchParams.get('category') || 'All';
@@ -386,34 +385,22 @@ const Products: React.FC = () => {
     setVisibleCount(12);
   }, [filteredProducts, currentOrderBy]);
 
-  useEffect(() => {
-    if (isLoadingMore || visibleCount >= sortedProducts.length) return;
+  const lastElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (isLoadingMore) return;
+    if (observerRef.current) observerRef.current.disconnect();
 
-    const handleObserver = (entries: IntersectionObserverEntry[]) => {
-      const target = entries[0];
-      if (target.isIntersecting) {
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && visibleCount < sortedProducts.length) {
         setIsLoadingMore(true);
         setTimeout(() => {
           setVisibleCount(prev => prev + 12);
           setIsLoadingMore(false);
         }, 500);
       }
-    };
+    }, { rootMargin: "400px" });
 
-    observerRef.current = new IntersectionObserver(handleObserver, {
-      root: null,
-      rootMargin: "400px", // Increased margin so it loads before reaching the very end
-      threshold: 0
-    });
-
-    if (loadMoreRef.current) {
-      observerRef.current.observe(loadMoreRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) observerRef.current.disconnect();
-    };
-  }, [visibleCount, sortedProducts.length, isLoadingMore]);
+    if (node) observerRef.current.observe(node);
+  }, [isLoadingMore, visibleCount, sortedProducts.length]);
 
   const productsToShow = useMemo(() => {
     return sortedProducts.slice(0, visibleCount);
@@ -711,24 +698,23 @@ const Products: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-                {productsToShow.map(product => (
-                  <div
-                    key={product.id}
-                    className="product-card-container h-full animate-in fade-in zoom-in-95 duration-500 slide-in-from-bottom-6"
-                  >
-                    <ProductCard product={product} className="h-full" />
-                  </div>
-                ))}
+                {productsToShow.map((product, index) => {
+                  const isLastElement = index === productsToShow.length - 1;
+                  return (
+                    <div
+                      ref={isLastElement ? lastElementRef : null}
+                      key={product.id}
+                      className="product-card-container h-full animate-in fade-in zoom-in-95 duration-500 slide-in-from-bottom-6"
+                    >
+                      <ProductCard product={product} className="h-full" />
+                    </div>
+                  );
+                })}
                 
                 {isLoadingMore && Array.from({ length: 6 }).map((_, idx) => (
                   <ProductCardSkeleton key={`skeleton-${idx}`} />
                 ))}
               </div>
-            )}
-            
-            {/* Intersection Observer Sentinel */}
-            {visibleCount < sortedProducts.length && (
-              <div ref={loadMoreRef} className="h-10 w-full mt-4"></div>
             )}
           </main>
         </div>
