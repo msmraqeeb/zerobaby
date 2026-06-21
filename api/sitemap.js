@@ -10,6 +10,19 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function sitemapHandler(req, res) {
   try {
+    const escapeXml = (unsafe) => {
+      if (!unsafe) return '';
+      return unsafe.replace(/[<>&'"]/g, function (c) {
+        switch (c) {
+          case '<': return '&lt;';
+          case '>': return '&gt;';
+          case '&': return '&amp;';
+          case '\'': return '&apos;';
+          case '"': return '&quot;';
+        }
+      });
+    };
+
     const baseUrl = 'https://www.zerobaby.com.bd';
 
     const urls = [
@@ -81,7 +94,7 @@ export default async function sitemapHandler(req, res) {
     
     urls.forEach(u => {
       sitemap += `  <url>\n`;
-      sitemap += `    <loc>${u.loc}</loc>\n`;
+      sitemap += `    <loc>${escapeXml(encodeURI(u.loc))}</loc>\n`;
       if (u.lastmod) {
         sitemap += `    <lastmod>${u.lastmod}</lastmod>\n`;
       }
