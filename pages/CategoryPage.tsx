@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import ProductCard from '../components/ProductCard';
@@ -128,6 +128,9 @@ const CategoryPage: React.FC = () => {
   const [visibleCount, setVisibleCount] = useState(12);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [minMax, setMinMax] = useState<[number, number]>([0, 10000]);
+
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // Reset attributes and brands when category changes to avoid stale filters
   // Actually, we should just let the URL parameters handle it. If user switches category via router links,
@@ -352,14 +355,11 @@ const CategoryPage: React.FC = () => {
   }, [filteredProducts, currentOrderBy]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (isLoadingMore || visibleCount >= sortedProducts.length) return;
-      
-      const scrollHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const clientHeight = window.innerHeight;
+    if (isLoadingMore || visibleCount >= sortedProducts.length) return;
 
-      if (scrollTop + clientHeight >= scrollHeight - 300) {
+    const handleObserver = (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting) {
         setIsLoadingMore(true);
         setTimeout(() => {
           setVisibleCount(prev => prev + 12);
@@ -368,8 +368,19 @@ const CategoryPage: React.FC = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    observerRef.current = new IntersectionObserver(handleObserver, {
+      root: null,
+      rootMargin: "400px", // Increased margin so it loads before reaching the very end
+      threshold: 0
+    });
+
+    if (loadMoreRef.current) {
+      observerRef.current.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) observerRef.current.disconnect();
+    };
   }, [visibleCount, sortedProducts.length, isLoadingMore]);
 
   const productsToShow = useMemo(() => {
@@ -753,7 +764,16 @@ const CategoryPage: React.FC = () => {
                 {productsToShow.map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}
+                
+                {isLoadingMore && Array.from({ length: 4 }).map((_, idx) => (
+                  <ProductCardSkeleton key={`skeleton-${idx}`} />
+                ))}
               </div>
+            )}
+            
+            {/* Intersection Observer Sentinel */}
+            {visibleCount < sortedProducts.length && (
+              <div ref={loadMoreRef} className="h-10 w-full mt-4"></div>
             )}
           </main>
         </div>

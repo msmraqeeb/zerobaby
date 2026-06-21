@@ -113,6 +113,9 @@ const Products: React.FC = () => {
   const [visibleCount, setVisibleCount] = useState(12);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  
   const currentOrderBy = searchParams.get('orderby') || 'default';
   const selectedCategory = searchParams.get('category') || 'All';
 
@@ -384,14 +387,11 @@ const Products: React.FC = () => {
   }, [filteredProducts, currentOrderBy]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (isLoadingMore || visibleCount >= sortedProducts.length) return;
-      
-      const scrollHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const clientHeight = window.innerHeight;
+    if (isLoadingMore || visibleCount >= sortedProducts.length) return;
 
-      if (scrollTop + clientHeight >= scrollHeight - 300) {
+    const handleObserver = (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting) {
         setIsLoadingMore(true);
         setTimeout(() => {
           setVisibleCount(prev => prev + 12);
@@ -400,8 +400,19 @@ const Products: React.FC = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    observerRef.current = new IntersectionObserver(handleObserver, {
+      root: null,
+      rootMargin: "400px", // Increased margin so it loads before reaching the very end
+      threshold: 0
+    });
+
+    if (loadMoreRef.current) {
+      observerRef.current.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) observerRef.current.disconnect();
+    };
   }, [visibleCount, sortedProducts.length, isLoadingMore]);
 
   const productsToShow = useMemo(() => {
@@ -713,6 +724,11 @@ const Products: React.FC = () => {
                   <ProductCardSkeleton key={`skeleton-${idx}`} />
                 ))}
               </div>
+            )}
+            
+            {/* Intersection Observer Sentinel */}
+            {visibleCount < sortedProducts.length && (
+              <div ref={loadMoreRef} className="h-10 w-full mt-4"></div>
             )}
           </main>
         </div>
