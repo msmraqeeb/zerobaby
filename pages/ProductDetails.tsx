@@ -284,10 +284,10 @@ const ProductDetails: React.FC = () => {
 
             {/* Short Description Section Styled exactly as screenshot (Vertical Green Line) */}
             {product.shortDescription && (
-              <div className="relative pl-8 py-1 my-6">
-                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#e92c5d] rounded-full"></div>
+              <div className="relative pl-4 md:pl-8 py-0.5 md:py-1 my-4 md:my-6">
+                <div className="absolute left-0 top-0 bottom-0 w-1 md:w-1.5 bg-[#e92c5d] rounded-full"></div>
                 <div
-                  className="text-sm md:text-[16px] text-gray-600 leading-relaxed italic prose prose-sm max-w-none font-medium"
+                  className="text-gray-600 italic prose prose-sm md:prose-base max-w-none font-medium prose-p:my-1 md:prose-p:my-3 prose-ul:my-1 md:prose-ul:my-3 prose-li:my-0 md:prose-li:my-1 [&>p]:text-[11px] md:[&>p]:text-[16px] [&>ul]:text-[11px] md:[&>ul]:text-[16px] [&>p]:leading-snug md:[&>p]:leading-relaxed [&>ul]:leading-snug md:[&>ul]:leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: product.shortDescription }}
                 />
               </div>
@@ -325,19 +325,19 @@ const ProductDetails: React.FC = () => {
             )}
 
             <div className="flex items-center gap-3 md:gap-6 pt-6">
-              <div className="flex items-center border-2 border-gray-100 rounded-[20px] overflow-hidden h-16 shadow-sm bg-gray-50/50 shrink-0">
-                <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="px-3 md:px-6 h-full hover:bg-white text-gray-400 hover:text-[#e92c5d] transition-colors"><Minus size={16} className="md:w-5 md:h-5" /></button>
-                <span className="w-10 md:w-14 text-center font-black text-gray-800 text-lg md:text-xl">{quantity}</span>
-                <button onClick={() => setQuantity(prev => prev + 1)} className="px-3 md:px-6 h-full hover:bg-white text-gray-400 hover:text-[#e92c5d] transition-colors"><Plus size={16} className="md:w-5 md:h-5" /></button>
+              <div className="flex items-center border-2 border-gray-100 rounded-xl md:rounded-[20px] overflow-hidden h-12 md:h-16 shadow-sm bg-gray-50/50 shrink-0">
+                <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="px-2 md:px-6 h-full hover:bg-white text-gray-400 hover:text-[#e92c5d] transition-colors"><Minus size={14} className="md:w-5 md:h-5" /></button>
+                <span className="w-8 md:w-14 text-center font-black text-gray-800 text-base md:text-xl">{quantity}</span>
+                <button onClick={() => setQuantity(prev => prev + 1)} className="px-2 md:px-6 h-full hover:bg-white text-gray-400 hover:text-[#e92c5d] transition-colors"><Plus size={14} className="md:w-5 md:h-5" /></button>
               </div>
               <button
                 onClick={handleAddToCart}
-                className={`flex-1 font-black py-5 px-4 md:px-10 rounded-[20px] transition-all flex items-center justify-center gap-2 md:gap-4 h-16 shadow-2xl uppercase tracking-widest text-xs md:text-sm whitespace-nowrap ${product.variants && product.variants.length > 0 && !currentVariant
+                className={`flex-1 font-black py-3 md:py-5 px-3 md:px-10 rounded-xl md:rounded-[20px] transition-all flex items-center justify-center gap-2 md:gap-4 h-12 md:h-16 shadow-2xl uppercase tracking-widest text-[10px] md:text-sm whitespace-nowrap ${product.variants && product.variants.length > 0 && !currentVariant
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
                   : 'bg-[#e92c5d] hover:bg-[#c81d4a] text-white shadow-rose-100 active:scale-95'
                   }`}
               >
-                <ShoppingCart size={20} className="md:w-5.5 md:h-5.5" />
+                <ShoppingCart size={16} className="md:w-5.5 md:h-5.5" />
                 Add To Cart
               </button>
             </div>
@@ -351,13 +351,13 @@ const ProductDetails: React.FC = () => {
         </div>
 
         {/* Detailed Info Section */}
-        <div className="mt-12 bg-white rounded-xl p-8 border border-gray-100 shadow-sm">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Product Details</h2>
+        <div className="mt-8 md:mt-12 bg-white rounded-xl p-4 md:p-8 border border-gray-100 shadow-sm">
+          <div className="mb-4 md:mb-6">
+            <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-2">Product Details</h2>
             <div className="w-12 h-1 bg-[#e92c5d] rounded-full"></div>
           </div>
           <div
-            className="text-gray-600 leading-relaxed text-sm"
+            className="text-gray-600 leading-relaxed text-[11px] md:text-sm [&>p]:mb-2 md:[&>p]:mb-4"
             dangerouslySetInnerHTML={{ __html: product.description || "No detailed description available for this product." }}
           />
         </div>
