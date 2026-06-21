@@ -59,6 +59,11 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
       },
+      '/sitemap.xml': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/sitemap\.xml$/, '/api/sitemap')
+      },
     },
   },
 });
