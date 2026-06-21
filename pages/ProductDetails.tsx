@@ -79,6 +79,40 @@ const ProductDetails: React.FC = () => {
     }
   }, [product]);
 
+  // Related Products Drag to scroll logic
+  const relatedScrollRef = React.useRef<HTMLDivElement>(null);
+  const [isRelatedDragging, setIsRelatedDragging] = useState(false);
+  const [relatedStartX, setRelatedStartX] = useState(0);
+  const [relatedScrollLeft, setRelatedScrollLeft] = useState(0);
+
+  const { loading } = useStore();
+
+  if (loading && !product) {
+    return (
+      <div className="bg-white min-h-screen pb-20 animate-pulse">
+        <div className="container mx-auto px-4 md:px-8 py-8">
+          <div className="flex flex-col lg:flex-row gap-12">
+            <div className="lg:w-1/2 aspect-square bg-gray-100 rounded-2xl"></div>
+            <div className="lg:w-1/2 space-y-6">
+              <div className="h-6 bg-gray-100 w-24 rounded-full"></div>
+              <div className="h-10 bg-gray-100 w-3/4 rounded-lg"></div>
+              <div className="h-12 bg-gray-100 w-1/3 rounded-lg"></div>
+              <div className="space-y-2 py-6">
+                <div className="h-4 bg-gray-100 w-full rounded"></div>
+                <div className="h-4 bg-gray-100 w-5/6 rounded"></div>
+                <div className="h-4 bg-gray-100 w-4/6 rounded"></div>
+              </div>
+              <div className="flex gap-4 pt-6">
+                <div className="h-16 bg-gray-100 w-32 rounded-[20px]"></div>
+                <div className="h-16 bg-gray-100 flex-1 rounded-[20px]"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
@@ -149,12 +183,6 @@ const ProductDetails: React.FC = () => {
 
   const displayImages = product.images || [];
   const variantImage = currentVariant?.image;
-
-  // Related Products Drag to scroll logic
-  const relatedScrollRef = React.useRef<HTMLDivElement>(null);
-  const [isRelatedDragging, setIsRelatedDragging] = useState(false);
-  const [relatedStartX, setRelatedStartX] = useState(0);
-  const [relatedScrollLeft, setRelatedScrollLeft] = useState(0);
 
   const handleRelatedMouseDown = (e: React.MouseEvent) => {
     if (!relatedScrollRef.current) return;

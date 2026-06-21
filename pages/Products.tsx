@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import ProductCard from '../components/ProductCard';
 import { Filter, SlidersHorizontal, ChevronRight, ChevronDown, Search, RotateCcw, Check, Star, Coins, X } from 'lucide-react';
@@ -105,13 +105,17 @@ const ProductCardSkeleton: React.FC = () => {
 };
 
 const Products: React.FC = () => {
-  const { products, categories, searchQuery, brands, reviews } = useStore();
+  const navigate = useNavigate();
+  const { products, categories, searchQuery, brands, reviews, loading } = useStore();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedMinRating, setSelectedMinRating] = useState<number | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const currentOrderBy = searchParams.get('orderby') || 'default';
 
   const categoryTree = useMemo(() => buildCategoryTree(categories), [categories]);
 
@@ -151,12 +155,10 @@ const Products: React.FC = () => {
     return family;
   }, [selectedCategory, categories]);
 
-  const location = useLocation();
-
   // Sync URL category and brand params with state
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const catParam = searchParams.get('category');
+    const params = new URLSearchParams(location.search);
+    const catParam = params.get('category');
     if (catParam) {
       setSelectedCategory(decodeURIComponent(catParam));
     }
@@ -306,36 +308,65 @@ const Products: React.FC = () => {
 
       return searchMatch && brandMatch && ratingMatch && saleMatch && attributeMatch && priceMatch;
     });
-  }, [categoryProducts, searchQuery, selectedBrands, selectedMinRating, reviews, location.search, selectedAttributes, priceRange]);
+  }, [categoryProducts, searchQuery, selectedBrands, selectedMinRating, reviews, selectedAttributes, priceRange]);
+
+  const sortedProducts = useMemo(() => {
+    const sorted = [...filteredProducts].sort((a, b) => {
+      const order = currentOrderBy || '';
+      
+      const priceA = typeof a.price === 'number' ? a.price : Number(a.price) || 0;
+      const priceB = typeof b.price === 'number' ? b.price : Number(b.price) || 0;
+      const pA = isNaN(priceA) ? 0 : priceA;
+      const pB = isNaN(priceB) ? 0 : priceB;
+
+      if (order.includes('price-desc')) return pA < pB ? 1 : (pA > pB ? -1 : 0);
+      if (order.includes('price')) return pA < pB ? -1 : (pA > pB ? 1 : 0);
+      
+      if (order.includes('rating')) {
+        const avgA = reviews.filter(r => r.productId === a.id).reduce((sum, r, _, arr) => sum + r.rating / arr.length, 0);
+        const avgB = reviews.filter(r => r.productId === b.id).reduce((sum, r, _, arr) => sum + r.rating / arr.length, 0);
+        return avgA < avgB ? 1 : (avgA > avgB ? -1 : 0);
+      }
+      if (order.includes('date')) {
+        const dateA = new Date((a as any).created_at || (a as any).createdAt || 0).getTime();
+        const dateB = new Date((b as any).created_at || (b as any).createdAt || 0).getTime();
+        return dateA < dateB ? 1 : (dateA > dateB ? -1 : 0);
+      }
+      return 0; // Default Sorting
+    });
+    
+    return sorted;
+  }, [filteredProducts, currentOrderBy, reviews]);
 
   useEffect(() => {
     setVisibleCount(12);
-  }, [filteredProducts]);
+  }, [filteredProducts, currentOrderBy]);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (isLoadingMore || visibleCount >= filteredProducts.length) return;
+      if (isLoadingMore || visibleCount >= sortedProducts.length) return;
       
       const scrollHeight = document.documentElement.scrollHeight;
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
       const clientHeight = window.innerHeight;
-      
-      if (scrollHeight - scrollTop - clientHeight < 1000) {
+
+      if (scrollTop + clientHeight >= scrollHeight - 300) {
         setIsLoadingMore(true);
         setTimeout(() => {
           setVisibleCount(prev => prev + 12);
           setIsLoadingMore(false);
-        }, 800);
+        }, 500);
       }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [visibleCount, filteredProducts.length, isLoadingMore]);
+  }, [visibleCount, sortedProducts.length, isLoadingMore]);
 
   const productsToShow = useMemo(() => {
-    return filteredProducts.slice(0, visibleCount);
-  }, [filteredProducts, visibleCount]);
+    return sortedProducts.slice(0, visibleCount);
+  }, [sortedProducts, visibleCount]);
+
 
   const toggleBrand = (brandName: string) => {
     setSelectedBrands(prev =>
@@ -374,8 +405,8 @@ const Products: React.FC = () => {
                 </h3>
                 <div className="space-y-1">
                   <button
-                    onClick={() => setSelectedCategory('All')}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === 'All' ? 'bg-rose-50 text-rose-600' : 'text-gray-600 hover:bg-gray-50'}`}
+                    onClick={() => navigate('/products')}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === 'All' ? 'bg-rose-50 text-rose-600 font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
                   >
                     All Categories
                   </button>
@@ -384,7 +415,12 @@ const Products: React.FC = () => {
                       key={cat.id}
                       category={cat}
                       selectedCategory={selectedCategory}
-                      onSelect={setSelectedCategory}
+                      onSelect={(catName) => {
+                         const clickedCat = categories.find(c => c.name === catName);
+                         if (clickedCat) {
+                           navigate(`/category/${clickedCat.slug || encodeURIComponent(clickedCat.name)}`);
+                         }
+                      }}
                       selectedCategoryFamily={selectedCategoryFamily}
                     />
                   ))}
@@ -535,19 +571,29 @@ const Products: React.FC = () => {
             {/* Desktop Header Layout */}
             <div className="hidden lg:flex bg-white p-4 rounded-2xl border border-gray-100 shadow-sm justify-between items-center gap-4 w-full">
               <p className="text-xs md:text-sm font-medium text-gray-500">
-                Showing <span className="font-bold text-gray-800">{filteredProducts.length}</span> results
+                Showing <span className="font-bold text-gray-800">{filteredProducts.length}</span> results 
+
                 {selectedCategory !== 'All' && <span className="hidden sm:inline"> in <span className="text-rose-500 font-bold">{selectedCategory}</span></span>}
               </p>
 
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm">
                   <span className="text-gray-400 font-medium hidden sm:inline">Sort by:</span>
-                  <select className="bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 md:px-3 md:py-1.5 font-bold text-gray-700 outline-none focus:border-rose-500 text-xs md:text-sm">
-                    <option>Default Sorting</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
-                    <option>Average Rating</option>
-                    <option>Newest First</option>
+                  <select 
+                    value={currentOrderBy}
+                    onChange={(e) => {
+                      const params = new URLSearchParams(location.search);
+                      if (e.target.value === 'default') params.delete('orderby');
+                      else params.set('orderby', e.target.value);
+                      navigate(`${location.pathname}?${params.toString()}`);
+                    }}
+                    className="bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 md:px-3 md:py-1.5 font-bold text-gray-700 outline-none focus:border-rose-500 text-xs md:text-sm"
+                  >
+                    <option value="default">Default Sorting</option>
+                    <option value="price">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="rating">Average Rating</option>
+                    <option value="date">Newest First</option>
                   </select>
                 </div>
               </div>
@@ -560,12 +606,21 @@ const Products: React.FC = () => {
                   Showing <span className="text-gray-800 font-black">{filteredProducts.length}</span>
                 </p>
                 <div className="h-4 w-[1px] bg-gray-200 shrink-0"></div>
-                <select className="bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 font-bold text-gray-700 outline-none focus:border-rose-500 text-xs truncate max-w-[130px] flex-1">
-                  <option>Default Sorting</option>
-                  <option>Price: Low to High</option>
-                  <option>Price: High to Low</option>
-                  <option>Average Rating</option>
-                  <option>Newest First</option>
+                <select 
+                  value={currentOrderBy}
+                  onChange={(e) => {
+                    const params = new URLSearchParams(location.search);
+                    if (e.target.value === 'default') params.delete('orderby');
+                    else params.set('orderby', e.target.value);
+                    navigate(`${location.pathname}?${params.toString()}`);
+                  }}
+                  className="bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 font-bold text-gray-700 outline-none focus:border-rose-500 text-xs truncate max-w-[130px] flex-1"
+                >
+                  <option value="default">Default Sorting</option>
+                  <option value="price">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="rating">Average Rating</option>
+                  <option value="date">Newest First</option>
                 </select>
               </div>
 
@@ -579,7 +634,13 @@ const Products: React.FC = () => {
             </div>
 
 
-            {filteredProducts.length === 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+                {[...Array(8)].map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : filteredProducts.length === 0 ? (
               <div className="bg-white rounded-3xl p-20 flex flex-col items-center justify-center text-center border border-gray-100 shadow-sm">
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
                   <Search size={32} className="text-gray-300" />
@@ -649,8 +710,8 @@ const Products: React.FC = () => {
                   <Filter size={14} className="text-rose-500" /> Categories
                 </h3>
                 <button
-                  onClick={() => { setSelectedCategory('All'); setIsFilterOpen(false); }}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === 'All' ? 'bg-rose-50 text-rose-600' : 'text-gray-600 hover:bg-gray-50'}`}
+                  onClick={() => navigate('/products')}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === 'All' ? 'bg-rose-50 text-rose-600 font-bold' : 'text-gray-600 hover:bg-gray-50'}`}
                 >
                   All Categories
                 </button>
@@ -659,7 +720,12 @@ const Products: React.FC = () => {
                     key={cat.id}
                     category={cat}
                     selectedCategory={selectedCategory}
-                    onSelect={(name) => { setSelectedCategory(name); setIsFilterOpen(false); }}
+                    onSelect={(catName) => {
+                       const clickedCat = categories.find(c => c.name === catName);
+                       if (clickedCat) {
+                         navigate(`/category/${clickedCat.slug || encodeURIComponent(clickedCat.name)}`);
+                       }
+                    }}
                     selectedCategoryFamily={selectedCategoryFamily}
                   />
                 ))}

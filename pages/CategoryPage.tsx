@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
+import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import ProductCard from '../components/ProductCard';
 import { Filter, SlidersHorizontal, ChevronRight, Search, RotateCcw, Check, Star, Coins, Home, Grid, X } from 'lucide-react';
@@ -20,10 +20,29 @@ const buildCategoryTree = (categories: Category[], parentId: string | null = nul
     }));
 };
 
+const ProductCardSkeleton: React.FC = () => {
+  return (
+    <div className="bg-white rounded-3xl border border-gray-100 p-4 space-y-4 animate-pulse shadow-sm">
+      <div className="w-full aspect-square bg-gray-200 rounded-2xl"></div>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div className="w-8 h-8 bg-gray-200 rounded-full shrink-0"></div>
+        </div>
+        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+      </div>
+    </div>
+  );
+};
+
 const CategoryPage: React.FC = () => {
   const { categorySlug } = useParams<{ categorySlug: string }>();
-  const { products, categories, searchQuery, brands, reviews } = useStore();
+  const { products, categories, searchQuery, brands, reviews, loading } = useStore();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const currentOrderBy = searchParams.get('orderby') || 'default';
   
   // Find current category
   const currentCategory = useMemo(() => {
@@ -79,6 +98,8 @@ const CategoryPage: React.FC = () => {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedMinRating, setSelectedMinRating] = useState<number | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+  const [visibleCount, setVisibleCount] = useState(12);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [minMax, setMinMax] = useState<[number, number]>([0, 10000]);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string[]>>({});
 
@@ -239,6 +260,64 @@ const CategoryPage: React.FC = () => {
       return brandMatch && ratingMatch && priceMatch && attributeMatch;
     });
   }, [categoryProducts, selectedBrands, selectedMinRating, reviews, priceRange, selectedAttributes]);
+
+  const sortedProducts = useMemo(() => {
+    const sorted = [...filteredProducts].sort((a, b) => {
+      const order = currentOrderBy || '';
+      
+      const priceA = typeof a.price === 'number' ? a.price : Number(a.price) || 0;
+      const priceB = typeof b.price === 'number' ? b.price : Number(b.price) || 0;
+      const pA = isNaN(priceA) ? 0 : priceA;
+      const pB = isNaN(priceB) ? 0 : priceB;
+
+      if (order.includes('price-desc')) return pA < pB ? 1 : (pA > pB ? -1 : 0);
+      if (order.includes('price')) return pA < pB ? -1 : (pA > pB ? 1 : 0);
+      
+      if (order.includes('rating')) {
+        const avgA = reviews.filter(r => r.productId === a.id).reduce((sum, r, _, arr) => sum + r.rating / arr.length, 0);
+        const avgB = reviews.filter(r => r.productId === b.id).reduce((sum, r, _, arr) => sum + r.rating / arr.length, 0);
+        return avgA < avgB ? 1 : (avgA > avgB ? -1 : 0);
+      }
+      if (order.includes('date')) {
+        const dateA = new Date((a as any).created_at || (a as any).createdAt || 0).getTime();
+        const dateB = new Date((b as any).created_at || (b as any).createdAt || 0).getTime();
+        return dateA < dateB ? 1 : (dateA > dateB ? -1 : 0);
+      }
+      return 0; // Default Sorting
+    });
+    
+    return sorted;
+  }, [filteredProducts, currentOrderBy, reviews]);
+
+  // Use separated sortedProducts for display and auto-load logic
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [filteredProducts, currentOrderBy]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isLoadingMore || visibleCount >= sortedProducts.length) return;
+      
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const clientHeight = window.innerHeight;
+
+      if (scrollTop + clientHeight >= scrollHeight - 300) {
+        setIsLoadingMore(true);
+        setTimeout(() => {
+          setVisibleCount(prev => prev + 12);
+          setIsLoadingMore(false);
+        }, 500);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [visibleCount, sortedProducts.length, isLoadingMore]);
+
+  const productsToShow = useMemo(() => {
+    return sortedProducts.slice(0, visibleCount);
+  }, [sortedProducts, visibleCount]);
 
   const toggleBrand = (brandName: string) => {
     setSelectedBrands(prev =>
@@ -524,15 +603,58 @@ const CategoryPage: React.FC = () => {
             {/* Desktop Header Layout */}
             <div className="hidden lg:flex bg-white p-4 rounded-2xl border border-gray-100 shadow-sm justify-between items-center gap-4 w-full">
               <p className="text-xs md:text-sm font-medium text-gray-500">
-                Found <span className="font-bold text-gray-800">{filteredProducts.length}</span> products in <span className="text-rose-500 font-bold">{currentCategory.name}</span>
+                Showing <span className="font-bold text-gray-800">{filteredProducts.length}</span> results
+
+                <span className="hidden sm:inline"> in <span className="text-rose-500 font-bold">{currentCategory?.name}</span></span>
               </p>
+              
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm">
+                  <span className="text-gray-400 font-medium hidden sm:inline">Sort by:</span>
+                  <select 
+                    value={currentOrderBy}
+                    onChange={(e) => {
+                      const params = new URLSearchParams(location.search);
+                      if (e.target.value === 'default') params.delete('orderby');
+                      else params.set('orderby', e.target.value);
+                      navigate(`${location.pathname}?${params.toString()}`);
+                    }}
+                    className="bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 md:px-3 md:py-1.5 font-bold text-gray-700 outline-none focus:border-rose-500 text-xs md:text-sm"
+                  >
+                    <option value="default">Default Sorting</option>
+                    <option value="price">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="rating">Average Rating</option>
+                    <option value="date">Newest First</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             {/* Mobile Header Layout */}
             <div className="flex lg:hidden bg-white p-4 rounded-2xl border border-gray-100 shadow-sm justify-between items-center gap-3 w-full">
-              <p className="text-xs font-bold text-gray-500 truncate flex-1">
-                Found <span className="text-gray-800 font-black">{filteredProducts.length}</span> products
-              </p>
+              <div className="flex items-center gap-2 overflow-hidden flex-1">
+                <p className="text-xs font-bold text-gray-500 shrink-0">
+                  Found <span className="text-gray-800 font-black">{filteredProducts.length}</span>
+                </p>
+                <div className="h-4 w-[1px] bg-gray-200 shrink-0"></div>
+                <select 
+                  value={currentOrderBy}
+                  onChange={(e) => {
+                    const params = new URLSearchParams(location.search);
+                    if (e.target.value === 'default') params.delete('orderby');
+                    else params.set('orderby', e.target.value);
+                    navigate(`${location.pathname}?${params.toString()}`);
+                  }}
+                  className="bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 font-bold text-gray-700 outline-none focus:border-rose-500 text-xs truncate max-w-[130px] flex-1"
+                >
+                  <option value="default">Default Sorting</option>
+                  <option value="price">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="rating">Average Rating</option>
+                  <option value="date">Newest First</option>
+                </select>
+              </div>
 
               <button
                 onClick={() => setIsFilterOpen(true)}
@@ -544,7 +666,13 @@ const CategoryPage: React.FC = () => {
             </div>
 
 
-            {filteredProducts.length === 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+                {[...Array(8)].map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : sortedProducts.length === 0 ? (
               <div className="bg-white rounded-3xl p-20 flex flex-col items-center justify-center text-center border border-gray-100 shadow-sm">
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
                   <Search size={32} className="text-gray-300" />
@@ -557,7 +685,7 @@ const CategoryPage: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 animate-fade-in">
-                {filteredProducts.map(product => (
+                {productsToShow.map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>

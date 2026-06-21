@@ -63,7 +63,7 @@ const AppContent: React.FC = () => {
 
   return (
     <>
-      {loading && <LoadingScreen />}
+      {loading && pathname === '/' && <LoadingScreen />}
       <div className="min-h-screen flex flex-col font-sans">
         <CustomCursor />
         <FlyToCart />
