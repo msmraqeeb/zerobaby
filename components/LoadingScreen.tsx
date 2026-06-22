@@ -14,6 +14,8 @@ const LoadingScreen: React.FC = () => {
           <img 
             src="https://ik.imagekit.io/vrtbi4wsn/store/zerobaby-logo_a9UGaRrto.png" 
             alt="Zero Baby" 
+            width="160"
+            height="64"
             className="h-8 md:h-12 w-auto object-contain" 
           />
           

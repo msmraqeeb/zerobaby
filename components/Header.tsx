@@ -183,7 +183,7 @@ const Header: React.FC = () => {
               <Link to="/" className="flex items-center gap-2 cursor-auto">
                 <div className="flex items-center">
                   {storeInfo.logo_url ? (
-                    <img src={storeInfo.logo_url} alt={storeInfo.name} className="h-10 md:h-16 w-auto object-contain" />
+                    <img src={storeInfo.logo_url} alt={storeInfo.name} width="160" height="64" fetchPriority="high" className="h-10 md:h-16 w-auto object-contain" />
                   ) : (
                     <div className="w-10 h-10 md:w-14 md:h-14 bg-white/20 rounded-lg flex items-center justify-center">
                       <ShoppingCart size={20} className="text-white md:w-7 md:h-7" />
@@ -337,7 +337,7 @@ const Header: React.FC = () => {
             <div className={`transition-all duration-300 overflow-hidden ${isSticky ? 'w-10 opacity-100 mr-2' : 'w-0 opacity-0'} `}>
               <Link to="/">
                 {storeInfo.logo_url ? (
-                  <img src={storeInfo.logo_url} alt={storeInfo.name} className="h-8 w-auto object-contain" />
+                  <img src={storeInfo.logo_url} alt={storeInfo.name} width="160" height="64" className="h-8 w-auto object-contain" />
                 ) : (
                   <ShoppingCart size={24} className="text-[#e92c5d]" />
                 )}
@@ -451,7 +451,7 @@ const Header: React.FC = () => {
           <div className="bg-[#2a0c16] p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               {storeInfo.logo_url ? (
-                <img src={storeInfo.logo_url} alt={storeInfo.name} className="h-8 w-auto object-contain brightness-0 invert" />
+                <img src={storeInfo.logo_url} alt={storeInfo.name} width="160" height="64" className="h-8 w-auto object-contain brightness-0 invert" />
               ) : (
                 <span className="text-white font-bold text-lg">zerobaby</span>
               )}
