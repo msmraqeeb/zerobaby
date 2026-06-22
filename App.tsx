@@ -8,7 +8,7 @@ import FloatingContact from './components/FloatingContact';
 import CartSidebar from './components/CartSidebar';
 import CustomCursor from './components/CustomCursor';
 import FlyToCart from './components/FlyToCart';
-const Home = React.lazy(() => import('./pages/Home'));
+import Home from './pages/Home';
 const Products = React.lazy(() => import('./pages/Products'));
 const MyAccount = React.lazy(() => import('./pages/MyAccount'));
 const Admin = React.lazy(() => import('./pages/Admin'));
@@ -69,7 +69,7 @@ const AppContent: React.FC = () => {
         <FlyToCart />
         <Header />
         <CartSidebar />
-      <main className="flex-grow">
+      <main className="flex-grow min-h-[100vh]">
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
             <Route path="/" element={<Home />} />
