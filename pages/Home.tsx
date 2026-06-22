@@ -820,7 +820,7 @@ const Home: React.FC = () => {
 
                   return (
                     <div key={banner.id} className={`slide-${idx} absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}>
-                      <img src={banner.image_url} alt={banner.title} loading={idx === 0 ? "eager" : "lazy"} fetchpriority={idx === 0 ? "high" : "auto"} className="w-full h-full object-cover hero-image" />
+                      <img src={banner.image_url} alt={banner.title} loading={idx === 0 ? "eager" : "lazy"} fetchPriority={idx === 0 ? "high" : "auto"} className="w-full h-full object-cover hero-image" />
                       {(banner.title || banner.subtitle || desc) && (
                         <div className={`absolute top-1/2 -translate-y-1/2 max-w-[85%] md:max-w-md drop-shadow-md p-3 md:p-4 flex flex-col ${isDarkText ? 'text-gray-900' : 'text-white'} ${align === 'right' ? 'right-4 md:right-12 items-end text-right' : 'left-4 md:left-12 items-start text-left'}`}>
                           {banner.subtitle && (
