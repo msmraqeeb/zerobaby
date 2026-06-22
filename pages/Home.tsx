@@ -264,12 +264,12 @@ const PromoBannersSection = () => {
         {/* Banner 1 */}
         <Link
           to="/category/toys-&-stationery"
-          className="parallax-container w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
+          className="parallax-container w-[80vw] md:w-auto aspect-[4/5] md:aspect-[3/4] lg:aspect-auto h-auto md:h-full lg:h-[350px] flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block bg-slate-50"
         >
           <img
-            src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.1.png"
+            src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.1.png?tr=w-600,q-80,f-auto"
             loading="lazy"
-            className="parallax-img w-full h-auto object-contain md:object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
+            className="parallax-img w-full h-full object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
             alt="Promo Banner 1"
           />
         </Link>
@@ -277,12 +277,12 @@ const PromoBannersSection = () => {
         {/* Banner 2 */}
         <Link
           to="/category/apparels"
-          className="parallax-container w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
+          className="parallax-container w-[80vw] md:w-auto aspect-[4/5] md:aspect-[3/4] lg:aspect-auto h-auto md:h-full lg:h-[350px] flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block bg-slate-50"
         >
           <img
-            src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.2.png"
+            src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.2.png?tr=w-600,q-80,f-auto"
             loading="lazy"
-            className="parallax-img w-full h-auto object-contain md:object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
+            className="parallax-img w-full h-full object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
             alt="Promo Banner 2"
           />
         </Link>
@@ -290,12 +290,12 @@ const PromoBannersSection = () => {
         {/* Banner 3 */}
         <Link
           to="/category/childcare"
-          className="parallax-container w-full md:w-auto h-auto md:h-full flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block"
+          className="parallax-container w-[80vw] md:w-auto aspect-[4/5] md:aspect-[3/4] lg:aspect-auto h-auto md:h-full lg:h-[350px] flex-none snap-center rounded-2xl overflow-hidden shadow-sm group select-none relative block bg-slate-50"
         >
           <img
-            src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.3.png"
+            src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.3.png?tr=w-600,q-80,f-auto"
             loading="lazy"
-            className="parallax-img w-full h-auto object-contain md:object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
+            className="parallax-img w-full h-full object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
             alt="Promo Banner 3"
           />
         </Link>
@@ -820,7 +820,7 @@ const Home: React.FC = () => {
 
                   return (
                     <div key={banner.id} className={`slide-${idx} absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}>
-                      <img src={banner.image_url} alt={banner.title} loading={idx === 0 ? "eager" : "lazy"} fetchPriority={idx === 0 ? "high" : "auto"} className="w-full h-full object-cover hero-image" />
+                      <img src={`${banner.image_url}${banner.image_url?.includes('ik.imagekit.io') ? (banner.image_url.includes('?') ? '&' : '?') + 'tr=w-1200,q-80,f-auto' : ''}`} alt={banner.title} loading={idx === 0 ? "eager" : "lazy"} fetchPriority={idx === 0 ? "high" : "auto"} className="w-full h-full object-cover hero-image" />
                       {(banner.title || banner.subtitle || desc) && (
                         <div className={`absolute top-1/2 -translate-y-1/2 max-w-[85%] md:max-w-md drop-shadow-md p-3 md:p-4 flex flex-col ${isDarkText ? 'text-gray-900' : 'text-white'} ${align === 'right' ? 'right-4 md:right-12 items-end text-right' : 'left-4 md:left-12 items-start text-left'}`}>
                           {banner.subtitle && (
@@ -892,7 +892,7 @@ const Home: React.FC = () => {
 
               return (
                 <div className={`rounded-xl relative overflow-hidden flex flex-col justify-center group h-[135px] lg:h-[215px] lg:flex-1 p-3 lg:p-8 ${isRightAlign ? 'items-end' : 'items-start'}`}>
-                  <img src={rightTopBanner.image_url} alt={rightTopBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <img src={`${rightTopBanner.image_url}${rightTopBanner.image_url?.includes('ik.imagekit.io') ? (rightTopBanner.image_url.includes('?') ? '&' : '?') + 'tr=w-600,q-80,f-auto' : ''}`} alt={rightTopBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   {!isDarkText && <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>}
                   <div className={`relative z-10 w-full flex flex-col ${isRightAlign ? 'items-end text-right' : 'items-start text-left'}`}>
                     {rightTopBanner.subtitle && (
@@ -960,7 +960,7 @@ const Home: React.FC = () => {
 
               return (
                 <div className={`rounded-xl relative overflow-hidden flex flex-col justify-center group h-[135px] lg:h-[215px] lg:flex-1 p-3 lg:p-8 ${isRightAlign ? 'items-end' : 'items-start'}`}>
-                  <img src={rightBottomBanner.image_url} alt={rightBottomBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <img src={`${rightBottomBanner.image_url}${rightBottomBanner.image_url?.includes('ik.imagekit.io') ? (rightBottomBanner.image_url.includes('?') ? '&' : '?') + 'tr=w-600,q-80,f-auto' : ''}`} alt={rightBottomBanner.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   {!isDarkText && <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>}
                   <div className={`relative z-10 w-full flex flex-col ${isRightAlign ? 'items-end text-right' : 'items-start text-left'}`}>
                     {rightBottomBanner.subtitle && (
