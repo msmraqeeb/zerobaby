@@ -1,6 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@media (pointer: fine) {
-  html.hide-native-cursor, html.hide-native-cursor * {
-    cursor: none !important;
-  }
+@layer base {
 }

@@ -268,6 +268,7 @@ const PromoBannersSection = () => {
         >
           <img
             src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.1.png"
+            loading="lazy"
             className="parallax-img w-full h-auto object-contain md:object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
             alt="Promo Banner 1"
           />
@@ -280,6 +281,7 @@ const PromoBannersSection = () => {
         >
           <img
             src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.2.png"
+            loading="lazy"
             className="parallax-img w-full h-auto object-contain md:object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
             alt="Promo Banner 2"
           />
@@ -292,6 +294,7 @@ const PromoBannersSection = () => {
         >
           <img
             src="https://ik.imagekit.io/vrtbi4wsn/banners/banner-1.3.png"
+            loading="lazy"
             className="parallax-img w-full h-auto object-contain md:object-cover scale-110 transition-transform duration-500 group-hover:scale-[1.15] pointer-events-none"
             alt="Promo Banner 3"
           />
@@ -308,13 +311,13 @@ const DualBannerSection = () => (
         to="/category/toiletries"
         className="parallax-container rounded-2xl overflow-hidden shadow-sm group aspect-[2/1] h-auto md:aspect-auto md:h-[280px] block"
       >
-        <img src="https://ik.imagekit.io/vrtbi4wsn/banners/banner1.4.jpg" className="parallax-img w-full h-full object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15]" alt="Special Offer 1" />
+        <img src="https://ik.imagekit.io/vrtbi4wsn/banners/banner1.4.jpg" loading="lazy" className="parallax-img w-full h-full object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15]" alt="Special Offer 1" />
       </Link>
       <Link
         to="/category/baby-foods"
         className="parallax-container rounded-2xl overflow-hidden shadow-sm group aspect-[2/1] h-auto md:aspect-auto md:h-[280px] block"
       >
-        <img src="https://ik.imagekit.io/vrtbi4wsn/banners/banner1.5.jpg" className="parallax-img w-full h-full object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15]" alt="Special Offer 2" />
+        <img src="https://ik.imagekit.io/vrtbi4wsn/banners/banner1.5.jpg" loading="lazy" className="parallax-img w-full h-full object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15]" alt="Special Offer 2" />
       </Link>
     </div>
   </section>
@@ -328,6 +331,7 @@ const FullWidthBannerSection: React.FC<{ section: HomeSection }> = ({ section })
     <div className="parallax-container w-full rounded-2xl overflow-hidden shadow-sm group relative block aspect-[3/1] md:aspect-[4/1] lg:aspect-[5/1]">
       <img
         src={banner.imageUrl}
+        loading="lazy"
         className="parallax-img w-full h-full object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none"
         alt={section.title || "Full Width Promo Banner"}
       />
@@ -361,11 +365,11 @@ const DoubleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
               to={banner1.link}
               className="parallax-container rounded-2xl overflow-hidden shadow-sm group block w-full"
             >
-              <img src={banner1.imageUrl} className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 1" />
+              <img src={banner1.imageUrl} loading="lazy" className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 1" />
             </Link>
           ) : (
             <div className="parallax-container rounded-2xl overflow-hidden shadow-sm group block w-full">
-              <img src={banner1.imageUrl} className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 1" />
+              <img src={banner1.imageUrl} loading="lazy" className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 1" />
             </div>
           )
         )}
@@ -375,11 +379,11 @@ const DoubleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
               to={banner2.link}
               className="parallax-container rounded-2xl overflow-hidden shadow-sm group block w-full"
             >
-              <img src={banner2.imageUrl} className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 2" />
+              <img src={banner2.imageUrl} loading="lazy" className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 2" />
             </Link>
           ) : (
             <div className="parallax-container rounded-2xl overflow-hidden shadow-sm group block w-full">
-              <img src={banner2.imageUrl} className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 2" />
+              <img src={banner2.imageUrl} loading="lazy" className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none" alt="Offer 2" />
             </div>
           )
         )}
@@ -418,6 +422,7 @@ const TripleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
             <div className="parallax-container rounded-2xl overflow-hidden shadow-sm group block w-full relative">
               <img
                 src={banner.imageUrl}
+                loading="lazy"
                 className="parallax-img w-full h-auto object-cover scale-110 transition-transform duration-700 group-hover:scale-[1.15] pointer-events-none"
                 alt={`Triple Banner Offer ${index + 1}`}
               />
@@ -445,6 +450,7 @@ const TripleBannerSection: React.FC<{ section: HomeSection }> = ({ section }) =>
               <div className="w-full h-full relative">
                 <img
                   src={banner.imageUrl}
+                  loading="lazy"
                   className="w-full h-full object-cover pointer-events-none"
                   alt={`Triple Banner Offer Mobile ${index + 1}`}
                 />
@@ -814,7 +820,7 @@ const Home: React.FC = () => {
 
                   return (
                     <div key={banner.id} className={`slide-${idx} absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}>
-                      <img src={banner.image_url} alt={banner.title} className="w-full h-full object-cover hero-image" />
+                      <img src={banner.image_url} alt={banner.title} loading={idx === 0 ? "eager" : "lazy"} fetchpriority={idx === 0 ? "high" : "auto"} className="w-full h-full object-cover hero-image" />
                       {(banner.title || banner.subtitle || desc) && (
                         <div className={`absolute top-1/2 -translate-y-1/2 max-w-[85%] md:max-w-md drop-shadow-md p-3 md:p-4 flex flex-col ${isDarkText ? 'text-gray-900' : 'text-white'} ${align === 'right' ? 'right-4 md:right-12 items-end text-right' : 'left-4 md:left-12 items-start text-left'}`}>
                           {banner.subtitle && (

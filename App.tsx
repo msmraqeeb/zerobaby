@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import Header from './components/Header';
@@ -8,20 +8,20 @@ import FloatingContact from './components/FloatingContact';
 import CartSidebar from './components/CartSidebar';
 import CustomCursor from './components/CustomCursor';
 import FlyToCart from './components/FlyToCart';
-import Home from './pages/Home';
-import Products from './pages/Products';
-import MyAccount from './pages/MyAccount';
-import Admin from './pages/Admin';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import OrderSuccess from './pages/OrderSuccess';
-import ProductDetails from './pages/ProductDetails';
-import Login from './pages/Login';
-import Blog from './pages/Blog';
-import BlogPost from './pages/BlogPost';
+const Home = React.lazy(() => import('./pages/Home'));
+const Products = React.lazy(() => import('./pages/Products'));
+const MyAccount = React.lazy(() => import('./pages/MyAccount'));
+const Admin = React.lazy(() => import('./pages/Admin'));
+const Cart = React.lazy(() => import('./pages/Cart'));
+const Checkout = React.lazy(() => import('./pages/Checkout'));
+const OrderSuccess = React.lazy(() => import('./pages/OrderSuccess'));
+const ProductDetails = React.lazy(() => import('./pages/ProductDetails'));
+const Login = React.lazy(() => import('./pages/Login'));
+const Blog = React.lazy(() => import('./pages/Blog'));
+const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 
-import DynamicPage from './pages/DynamicPage';
-import CategoryPage from './pages/CategoryPage';
+const DynamicPage = React.lazy(() => import('./pages/DynamicPage'));
+const CategoryPage = React.lazy(() => import('./pages/CategoryPage'));
 import LoadingScreen from './components/LoadingScreen';
 import { StoreProvider, useStore } from './context/StoreContext';
 
@@ -70,23 +70,25 @@ const AppContent: React.FC = () => {
         <Header />
         <CartSidebar />
       <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/product/:slug" element={<ProductDetails />} />
-          <Route path="/my-account" element={<MyAccount />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
+        <Suspense fallback={<LoadingScreen />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/product/:slug" element={<ProductDetails />} />
+            <Route path="/my-account" element={<MyAccount />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
 
-          <Route path="/admin" element={isAdmin ? <Admin /> : <Navigate to="/login" />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/order-success/:orderId" element={<OrderSuccess />} />
-          <Route path="/category/:categorySlug" element={<CategoryPage />} />
-          <Route path="/:slug" element={<DynamicPage />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+            <Route path="/admin" element={isAdmin ? <Admin /> : <Navigate to="/login" />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order-success/:orderId" element={<OrderSuccess />} />
+            <Route path="/category/:categorySlug" element={<CategoryPage />} />
+            <Route path="/:slug" element={<DynamicPage />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Suspense>
       </main>
       <Footer />
         <FloatingContact />

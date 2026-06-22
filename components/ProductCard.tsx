@@ -28,6 +28,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
 
   const primaryImage = product.images && product.images.length > 0 ? product.images[0] : '';
   
+  let optimizedImage = primaryImage;
+  if (optimizedImage && optimizedImage.includes('ik.imagekit.io') && !optimizedImage.includes('tr=')) {
+    optimizedImage += (optimizedImage.includes('?') ? '&' : '?') + 'tr=w-400';
+  }
+  
   // Refined Discount Logic: Selling price is product.price. Original price is product.originalPrice.
   // A discount ONLY exists if originalPrice is valid and greater than price.
   const isDiscounted = product.originalPrice !== undefined && product.originalPrice > product.price;
@@ -55,8 +60,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = '' }) =>
       {/* Image Area */}
       <div className="aspect-square w-full p-4 flex items-center justify-center bg-transparent group-hover:bg-gray-50/50 transition-colors relative cursor-pointer" onClick={() => setIsZoomOpen(true)}>
         <img 
-          src={primaryImage} 
+          src={optimizedImage} 
           alt={product.name} 
+          loading="lazy"
           className="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" 
         />
         {/* Zoom indicator on hover */}
